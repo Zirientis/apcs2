@@ -1,180 +1,177 @@
 // Comsci.cpp : Defines the entry point for the application.
 //
-
 #include "stdafx.h"
 #include "Comsci.h"
 
 #define MAX_LOADSTRING 100
 
-// Global Variables:
-HINSTANCE hInst;                                // current instance
-WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
-WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
-
-// Forward declarations of functions included in this code module:
-ATOM                MyRegisterClass(HINSTANCE hInstance);
-BOOL                InitInstance(HINSTANCE, int);
-LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+int WINAPI WinMain(
+	HINSTANCE /* hInstance */,
+	HINSTANCE /* hPrevInstance */,
+	LPSTR /* lpCmdLine */,
+	int /* nCmdShow */
+	)
 {
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
+	HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 
-    // TODO: Place code here.
+	if (SUCCEEDED(CoInitialize(NULL)))
+	{
+		{
+			Comsci app;
 
-    // Initialize global strings
-    LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_COMSCI, szWindowClass, MAX_LOADSTRING);
-    MyRegisterClass(hInstance);
+			if (SUCCEEDED(app.Initialize()))
+			{
+				app.RunMessageLoop();
+			}
+		}
+		CoUninitialize();
+	}
 
-    // Perform application initialization:
-    if (!InitInstance (hInstance, nCmdShow))
-    {
-        return FALSE;
-    }
-
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_COMSCI));
-
-    MSG msg;
-
-    // Main message loop:
-    while (GetMessage(&msg, nullptr, 0, 0))
-    {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-    }
-
-    return (int) msg.wParam;
+	return 0;
 }
 
 
-
-//
-//  FUNCTION: MyRegisterClass()
-//
-//  PURPOSE: Registers the window class.
-//
-ATOM MyRegisterClass(HINSTANCE hInstance)
+HRESULT Comsci::OnRender()
 {
-    WNDCLASSEXW wcex;
+	HRESULT hr = S_OK;
+	hr = CreateDeviceResources();
 
-    wcex.cbSize = sizeof(WNDCLASSEX);
+	if (SUCCEEDED(hr))
+	{
+		m_pRenderTarget->BeginDraw();
+		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_COMSCI));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_COMSCI);
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+		D2D1_SIZE_F rtSize = m_pRenderTarget->GetSize();
 
-    return RegisterClassExW(&wcex);
+		int width = static_cast<int>(rtSize.width);
+		int height = static_cast<int>(rtSize.height);
+
+		for (int x = 0; x < width; x += 10)
+		{
+			m_pRenderTarget->DrawLine(
+				D2D1::Point2F(static_cast<FLOAT>(x), 0.0f),
+				D2D1::Point2F(static_cast<FLOAT>(x), rtSize.height),
+				m_pLightSlateGrayBrush,
+				0.5f
+				);
+		}
+
+		for (int y = 0; y < height; y += 10)
+		{
+			m_pRenderTarget->DrawLine(
+				D2D1::Point2F(0.0f, static_cast<FLOAT>(y)),
+				D2D1::Point2F(rtSize.width, static_cast<FLOAT>(y)),
+				m_pLightSlateGrayBrush,
+				0.5f
+				);
+		}
+
+		D2D1_RECT_F rectangle1 = D2D1::RectF(
+			rtSize.width / 2 - 50.0f,
+			rtSize.height / 2 - 50.0f,
+			rtSize.width / 2 + 50.0f,
+			rtSize.height / 2 + 50.0f
+			);
+
+		D2D1_RECT_F rectangle2 = D2D1::RectF(
+			rtSize.width / 2 - 100.0f,
+			rtSize.height / 2 - 100.0f,
+			rtSize.width / 2 + 100.0f,
+			rtSize.height / 2 + 100.0f
+			);
+
+		m_pRenderTarget->FillRectangle(&rectangle1, m_pLightSlateGrayBrush);
+
+		m_pRenderTarget->DrawRectangle(&rectangle2, m_pCornflowerBlueBrush);
+
+		hr = m_pRenderTarget->EndDraw();
+
+	}
+
+	if (hr == D2DERR_RECREATE_TARGET)
+	{
+		hr = S_OK;
+		DiscardDeviceResources();
+	}
+
+	return hr;
 }
 
-//
-//   FUNCTION: InitInstance(HINSTANCE, int)
-//
-//   PURPOSE: Saves instance handle and creates main window
-//
-//   COMMENTS:
-//
-//        In this function, we save the instance handle in a global variable and
-//        create and display the main program window.
-//
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
+LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-   hInst = hInstance; // Store instance handle in our global variable
+	LRESULT result = 0;
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+	if (message == WM_CREATE)
+	{
+		LPCREATESTRUCT pcs = (LPCREATESTRUCT)lParam;
+		Comsci *pComsci = (Comsci *)pcs->lpCreateParams;
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+		::SetWindowLongPtrW(
+			hwnd,
+			GWLP_USERDATA,
+			PtrToUlong(pComsci)
+			);
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+		result = 1;
+	}
+	else
+	{
+		Comsci *pComsci = reinterpret_cast<Comsci *>(static_cast<LONG_PTR>(
+			::GetWindowLongPtrW(
+				hwnd,
+				GWLP_USERDATA
+				)));
 
-   return TRUE;
+		bool wasHandled = false;
+
+		if (pComsci)
+		{
+			switch (message)
+			{
+			case WM_SIZE:
+			{
+				UINT width = LOWORD(lParam);
+				UINT height = HIWORD(lParam);
+				pComsci->OnResize(width, height);
+			}
+			result = 0;
+			wasHandled = true;
+			break;
+
+			case WM_DISPLAYCHANGE:
+			{
+				InvalidateRect(hwnd, NULL, FALSE);
+			}
+			result = 0;
+			wasHandled = true;
+			break;
+
+			case WM_PAINT:
+			{
+				pComsci->OnRender();
+				ValidateRect(hwnd, NULL);
+			}
+			result = 0;
+			wasHandled = true;
+			break;
+
+			case WM_DESTROY:
+			{
+				PostQuitMessage(0);
+			}
+			result = 1;
+			wasHandled = true;
+			break;
+			}
+		}
+
+		if (!wasHandled)
+		{
+			result = DefWindowProc(hwnd, message, wParam, lParam);
+		}
+	}
+
+	return result;
 }
 
-//
-//  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  PURPOSE:  Processes messages for the main window.
-//
-//  WM_COMMAND  - process the application menu
-//  WM_PAINT    - Paint the main window
-//  WM_DESTROY  - post a quit message and return
-//
-//
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch (message)
-    {
-    case WM_COMMAND:
-        {
-            int wmId = LOWORD(wParam);
-            // Parse the menu selections:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
-        }
-        break;
-    case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: Add any drawing code that uses hdc here...
-            EndPaint(hWnd, &ps);
-        }
-        break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
-    }
-    return 0;
-}
-
-// Message handler for about box.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
-    case WM_INITDIALOG:
-        return (INT_PTR)TRUE;
-
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        }
-        break;
-    }
-    return (INT_PTR)FALSE;
-}

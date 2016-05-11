@@ -15,6 +15,7 @@
 #include <d2d1helper.h>
 #include <dwrite.h>
 #include <wincodec.h>
+#include "lodepng.h"
 
 template <class Interface>
 inline void SafeRelease(
@@ -78,6 +79,8 @@ private:
 	ID2D1HwndRenderTarget* m_pRenderTarget;
 	ID2D1SolidColorBrush* m_pLightSlateGrayBrush;
 	ID2D1SolidColorBrush* m_pCornflowerBlueBrush;
+	unsigned char* m_pRawImageData;
+	ID2D1Bitmap* m_pSpriteSheet;
 };
 
 Comsci::Comsci() :
@@ -85,7 +88,8 @@ Comsci::Comsci() :
 	m_pDirect2dFactory(NULL),
 	m_pRenderTarget(NULL),
 	m_pLightSlateGrayBrush(NULL),
-	m_pCornflowerBlueBrush(NULL)
+	m_pCornflowerBlueBrush(NULL),
+	m_pSpriteSheet(NULL)
 {
 }
 
@@ -95,6 +99,7 @@ Comsci::~Comsci()
 	SafeRelease(&m_pRenderTarget);
 	SafeRelease(&m_pLightSlateGrayBrush);
 	SafeRelease(&m_pCornflowerBlueBrush);
+	SafeRelease(&m_pSpriteSheet);
 }
 
 void Comsci::RunMessageLoop()
@@ -157,36 +162,12 @@ HRESULT Comsci::Initialize()
 	return hr;
 }
 
-int WINAPI WinMain(
-	HINSTANCE /* hInstance */,
-	HINSTANCE /* hPrevInstance */,
-	LPSTR /* lpCmdLine */,
-	int /* nCmdShow */
-	)
-{
-	HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
-
-	if (SUCCEEDED(CoInitialize(NULL)))
-	{
-		{
-			Comsci app;
-
-			if (SUCCEEDED(app.Initialize()))
-			{
-				app.RunMessageLoop();
-			}
-		}
-		CoUninitialize();
-	}
-
-	return 0;
-}
-
 HRESULT Comsci::CreateDeviceIndependentResources()
 {
 	HRESULT hr = S_OK;
 
 	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pDirect2dFactory);
+	lodepng_decode32_file(&m_pRawImageData, NULL, NULL, "C:\\Users\\Reyn\\Documents\\Visual Studio 2015\\Projects\\Comsci\\Comsci\\textures\\BasicLogo.png");
 
 	return hr;
 }
@@ -234,150 +215,6 @@ void Comsci::DiscardDeviceResources()
 	SafeRelease(&m_pRenderTarget);
 	SafeRelease(&m_pLightSlateGrayBrush);
 	SafeRelease(&m_pCornflowerBlueBrush);
-}
-
-LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	LRESULT result = 0;
-
-	if (message == WM_CREATE)
-	{
-		LPCREATESTRUCT pcs = (LPCREATESTRUCT)lParam;
-		Comsci *pComsci = (Comsci *)pcs->lpCreateParams;
-
-		::SetWindowLongPtrW(
-			hwnd,
-			GWLP_USERDATA,
-			PtrToUlong(pComsci)
-			);
-
-		result = 1;
-	}
-	else
-	{
-		Comsci *pComsci = reinterpret_cast<Comsci *>(static_cast<LONG_PTR>(
-			::GetWindowLongPtrW(
-				hwnd,
-				GWLP_USERDATA
-				)));
-
-		bool wasHandled = false;
-
-		if (pComsci)
-		{
-			switch (message)
-			{
-			case WM_SIZE:
-			{
-				UINT width = LOWORD(lParam);
-				UINT height = HIWORD(lParam);
-				pComsci->OnResize(width, height);
-			}
-			result = 0;
-			wasHandled = true;
-			break;
-
-			case WM_DISPLAYCHANGE:
-			{
-				InvalidateRect(hwnd, NULL, FALSE);
-			}
-			result = 0;
-			wasHandled = true;
-			break;
-
-			case WM_PAINT:
-			{
-				pComsci->OnRender();
-				ValidateRect(hwnd, NULL);
-			}
-			result = 0;
-			wasHandled = true;
-			break;
-
-			case WM_DESTROY:
-			{
-				PostQuitMessage(0);
-			}
-			result = 1;
-			wasHandled = true;
-			break;
-			}
-		}
-
-		if (!wasHandled)
-		{
-			result = DefWindowProc(hwnd, message, wParam, lParam);
-		}
-	}
-
-	return result;
-}
-
-HRESULT Comsci::OnRender()
-{
-	HRESULT hr = S_OK;
-	hr = CreateDeviceResources();
-
-	if (SUCCEEDED(hr))
-	{
-		m_pRenderTarget->BeginDraw();
-		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
-
-		D2D1_SIZE_F rtSize = m_pRenderTarget->GetSize();
-
-		int width = static_cast<int>(rtSize.width);
-		int height = static_cast<int>(rtSize.height);
-
-		for (int x = 0; x < width; x += 10)
-		{
-			m_pRenderTarget->DrawLine(
-				D2D1::Point2F(static_cast<FLOAT>(x), 0.0f),
-				D2D1::Point2F(static_cast<FLOAT>(x), rtSize.height),
-				m_pLightSlateGrayBrush,
-				0.5f
-				);
-		}
-
-		for (int y = 0; y < height; y += 10)
-		{
-			m_pRenderTarget->DrawLine(
-				D2D1::Point2F(0.0f, static_cast<FLOAT>(y)),
-				D2D1::Point2F(rtSize.width, static_cast<FLOAT>(y)),
-				m_pLightSlateGrayBrush,
-				0.5f
-				);
-		}
-
-		D2D1_RECT_F rectangle1 = D2D1::RectF(
-			rtSize.width / 2 - 50.0f,
-			rtSize.height / 2 - 50.0f,
-			rtSize.width / 2 + 50.0f,
-			rtSize.height / 2 + 50.0f
-			);
-
-		D2D1_RECT_F rectangle2 = D2D1::RectF(
-			rtSize.width / 2 - 100.0f,
-			rtSize.height / 2 - 100.0f,
-			rtSize.width / 2 + 100.0f,
-			rtSize.height / 2 + 100.0f
-			);
-
-		m_pRenderTarget->FillRectangle(&rectangle1, m_pLightSlateGrayBrush);
-
-		m_pRenderTarget->DrawRectangle(&rectangle2, m_pCornflowerBlueBrush);
-
-		hr = m_pRenderTarget->EndDraw();
-
-	}
-
-	if (hr == D2DERR_RECREATE_TARGET)
-	{
-		hr = S_OK;
-		DiscardDeviceResources();
-	}
-
-	return hr;
 }
 
 void Comsci::OnResize(UINT width, UINT height)
