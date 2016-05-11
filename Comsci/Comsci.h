@@ -165,9 +165,10 @@ HRESULT Comsci::Initialize()
 HRESULT Comsci::CreateDeviceIndependentResources()
 {
 	HRESULT hr = S_OK;
+	unsigned int width, height;
 
 	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pDirect2dFactory);
-	lodepng_decode32_file(&m_pRawImageData, NULL, NULL, "C:\\Users\\Reyn\\Documents\\Visual Studio 2015\\Projects\\Comsci\\Comsci\\textures\\BasicLogo.png");
+	lodepng_decode32_file(&m_pRawImageData, &width, &height, "C:\\Users\\Reyn\\Documents\\Visual Studio 2015\\Projects\\Comsci\\Comsci\\textures\\BasicLogo.png");
 
 	return hr;
 }
