@@ -43,7 +43,7 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
 #endif
 
-
+inline unsigned int Color32Reverse(unsigned int x);
 class Comsci
 {
 public:
@@ -81,6 +81,7 @@ private:
 	ID2D1SolidColorBrush* m_pCornflowerBlueBrush;
 	unsigned char* m_pRawImageData;
 	ID2D1Bitmap* m_pSpriteSheet;
+	unsigned int m_spriteSheetWidth, m_spriteSheetHeight;
 };
 
 Comsci::Comsci() :
@@ -165,10 +166,13 @@ HRESULT Comsci::Initialize()
 HRESULT Comsci::CreateDeviceIndependentResources()
 {
 	HRESULT hr = S_OK;
-	unsigned int width, height;
-
 	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pDirect2dFactory);
-	lodepng_decode32_file(&m_pRawImageData, &width, &height, "C:\\Users\\Reyn\\Documents\\Visual Studio 2015\\Projects\\Comsci\\Comsci\\textures\\BasicLogo.png");
+	lodepng_decode32_file(&m_pRawImageData, &m_spriteSheetWidth, &m_spriteSheetHeight, "C:\\Users\\Reyn\\Documents\\Visual Studio 2015\\Projects\\Comsci\\Comsci\\textures\\ColorTest.png");
+	unsigned int* bufferPtr = reinterpret_cast<unsigned int*>(m_pRawImageData);
+	for (unsigned int* i = bufferPtr; i < (4 * m_spriteSheetWidth * m_spriteSheetHeight) + bufferPtr; i++)
+	{
+		*i = Color32Reverse(*i);
+	}
 
 	return hr;
 }
@@ -206,6 +210,13 @@ HRESULT Comsci::CreateDeviceResources()
 				&m_pCornflowerBlueBrush
 				);
 		}
+		if (SUCCEEDED(hr))
+		{
+			D2D1_SIZE_U spriteSheetSize = D2D1::SizeU(m_spriteSheetWidth, m_spriteSheetHeight);
+			D2D1_PIXEL_FORMAT pFormat = D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE);
+			D2D1_BITMAP_PROPERTIES bitmapProps = D2D1::BitmapProperties(pFormat);
+			hr = m_pRenderTarget->CreateBitmap(spriteSheetSize, m_pRawImageData, m_spriteSheetWidth * 4, bitmapProps, &m_pSpriteSheet);
+		}
 	}
 
 	return hr;
@@ -225,3 +236,18 @@ void Comsci::OnResize(UINT width, UINT height)
 		m_pRenderTarget->Resize(D2D1::SizeU(width, height));
 	}
 }
+
+/*
+* Thanks to Enrique Nieloud from StackOverflow
+* for providing this snippet, which we then modified
+* for our own needs.
+*/
+inline unsigned int Color32Reverse(unsigned int x)
+{
+	return
+		((x & 0xFF000000) >> 16) |
+		((x & 0x00FF0000) >> 0) |
+		((x & 0x0000FF00) << 16) |
+		((x & 0x000000FF) << 0);
+}
+
