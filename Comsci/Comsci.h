@@ -17,6 +17,7 @@
 #include <wincodec.h>
 #include "lodepng.h"
 #include "texpath.h"
+#define SPRITE_DIM 50
 
 template <class Interface>
 inline void SafeRelease(
@@ -44,7 +45,6 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
 #endif
 
-inline unsigned int Color32Reverse(unsigned int x);
 class Comsci
 {
 public:
@@ -75,6 +75,7 @@ private:
 		WPARAM wParam,
 		LPARAM lParam
 		);
+	void RenderSprite(UINT left, UINT top, UINT spriteId);
 	HWND m_hwnd;
 	ID2D1Factory* m_pDirect2dFactory;
 	ID2D1HwndRenderTarget* m_pRenderTarget;
@@ -142,7 +143,7 @@ HRESULT Comsci::Initialize()
 
 		m_hwnd = CreateWindow(
 			L"D2DComsci",
-			L"Direct2D Demo App",
+			L"Comsci",
 			WS_OVERLAPPED,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
@@ -168,7 +169,7 @@ HRESULT Comsci::CreateDeviceIndependentResources()
 {
 	HRESULT hr = S_OK;
 	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pDirect2dFactory);
-	lodepng_decode32_file(&m_pRawImageData, &m_spriteSheetWidth, &m_spriteSheetHeight, TEXTURES_DIR "ColorTest.png");
+	lodepng_decode32_file(&m_pRawImageData, &m_spriteSheetWidth, &m_spriteSheetHeight, TEXTURES_DIR "0001.png");
 	for (unsigned int i = 0; i < (4 * m_spriteSheetWidth * m_spriteSheetHeight); i += 4)
 	{
         /*
@@ -178,6 +179,10 @@ HRESULT Comsci::CreateDeviceIndependentResources()
         unsigned char tmp = m_pRawImageData[i];
         m_pRawImageData[i] = m_pRawImageData[i + 2];
         m_pRawImageData[i + 2] = tmp;
+
+		m_pRawImageData[i + 0] = (char)((double)m_pRawImageData[i + 3] * m_pRawImageData[i + 0] / 255);
+		m_pRawImageData[i + 1] = (char)((double)m_pRawImageData[i + 3] * m_pRawImageData[i + 1] / 255);
+		m_pRawImageData[i + 2] = (char)((double)m_pRawImageData[i + 3] * m_pRawImageData[i + 2] / 255);
 	}
 
 	return hr;
@@ -219,7 +224,7 @@ HRESULT Comsci::CreateDeviceResources()
 		if (SUCCEEDED(hr))
 		{
 			D2D1_SIZE_U spriteSheetSize = D2D1::SizeU(m_spriteSheetWidth, m_spriteSheetHeight);
-			D2D1_PIXEL_FORMAT pFormat = D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE);
+			D2D1_PIXEL_FORMAT pFormat = D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED);
 			D2D1_BITMAP_PROPERTIES bitmapProps = D2D1::BitmapProperties(pFormat);
 			hr = m_pRenderTarget->CreateBitmap(spriteSheetSize, m_pRawImageData, m_spriteSheetWidth * 4, bitmapProps, &m_pSpriteSheet);
 		}
@@ -242,18 +247,3 @@ void Comsci::OnResize(UINT width, UINT height)
 		m_pRenderTarget->Resize(D2D1::SizeU(width, height));
 	}
 }
-
-/*
-* Thanks to Enrique Nieloud from StackOverflow
-* for providing this snippet, which we then modified
-* for our own needs.
-*/
-inline unsigned int Color32Reverse(unsigned int x)
-{
-	return
-		((x & 0xFF000000) >> 16) |
-		((x & 0x00FF0000) >> 0) |
-		((x & 0x0000FF00) << 16) |
-		((x & 0x000000FF) << 0);
-}
-

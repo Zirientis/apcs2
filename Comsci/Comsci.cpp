@@ -30,6 +30,13 @@ int WINAPI WinMain(
 	return 0;
 }
 
+void Comsci::RenderSprite(UINT left, UINT top, UINT spriteId)
+{
+	D2D1_RECT_F sprite = D2D1::RectF(left, top, left + SPRITE_DIM, top + SPRITE_DIM);
+	D2D1_RECT_F source = D2D1::RectF(spriteId * SPRITE_DIM, 0, SPRITE_DIM * (spriteId + 1), SPRITE_DIM);
+	m_pRenderTarget->DrawBitmap(m_pSpriteSheet, sprite, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, source);
+}
+
 
 HRESULT Comsci::OnRender()
 {
@@ -40,7 +47,7 @@ HRESULT Comsci::OnRender()
 	{
 		m_pRenderTarget->BeginDraw();
 		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::BlanchedAlmond));
 
 		D2D1_SIZE_F rtSize = m_pRenderTarget->GetSize();
 
@@ -86,8 +93,8 @@ HRESULT Comsci::OnRender()
 		//m_pRenderTarget->FillRectangle(&rectangle1, m_pLightSlateGrayBrush);
 
 		//m_pRenderTarget->DrawRectangle(&rectangle2, m_pCornflowerBlueBrush);
-        D2D1_RECT_F testRect = D2D1::RectF(0, 0, 1000, 1000);
-        m_pRenderTarget->DrawBitmap(m_pSpriteSheet, screen, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
+        
+		RenderSprite(0, 0, 0);
 
 		hr = m_pRenderTarget->EndDraw();
 
@@ -178,4 +185,5 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 
 	return result;
 }
+
 
