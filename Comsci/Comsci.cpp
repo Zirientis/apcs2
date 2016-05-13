@@ -68,7 +68,7 @@ HRESULT Comsci::OnRender()
 		}
 		*/
 		D2D1_RECT_F screen = D2D1::RectF(0, 0, rtSize.width, rtSize.height);
-
+        /*
 		D2D1_RECT_F rectangle1 = D2D1::RectF(
 			rtSize.width / 2 - 50.0f,
 			rtSize.height / 2 - 50.0f,
@@ -82,12 +82,12 @@ HRESULT Comsci::OnRender()
 			rtSize.width / 2 + 100.0f,
 			rtSize.height / 2 + 100.0f
 			);
-
+        */
 		//m_pRenderTarget->FillRectangle(&rectangle1, m_pLightSlateGrayBrush);
 
 		//m_pRenderTarget->DrawRectangle(&rectangle2, m_pCornflowerBlueBrush);
-
-		m_pRenderTarget->DrawBitmap(m_pSpriteSheet, screen);
+        D2D1_RECT_F testRect = D2D1::RectF(0, 0, 1000, 1000);
+        m_pRenderTarget->DrawBitmap(m_pSpriteSheet, screen, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR);
 
 		hr = m_pRenderTarget->EndDraw();
 

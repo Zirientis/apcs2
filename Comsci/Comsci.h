@@ -16,6 +16,7 @@
 #include <dwrite.h>
 #include <wincodec.h>
 #include "lodepng.h"
+#include "texpath.h"
 
 template <class Interface>
 inline void SafeRelease(
@@ -167,11 +168,16 @@ HRESULT Comsci::CreateDeviceIndependentResources()
 {
 	HRESULT hr = S_OK;
 	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pDirect2dFactory);
-	lodepng_decode32_file(&m_pRawImageData, &m_spriteSheetWidth, &m_spriteSheetHeight, "C:\\Users\\Reyn\\Documents\\Visual Studio 2015\\Projects\\Comsci\\Comsci\\textures\\ColorTest.png");
-	unsigned int* bufferPtr = reinterpret_cast<unsigned int*>(m_pRawImageData);
-	for (unsigned int* i = bufferPtr; i < (4 * m_spriteSheetWidth * m_spriteSheetHeight) + bufferPtr; i++)
+	lodepng_decode32_file(&m_pRawImageData, &m_spriteSheetWidth, &m_spriteSheetHeight, TEXTURES_DIR "ColorTest.png");
+	for (unsigned int i = 0; i < (4 * m_spriteSheetWidth * m_spriteSheetHeight); i += 4)
 	{
-		*i = Color32Reverse(*i);
+        /*
+        From: RGBA
+        To:   BGRA
+        */
+        unsigned char tmp = m_pRawImageData[i];
+        m_pRawImageData[i] = m_pRawImageData[i + 2];
+        m_pRawImageData[i + 2] = tmp;
 	}
 
 	return hr;
