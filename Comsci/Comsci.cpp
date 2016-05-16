@@ -94,7 +94,10 @@ HRESULT Comsci::OnRender()
 
 		//m_pRenderTarget->DrawRectangle(&rectangle2, m_pCornflowerBlueBrush);
         
+        /*
 		RenderSprite(0, 0, 0);
+        RenderSprite(50, 50, 1);
+        */
 
 		hr = m_pRenderTarget->EndDraw();
 

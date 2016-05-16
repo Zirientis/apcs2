@@ -17,6 +17,9 @@
 #include <wincodec.h>
 #include "lodepng.h"
 #include "texpath.h"
+#include "Game.h"
+#include "GameObject.h"
+#include "ObjectCode.h"
 #define SPRITE_DIM 50
 
 template <class Interface>
@@ -84,15 +87,19 @@ private:
 	unsigned char* m_pRawImageData;
 	ID2D1Bitmap* m_pSpriteSheet;
 	unsigned int m_spriteSheetWidth, m_spriteSheetHeight;
+
+
+    Game game;
 };
 
 Comsci::Comsci() :
-	m_hwnd(NULL),
-	m_pDirect2dFactory(NULL),
-	m_pRenderTarget(NULL),
-	m_pLightSlateGrayBrush(NULL),
-	m_pCornflowerBlueBrush(NULL),
-	m_pSpriteSheet(NULL)
+    m_hwnd(NULL),
+    m_pDirect2dFactory(NULL),
+    m_pRenderTarget(NULL),
+    m_pLightSlateGrayBrush(NULL),
+    m_pCornflowerBlueBrush(NULL),
+    m_pSpriteSheet(NULL),
+    game(1)
 {
 }
 
@@ -169,7 +176,7 @@ HRESULT Comsci::CreateDeviceIndependentResources()
 {
 	HRESULT hr = S_OK;
 	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pDirect2dFactory);
-	lodepng_decode32_file(&m_pRawImageData, &m_spriteSheetWidth, &m_spriteSheetHeight, TEXTURES_DIR "0001.png");
+	lodepng_decode32_file(&m_pRawImageData, &m_spriteSheetWidth, &m_spriteSheetHeight, TEXTURES_DIR "spritesheet.png");
 	for (unsigned int i = 0; i < (4 * m_spriteSheetWidth * m_spriteSheetHeight); i += 4)
 	{
         /*

@@ -1,4 +1,5 @@
-﻿  Comsci.cpp
-c:\users\reyn\documents\visual studio 2015\projects\comsci\comsci\comsci.cpp(35): warning C4244: 'argument': conversion from 'UINT' to 'FLOAT', possible loss of data
-c:\users\reyn\documents\visual studio 2015\projects\comsci\comsci\comsci.cpp(36): warning C4244: 'argument': conversion from 'UINT' to 'FLOAT', possible loss of data
-  Comsci.vcxproj -> C:\Users\Reyn\Documents\Visual Studio 2015\Projects\Comsci\Debug\Comsci.exe
+﻿  Game.cpp
+h:\apcs2\comsci\game.cpp(5): error C2512: 'GameObject::GameObject': no appropriate default constructor available
+h:\apcs2\comsci\game.cpp(25): error C2248: 'Level::difficulty': cannot access private member declared in class 'Level'
+  h:\apcs2\comsci\level.h(9): note: see declaration of 'Level::difficulty'
+  h:\apcs2\comsci\level.h(4): note: see declaration of 'Level'

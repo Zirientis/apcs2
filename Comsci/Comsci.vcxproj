@@ -149,13 +149,19 @@
     <ClInclude Include="..\..\..\..\..\Desktop\Cygwin\home\Reyn\FinalProject\ObjectCode.h" />
     <ClInclude Include="..\..\..\..\..\Desktop\Cygwin\home\Reyn\FinalProject\position.h" />
     <ClInclude Include="Comsci.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="lodepng.h" />
+    <ClInclude Include="ObjectCode.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="texpath.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Comsci.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
