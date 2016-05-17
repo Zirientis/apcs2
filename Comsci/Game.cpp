@@ -27,9 +27,10 @@ void Game::start()
     {
         for (int p = 0; p < m_numPlayers; p++)
         {
-            std::cout << "Player" << p << std::endl;
-            std::cout << "Take an action: " << std::endl;
+            //std::cout << "Player" << p << std::endl;
+            //std::cout << "Take an action: " << std::endl;
         }
+        // AI logic runs here
     }
 }
 
