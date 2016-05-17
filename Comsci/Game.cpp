@@ -1,15 +1,20 @@
 #include "Game.h"
 #include "GameObject.h"
+#include "ObjectCode.h"
 Game::Game(int numPlayers)
 {
-    m_pPlayers = FIXME
     m_pCurrentLevel = nullptr;
+    m_numPlayers = numPlayers;
+    m_pPlayers = new GameObject[numPlayers];
 }
 
 Game::~Game()
 {
     delete m_pCurrentLevel;
     m_pCurrentLevel = nullptr;
+
+    delete[] m_pPlayers;
+    m_pPlayers = nullptr;
 }
 
 void Game::start()

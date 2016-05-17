@@ -2,5 +2,6 @@
 
 enum ObjectCode {
     WALL,
+    PLAYER,
     FOO
 };

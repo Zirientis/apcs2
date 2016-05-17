@@ -5,6 +5,7 @@ class GameObject
 private:
     ObjectCode code;
 public:
+    GameObject();
     GameObject(ObjectCode);
     ObjectCode getCode();
 
@@ -12,28 +13,3 @@ public:
     bool onWalk();
     bool onAfterWalk();
 };
-
-GameObject::GameObject(ObjectCode c)
-{
-    code = c;
-}
-
-ObjectCode GameObject::getCode()
-{
-    return code;
-}
-
-bool GameObject::onBeforeWalk()
-{
-    return true;
-}
-
-bool GameObject::onWalk()
-{
-    return true;
-}
-
-bool GameObject::onAfterWalk()
-{
-    return true;
-}

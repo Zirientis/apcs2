@@ -2,6 +2,7 @@
 #include "GameObject.h"
 class Level
 {
+    friend class Game;
 private:
     GameObject* m_pFixtures;
     GameObject* m_pEntities;
@@ -11,4 +12,3 @@ public:
     Level(int);
     ~Level();
 };
-

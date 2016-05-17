@@ -6,6 +6,7 @@ class Game
 private:
     Level* m_pCurrentLevel;
     GameObject* m_pPlayers;
+    int m_numPlayers;
 
     void advanceLevel();
 public:
