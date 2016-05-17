@@ -183,8 +183,10 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 			break;
             case WM_RBUTTONDOWN:
             {
-                DebugBreak();
             }
+            result = 0;
+            wasHandled = true;
+            break;
 			}
 		}
 

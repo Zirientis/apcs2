@@ -1,5 +1,6 @@
 #pragma once
 #include "Level.h"
+#include <Windows.h>
 
 class Game
 {
@@ -14,3 +15,5 @@ public:
     ~Game();
     void start();
 };
+
+DWORD WINAPI GameThreadEntryProc(void*);

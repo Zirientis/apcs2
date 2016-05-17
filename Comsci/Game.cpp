@@ -2,6 +2,8 @@
 #include "GameObject.h"
 #include "ObjectCode.h"
 
+#include <Windows.h>
+
 #include <iostream>
 
 Game::Game(int numPlayers)
@@ -27,8 +29,7 @@ void Game::start()
     {
         for (int p = 0; p < m_numPlayers; p++)
         {
-            //std::cout << "Player" << p << std::endl;
-            //std::cout << "Take an action: " << std::endl;
+            // Wait for input
         }
         // AI logic runs here
     }
@@ -43,4 +44,12 @@ void Game::advanceLevel()
         delete m_pCurrentLevel;
     }
     m_pCurrentLevel = new Level(oldDiff + 1);
+}
+
+
+DWORD WINAPI GameThreadEntryProc(void* pGameVoid)
+{
+    Game* game = reinterpret_cast<Game*>(pGameVoid);
+    game->start();
+    return 0;
 }

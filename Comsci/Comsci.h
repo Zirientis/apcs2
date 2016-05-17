@@ -88,7 +88,6 @@ private:
 	ID2D1Bitmap* m_pSpriteSheet;
 	unsigned int m_spriteSheetWidth, m_spriteSheetHeight;
 
-
     Game* game;
 };
 
@@ -101,7 +100,7 @@ Comsci::Comsci() :
     m_pSpriteSheet(NULL)
 {
     game = new Game(1);
-    game->start();
+    CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
 }
 
 Comsci::~Comsci()
@@ -111,6 +110,8 @@ Comsci::~Comsci()
 	SafeRelease(&m_pLightSlateGrayBrush);
 	SafeRelease(&m_pCornflowerBlueBrush);
 	SafeRelease(&m_pSpriteSheet);
+    delete game;
+    game = nullptr;
 }
 
 void Comsci::RunMessageLoop()
@@ -130,7 +131,7 @@ HRESULT Comsci::Initialize()
 
 	hr = CreateDeviceIndependentResources();
 
-	if (SUCCEEDED(hr))
+	if (SUCCEEDED(hr)) 
 	{
 		//Register the window class
 		WNDCLASSEX wcex = { sizeof(WNDCLASSEX) };
@@ -140,7 +141,7 @@ HRESULT Comsci::Initialize()
 		wcex.cbWndExtra = sizeof(LONG_PTR);
 		wcex.hInstance = HINST_THISCOMPONENT;
 		wcex.hbrBackground = NULL;
-		wcex.lpszMenuName = NULL;
+		wcex.lpszMenuName = MAKEINTRESOURCE(IDC_COMSCI);
 		wcex.hCursor = LoadCursor(NULL, IDI_APPLICATION);
 		wcex.lpszClassName = L"D2DComsci";
 
