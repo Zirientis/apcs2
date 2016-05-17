@@ -89,7 +89,7 @@ private:
 	unsigned int m_spriteSheetWidth, m_spriteSheetHeight;
 
 
-    Game game;
+    Game* game;
 };
 
 Comsci::Comsci() :
@@ -98,9 +98,10 @@ Comsci::Comsci() :
     m_pRenderTarget(NULL),
     m_pLightSlateGrayBrush(NULL),
     m_pCornflowerBlueBrush(NULL),
-    m_pSpriteSheet(NULL),
-    game(1)
+    m_pSpriteSheet(NULL)
 {
+    game = new Game(1);
+    game->start();
 }
 
 Comsci::~Comsci()

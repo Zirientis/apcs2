@@ -1,4 +1,4 @@
 ﻿  Comsci.cpp
-c:\users\michael\apcs2\comsci\comsci.cpp(41): warning C4244: 'argument': conversion from 'UINT' to 'FLOAT', possible loss of data
-c:\users\michael\apcs2\comsci\comsci.cpp(42): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-  Comsci.vcxproj -> C:\Users\Michael\apcs2\Debug\Comsci.exe
+h:\apcs2\comsci\comsci.cpp(41): warning C4244: 'argument': conversion from 'UINT' to 'FLOAT', possible loss of data
+h:\apcs2\comsci\comsci.cpp(42): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
+  Comsci.vcxproj -> H:\apcs2\Debug\Comsci.exe
