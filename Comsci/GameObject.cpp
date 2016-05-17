@@ -1,4 +1,5 @@
 #include "GameObject.h"
+
 GameObject::GameObject()
 {
     code = ObjectCode::PLAYER;
@@ -16,7 +17,7 @@ ObjectCode GameObject::getCode()
 
 bool GameObject::onBeforeWalk()
 {
-    return true;
+    return code != ObjectCode::WALL;
 }
 
 bool GameObject::onWalk()

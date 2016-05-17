@@ -1,5 +1,4 @@
-﻿  Game.cpp
-h:\apcs2\comsci\game.cpp(5): error C2512: 'GameObject::GameObject': no appropriate default constructor available
-h:\apcs2\comsci\game.cpp(25): error C2248: 'Level::difficulty': cannot access private member declared in class 'Level'
-  h:\apcs2\comsci\level.h(9): note: see declaration of 'Level::difficulty'
-  h:\apcs2\comsci\level.h(4): note: see declaration of 'Level'
+﻿  Comsci.cpp
+c:\users\michael\apcs2\comsci\comsci.cpp(41): warning C4244: 'argument': conversion from 'UINT' to 'FLOAT', possible loss of data
+c:\users\michael\apcs2\comsci\comsci.cpp(42): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
+  Comsci.vcxproj -> C:\Users\Michael\apcs2\Debug\Comsci.exe

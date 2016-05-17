@@ -3,6 +3,10 @@
 #include "stdafx.h"
 #include "Comsci.h"
 
+#include "ObjectCode.h"
+#include "Game.h"
+
+
 #define MAX_LOADSTRING 100
 
 int WINAPI WinMain(
@@ -11,6 +15,7 @@ int WINAPI WinMain(
 	LPSTR /* lpCmdLine */,
 	int /* nCmdShow */
 	)
+
 {
 	HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 
@@ -30,7 +35,8 @@ int WINAPI WinMain(
 	return 0;
 }
 
-void Comsci::RenderSprite(UINT left, UINT top, UINT spriteId)
+
+void Comsci::RenderSprite(UINT left, UINT top, ObjectCode spriteId)
 {
 	D2D1_RECT_F sprite = D2D1::RectF(left, top, left + SPRITE_DIM, top + SPRITE_DIM);
 	D2D1_RECT_F source = D2D1::RectF(spriteId * SPRITE_DIM, 0, SPRITE_DIM * (spriteId + 1), SPRITE_DIM);
@@ -94,10 +100,8 @@ HRESULT Comsci::OnRender()
 
 		//m_pRenderTarget->DrawRectangle(&rectangle2, m_pCornflowerBlueBrush);
         
-        /*
-		RenderSprite(0, 0, 0);
-        RenderSprite(50, 50, 1);
-        */
+		RenderSprite(0, 0, ObjectCode::WALL);
+        RenderSprite(50, 50, ObjectCode::PLAYER);
 
 		hr = m_pRenderTarget->EndDraw();
 
@@ -177,6 +181,10 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 			result = 1;
 			wasHandled = true;
 			break;
+            case WM_RBUTTONDOWN:
+            {
+                DebugBreak();
+            }
 			}
 		}
 

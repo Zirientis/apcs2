@@ -1,6 +1,9 @@
 #include "Game.h"
 #include "GameObject.h"
 #include "ObjectCode.h"
+
+#include <iostream>
+
 Game::Game(int numPlayers)
 {
     m_pCurrentLevel = nullptr;
@@ -20,6 +23,14 @@ Game::~Game()
 void Game::start()
 {
     advanceLevel();
+    for (;;) // forever
+    {
+        for (int p = 0; p < m_numPlayers; p++)
+        {
+            std::cout << "Player" << p << std::endl;
+            std::cout << "Take an action: " << std::endl;
+        }
+    }
 }
 
 void Game::advanceLevel()

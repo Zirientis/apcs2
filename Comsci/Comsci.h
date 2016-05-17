@@ -78,7 +78,7 @@ private:
 		WPARAM wParam,
 		LPARAM lParam
 		);
-	void RenderSprite(UINT left, UINT top, UINT spriteId);
+	void RenderSprite(UINT left, UINT top, ObjectCode spriteId);
 	HWND m_hwnd;
 	ID2D1Factory* m_pDirect2dFactory;
 	ID2D1HwndRenderTarget* m_pRenderTarget;

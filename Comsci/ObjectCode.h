@@ -1,7 +1,7 @@
 #pragma once
 
 enum ObjectCode {
-    WALL,
-    PLAYER,
+    WALL = 0,
+    PLAYER = 1,
     FOO
 };
