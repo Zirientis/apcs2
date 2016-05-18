@@ -17,7 +17,7 @@ ObjectCode GameObject::getCode()
 
 bool GameObject::onBeforeWalk()
 {
-    return code < ObjectCode::MAX_WALL;
+    return code <= ObjectCode::MAX_WALL;
 }
 
 bool GameObject::onWalk()
