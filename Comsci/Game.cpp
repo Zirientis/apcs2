@@ -1,16 +1,18 @@
 #include "Game.h"
 #include "GameObject.h"
 #include "ObjectCode.h"
+#include "Position.h"
 
 #include <Windows.h>
 
-#include <iostream>
+#include <vector>
 
-Game::Game(int numPlayers)
+Game::Game(int numPlayers, Position (*getInputFunc) (void))
 {
     m_pCurrentLevel = nullptr;
     m_numPlayers = numPlayers;
     m_pPlayers = new GameObject[numPlayers];
+    getInput = getInputFunc;
 }
 
 Game::~Game()
@@ -20,6 +22,7 @@ Game::~Game()
 
     delete[] m_pPlayers;
     m_pPlayers = nullptr;
+    getInput = nullptr;
 }
 
 void Game::start()
@@ -30,6 +33,7 @@ void Game::start()
         for (int p = 0; p < m_numPlayers; p++)
         {
             // Wait for input
+            getInput();
         }
         // AI logic runs here
     }
@@ -46,6 +50,15 @@ void Game::advanceLevel()
     m_pCurrentLevel = new Level(oldDiff + 1);
 }
 
+int Game::getActivePlayer()
+{
+    // lock
+}
+
+std::vector<Action> Game::getPotentialPlayerActions()
+{
+
+}
 
 DWORD WINAPI GameThreadEntryProc(void* pGameVoid)
 {
