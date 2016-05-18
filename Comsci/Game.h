@@ -5,22 +5,29 @@
 
 #include <vector>
 
+void DefaultInputFunc(void*, Position*); // Game thread only!
+
 class Game
 {
 private:
     Level* m_pCurrentLevel;
     GameObject* m_pPlayers;
     int m_numPlayers;
+    int m_activePlayer;
+    void (*getInput) (void*, Position*);
+    volatile Position synchronizedPos;
+    HANDLE inputEvent;
 
     void advanceLevel();
-    Position (*getInput) (void);
 public:
-    Game(int, Position (*getInput) (void));
+    Game(int, void (*getInput) (void*, Position*));
     ~Game();
     void start();
 
     int getActivePlayer();
-    std::vector<Action> getPotentialPlayerActions();
+    //std::vector<Action> getPotentialPlayerActions();
+    void DefaultMemberGetInput(Position*); // game thread only!
+    bool MaybeSendPosition(Position); // Returns whether the position was set
 };
 
 DWORD WINAPI GameThreadEntryProc(void*);

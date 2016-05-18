@@ -186,8 +186,8 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             {
                 UINT xCoord = GET_X_LPARAM(lParam);
                 UINT yCoord = GET_Y_LPARAM(lParam);
-                Position pos = { xCoord / 50, yCoord / 50 };
-                MaybeSendPosition(pos);
+                Position pos = { xCoord / SPRITE_DIM, yCoord / SPRITE_DIM };
+                pComsci->game->MaybeSendPosition(pos);
             }
             result = 0;
             wasHandled = true;
@@ -202,14 +202,4 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 	}
 
 	return result;
-}
-
-void MaybeSendPosition(Position pos)
-{
-
-}
-
-Position Comsci::DefaultGetInput() // game thread only!
-{
-    WaitForSingleObject(inputEvent, INFINITE);
 }
