@@ -5,6 +5,7 @@
 
 #include "ObjectCode.h"
 #include "Game.h"
+#include "Position.h"
 
 
 #define MAX_LOADSTRING 100
@@ -181,10 +182,16 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 			result = 1;
 			wasHandled = true;
 			break;
-            case WM_RBUTTONDOWN:
+            case WM_LBUTTONDOWN:
             {
-                DebugBreak();
+                UINT xCoord = GET_X_LPARAM(lParam);
+                UINT yCoord = GET_Y_LPARAM(lParam);
+                Position pos = { xCoord / 50, yCoord / 50 };
+                MaybeSendPosition(pos);
             }
+            result = 0;
+            wasHandled = true;
+            break;
 			}
 		}
 
@@ -197,4 +204,12 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 	return result;
 }
 
+void MaybeSendPosition(Position pos)
+{
 
+}
+
+Position Comsci::DefaultGetInput() // game thread only!
+{
+    WaitForSingleObject(inputEvent, INFINITE);
+}

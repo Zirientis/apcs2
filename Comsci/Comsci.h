@@ -3,6 +3,7 @@
 #include "Resource.h"
 //Windows Header Files:
 #include <windows.h>
+#include <windowsx.h>
 
 //C RunTIme Header FIles:
 #include <stdlib.h>
@@ -20,7 +21,10 @@
 #include "Game.h"
 #include "GameObject.h"
 #include "ObjectCode.h"
-#define SPRITE_DIM 50
+
+#include "DefaultInputImpl.h"
+
+#define SPRITE_DIM 25
 
 template <class Interface>
 inline void SafeRelease(
@@ -79,6 +83,8 @@ private:
 		LPARAM lParam
 		);
 	void RenderSprite(UINT left, UINT top, ObjectCode spriteId);
+
+    Position DefaultGetInput();
 	HWND m_hwnd;
 	ID2D1Factory* m_pDirect2dFactory;
 	ID2D1HwndRenderTarget* m_pRenderTarget;
@@ -88,8 +94,9 @@ private:
 	ID2D1Bitmap* m_pSpriteSheet;
 	unsigned int m_spriteSheetWidth, m_spriteSheetHeight;
 
-
-    Game game;
+    Game* game;
+    volatile Position synchronizedPos;
+    HANDLE inputEvent;
 };
 
 Comsci::Comsci() :
@@ -98,9 +105,13 @@ Comsci::Comsci() :
     m_pRenderTarget(NULL),
     m_pLightSlateGrayBrush(NULL),
     m_pCornflowerBlueBrush(NULL),
-    m_pSpriteSheet(NULL),
-    game(1)
+    m_pSpriteSheet(NULL)
 {
+    game = new Game(1, nullptr);
+    CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
+    synchronizedPos.xTile = 0;
+    synchronizedPos.yTile = 0;
+    inputEvent = CreateEvent(NULL, false, false, NULL);
 }
 
 Comsci::~Comsci()
@@ -110,6 +121,12 @@ Comsci::~Comsci()
 	SafeRelease(&m_pLightSlateGrayBrush);
 	SafeRelease(&m_pCornflowerBlueBrush);
 	SafeRelease(&m_pSpriteSheet);
+    delete game;
+    game = nullptr;
+    synchronizedPos.xTile = 0;
+    synchronizedPos.yTile = 0;
+    CloseHandle(inputEvent);
+    inputEvent = NULL;
 }
 
 void Comsci::RunMessageLoop()
@@ -129,7 +146,7 @@ HRESULT Comsci::Initialize()
 
 	hr = CreateDeviceIndependentResources();
 
-	if (SUCCEEDED(hr))
+	if (SUCCEEDED(hr)) 
 	{
 		//Register the window class
 		WNDCLASSEX wcex = { sizeof(WNDCLASSEX) };
@@ -139,7 +156,7 @@ HRESULT Comsci::Initialize()
 		wcex.cbWndExtra = sizeof(LONG_PTR);
 		wcex.hInstance = HINST_THISCOMPONENT;
 		wcex.hbrBackground = NULL;
-		wcex.lpszMenuName = NULL;
+		wcex.lpszMenuName = MAKEINTRESOURCE(IDC_COMSCI);
 		wcex.hCursor = LoadCursor(NULL, IDI_APPLICATION);
 		wcex.lpszClassName = L"D2DComsci";
 
@@ -254,3 +271,5 @@ void Comsci::OnResize(UINT width, UINT height)
 		m_pRenderTarget->Resize(D2D1::SizeU(width, height));
 	}
 }
+
+void MaybeSendPosition(Position);
