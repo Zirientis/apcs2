@@ -22,8 +22,6 @@
 #include "GameObject.h"
 #include "ObjectCode.h"
 
-#include "DefaultInputImpl.h"
-
 #define SPRITE_DIM 25
 
 template <class Interface>
