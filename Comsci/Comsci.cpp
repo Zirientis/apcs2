@@ -101,8 +101,9 @@ HRESULT Comsci::OnRender()
 
 		//m_pRenderTarget->DrawRectangle(&rectangle2, m_pCornflowerBlueBrush);
         
-		RenderSprite(0, 0, ObjectCode::WALL);
-        RenderSprite(50, 50, ObjectCode::PLAYER);
+		RenderSprite(0, 0, ObjectCode::WALL_MARIO);
+        RenderSprite(0, 0, ObjectCode::INDICATOR_RED);
+        RenderSprite(50, 50, ObjectCode::INDICATOR_GREEN);
 
 		hr = m_pRenderTarget->EndDraw();
 

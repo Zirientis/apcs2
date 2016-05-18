@@ -1,7 +1,26 @@
 #pragma once
 
 enum ObjectCode {
-    WALL = 0,
-    PLAYER = 1,
-    FOO
+    WALL_MARIO,
+    WALL_BRICK,
+
+    MAX_WALL = WALL_BRICK,
+
+    FLOOR_DIRT,
+    FLOOR_WEIRD,
+
+    MAX_FLOOR = FLOOR_WEIRD,
+
+    INDICATOR_GREEN,
+    INDICATOR_RED,
+
+    MAX_INDICATOR = INDICATOR_RED,
+
+    MONST_SPIDER,
+
+    MAX_MONST = MONST_SPIDER,
+
+    PLAYER,
+
+    MAX
 };
