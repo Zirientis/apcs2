@@ -101,8 +101,9 @@ HRESULT Comsci::OnRender()
 
 		//m_pRenderTarget->DrawRectangle(&rectangle2, m_pCornflowerBlueBrush);
         
-		RenderSprite(0, 0, ObjectCode::WALL);
-        RenderSprite(50, 50, ObjectCode::PLAYER);
+		RenderSprite(0, 0, ObjectCode::WALL_MARIO);
+        RenderSprite(0, 0, ObjectCode::INDICATOR_RED);
+        RenderSprite(50, 50, ObjectCode::INDICATOR_GREEN);
 
 		hr = m_pRenderTarget->EndDraw();
 
@@ -186,8 +187,8 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             {
                 UINT xCoord = GET_X_LPARAM(lParam);
                 UINT yCoord = GET_Y_LPARAM(lParam);
-                Position pos = { xCoord / 50, yCoord / 50 };
-                MaybeSendPosition(pos);
+                Position pos = { xCoord / SPRITE_DIM, yCoord / SPRITE_DIM };
+                pComsci->game->MaybeSendPosition(pos);
             }
             result = 0;
             wasHandled = true;
@@ -202,14 +203,4 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 	}
 
 	return result;
-}
-
-void MaybeSendPosition(Position pos)
-{
-
-}
-
-Position Comsci::DefaultGetInput() // game thread only!
-{
-    WaitForSingleObject(inputEvent, INFINITE);
 }

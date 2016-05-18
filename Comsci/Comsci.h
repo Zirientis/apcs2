@@ -21,6 +21,7 @@
 #include "Game.h"
 #include "GameObject.h"
 #include "ObjectCode.h"
+#include "Position.h"
 
 #define SPRITE_DIM 25
 
@@ -50,6 +51,7 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
 #endif
 
+
 class Comsci
 {
 public:
@@ -59,6 +61,7 @@ public:
 	HRESULT Initialize();
 
 	void RunMessageLoop();
+
 
 private:
 	HRESULT CreateDeviceIndependentResources();
@@ -82,7 +85,6 @@ private:
 		);
 	void RenderSprite(UINT left, UINT top, ObjectCode spriteId);
 
-    Position DefaultGetInput();
 	HWND m_hwnd;
 	ID2D1Factory* m_pDirect2dFactory;
 	ID2D1HwndRenderTarget* m_pRenderTarget;
@@ -93,8 +95,6 @@ private:
 	unsigned int m_spriteSheetWidth, m_spriteSheetHeight;
 
     Game* game;
-    volatile Position synchronizedPos;
-    HANDLE inputEvent;
 };
 
 Comsci::Comsci() :
@@ -105,11 +105,8 @@ Comsci::Comsci() :
     m_pCornflowerBlueBrush(NULL),
     m_pSpriteSheet(NULL)
 {
-    game = new Game(1, nullptr);
+    game = new Game(1, &DefaultInputFunc);
     CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
-    synchronizedPos.xTile = 0;
-    synchronizedPos.yTile = 0;
-    inputEvent = CreateEvent(NULL, false, false, NULL);
 }
 
 Comsci::~Comsci()
@@ -121,10 +118,6 @@ Comsci::~Comsci()
 	SafeRelease(&m_pSpriteSheet);
     delete game;
     game = nullptr;
-    synchronizedPos.xTile = 0;
-    synchronizedPos.yTile = 0;
-    CloseHandle(inputEvent);
-    inputEvent = NULL;
 }
 
 void Comsci::RunMessageLoop()
@@ -269,5 +262,3 @@ void Comsci::OnResize(UINT width, UINT height)
 		m_pRenderTarget->Resize(D2D1::SizeU(width, height));
 	}
 }
-
-void MaybeSendPosition(Position);
