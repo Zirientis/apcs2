@@ -1,2 +1,13 @@
 ﻿  Game.cpp
-  Comsci.vcxproj -> H:\apcs2\Debug\Comsci.exe
+h:\apcs2\comsci\game.h(23): error C2065: 'Action': undeclared identifier
+h:\apcs2\comsci\game.h(23): error C2923: 'std::vector': 'Action' is not a valid template type argument for parameter '_Ty'
+h:\apcs2\comsci\position.h(2): error C2011: 'Position': 'struct' type redefinition
+  h:\apcs2\comsci\position.h(2): note: see declaration of 'Position'
+h:\apcs2\comsci\game.cpp(58): error C2065: 'Action': undeclared identifier
+h:\apcs2\comsci\game.cpp(58): error C2923: 'std::vector': 'Action' is not a valid template type argument for parameter '_Ty'
+h:\apcs2\comsci\game.cpp(59): error C2079: 'Game::getPotentialPlayerActions' uses undefined class 'std::vector'
+  Comsci.cpp
+h:\apcs2\comsci\game.h(23): error C2065: 'Action': undeclared identifier
+h:\apcs2\comsci\game.h(23): error C2923: 'std::vector': 'Action' is not a valid template type argument for parameter '_Ty'
+h:\apcs2\comsci\comsci.h(25): fatal error C1083: Cannot open include file: 'DefaultInputImpl.h': No such file or directory
+  Generating Code...
