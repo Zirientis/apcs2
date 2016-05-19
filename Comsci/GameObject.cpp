@@ -2,12 +2,17 @@
 
 GameObject::GameObject()
 {
-    code = ObjectCode::PLAYER;
+    code = ObjectCode::ZERO;
 }
 
 GameObject::GameObject(ObjectCode c)
 {
     code = c;
+}
+
+GameObject::GameObject(GameObject& g)
+{
+    code = g.code;
 }
 
 ObjectCode GameObject::getCode()

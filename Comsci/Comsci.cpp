@@ -60,50 +60,27 @@ HRESULT Comsci::OnRender()
 
 		int width = static_cast<int>(rtSize.width);
 		int height = static_cast<int>(rtSize.height);
-		/*
-		for (int x = 0; x < width; x += 10)
-		{
-			m_pRenderTarget->DrawLine(
-				D2D1::Point2F(static_cast<FLOAT>(x), 0.0f),
-				D2D1::Point2F(static_cast<FLOAT>(x), rtSize.height),
-				m_pLightSlateGrayBrush,
-				0.5f
-				);
-		}
 
-		for (int y = 0; y < height; y += 10)
-		{
-			m_pRenderTarget->DrawLine(
-				D2D1::Point2F(0.0f, static_cast<FLOAT>(y)),
-				D2D1::Point2F(rtSize.width, static_cast<FLOAT>(y)),
-				m_pLightSlateGrayBrush,
-				0.5f
-				);
-		}
-		*/
-		D2D1_RECT_F screen = D2D1::RectF(0, 0, rtSize.width, rtSize.height);
-        /*
-		D2D1_RECT_F rectangle1 = D2D1::RectF(
-			rtSize.width / 2 - 50.0f,
-			rtSize.height / 2 - 50.0f,
-			rtSize.width / 2 + 50.0f,
-			rtSize.height / 2 + 50.0f
-			);
+        //static int i = 0;    
+        //RenderSprite(25 * ((i++)%ObjectCode::MAX), 0, (ObjectCode)(i%(int)ObjectCode::MAX));
+        //RenderSprite(100, 100, ObjectCode::PLAYER);
 
-		D2D1_RECT_F rectangle2 = D2D1::RectF(
-			rtSize.width / 2 - 100.0f,
-			rtSize.height / 2 - 100.0f,
-			rtSize.width / 2 + 100.0f,
-			rtSize.height / 2 + 100.0f
-			);
-        */
-		//m_pRenderTarget->FillRectangle(&rectangle1, m_pLightSlateGrayBrush);
-
-		//m_pRenderTarget->DrawRectangle(&rectangle2, m_pCornflowerBlueBrush);
-        
-		RenderSprite(0, 0, ObjectCode::WALL_MARIO);
-        RenderSprite(0, 0, ObjectCode::INDICATOR_RED);
-        RenderSprite(50, 50, ObjectCode::INDICATOR_GREEN);
+        // We should query the status of the level and render the contents
+        // Pseudocode:
+        // Get level map and dimensions.
+        // For each layer, render each tile by getting the ObjectCode of each object
+        unsigned int gameWidth = game->GetWidth();
+        unsigned int gameHeight = game->GetHeight();
+        // surfaces, then furnishings, then entities
+        for (unsigned int row = 0; row < gameHeight; row++)
+        {
+            for (unsigned int col = 0; col < gameWidth; col++)
+            {
+                RenderSprite(row * SPRITE_DIM, col * SPRITE_DIM, game->GetSurfaceAt(Position{ row, col }).getCode());
+                RenderSprite(row * SPRITE_DIM, col * SPRITE_DIM, game->GetFurnishingAt(Position{ row, col }).getCode());
+                RenderSprite(row * SPRITE_DIM, col * SPRITE_DIM, game->GetEntityAt(Position{ row, col }).getCode());
+            }
+        }
 
 		hr = m_pRenderTarget->EndDraw();
 

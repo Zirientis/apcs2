@@ -7,6 +7,7 @@ private:
 public:
     GameObject();
     GameObject(ObjectCode);
+    GameObject(GameObject&);
     ObjectCode getCode();
 
     bool onBeforeWalk();

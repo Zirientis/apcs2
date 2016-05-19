@@ -12,7 +12,7 @@ Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*))
 {
     m_pCurrentLevel = nullptr;
     m_numPlayers = numPlayers;
-    m_pPlayers = new GameObject[numPlayers];
+    //m_pPlayers = new GameObject[numPlayers];
     m_activePlayer = 0;
     getInput = getInputFunc;
     synchronizedPos.xTile = 0;
@@ -25,8 +25,8 @@ Game::~Game()
     delete m_pCurrentLevel;
     m_pCurrentLevel = nullptr;
 
-    delete[] m_pPlayers;
-    m_pPlayers = nullptr;
+    //delete[] m_pPlayers;
+    //m_pPlayers = nullptr;
     getInput = nullptr;
     synchronizedPos.xTile = 0;
     synchronizedPos.yTile = 0;
@@ -70,7 +70,7 @@ std::vector<Action> Game::getPotentialPlayerActions()
 
 }
 */
-bool Game::MaybeSendPosition(Position pos)
+bool Game::MaybeSendPosition(Position pos) // main thread only!
 {
     // First check to ensure the game thread is done using the position.
     // It should be nonsignalled. If signaled, game thread is still active.
@@ -91,6 +91,31 @@ void Game::DefaultMemberGetInput(Position* outPos) // game thread only!
     outPos->xTile = synchronizedPos.xTile;
     outPos->yTile = synchronizedPos.yTile;
     ResetEvent(inputEvent);
+}
+
+GameObject Game::GetEntityAt(Position p)
+{
+    return m_pCurrentLevel->GetEntityAt(p);
+}
+
+GameObject Game::GetFurnishingAt(Position p)
+{
+    return m_pCurrentLevel->GetFurnishingAt(p);
+}
+
+GameObject Game::GetSurfaceAt(Position p)
+{
+    return m_pCurrentLevel->GetSurfaceAt(p);
+}
+
+unsigned int Game::GetWidth()
+{
+    return m_pCurrentLevel->GetWidth();
+}
+
+unsigned int Game::GetHeight()
+{
+    return m_pCurrentLevel->GetHeight();
 }
 
 void DefaultInputFunc(void* pGameVoid, Position* outPos) // game thread only!
