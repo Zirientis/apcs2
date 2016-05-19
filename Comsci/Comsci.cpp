@@ -183,12 +183,21 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 			result = 1;
 			wasHandled = true;
 			break;
+
             case WM_LBUTTONDOWN:
             {
                 UINT xCoord = GET_X_LPARAM(lParam);
                 UINT yCoord = GET_Y_LPARAM(lParam);
                 Position pos = { xCoord / SPRITE_DIM, yCoord / SPRITE_DIM };
                 pComsci->game->MaybeSendPosition(pos);
+            }
+            result = 0;
+            wasHandled = true;
+            break;
+
+            case WM_TIMER:
+            {
+                InvalidateRect(hwnd, NULL, true); // System will send a WM_PAINT
             }
             result = 0;
             wasHandled = true;

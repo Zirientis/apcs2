@@ -24,6 +24,7 @@
 #include "Position.h"
 
 #define SPRITE_DIM 25
+#define TARGET_FRAMERATE 60
 
 template <class Interface>
 inline void SafeRelease(
@@ -175,6 +176,7 @@ HRESULT Comsci::Initialize()
 			ShowWindow(m_hwnd, SW_SHOWNORMAL);
 			UpdateWindow(m_hwnd);
 		}
+        SetTimer(m_hwnd, 0, 1000 / TARGET_FRAMERATE, NULL);
 	}
 
 	return hr;
