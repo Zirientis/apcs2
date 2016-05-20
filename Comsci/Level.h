@@ -5,6 +5,7 @@ class Level
 {
     friend class Game;
 private:
+    GameObject* m_pOverlays;
     GameObject* m_pEntities;
     GameObject* m_pFurnishings;
     GameObject* m_pSurfaces;
@@ -14,9 +15,10 @@ private:
 public:
     Level(int);
     ~Level();
-    GameObject GetEntityAt(Position);
-    GameObject GetFurnishingAt(Position);
-    GameObject GetSurfaceAt(Position);
+    const GameObject* GetOverlayAt(Position);
+    const GameObject* GetEntityAt(Position);
+    const GameObject* GetFurnishingAt(Position);
+    const GameObject* GetSurfaceAt(Position);
     unsigned int GetWidth();
     unsigned int GetHeight();
 };

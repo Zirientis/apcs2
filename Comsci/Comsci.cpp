@@ -39,6 +39,8 @@ int WINAPI WinMain(
 
 void Comsci::RenderSprite(UINT left, UINT top, ObjectCode spriteId)
 {
+    if (spriteId == ObjectCode::NONE)
+        return;
 	D2D1_RECT_F sprite = D2D1::RectF(left, top, left + SPRITE_DIM, top + SPRITE_DIM);
 	D2D1_RECT_F source = D2D1::RectF(spriteId * SPRITE_DIM, 0, SPRITE_DIM * (spriteId + 1), SPRITE_DIM);
 	m_pRenderTarget->DrawBitmap(m_pSpriteSheet, sprite, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, source);
@@ -69,16 +71,17 @@ HRESULT Comsci::OnRender()
         // Pseudocode:
         // Get level map and dimensions.
         // For each layer, render each tile by getting the ObjectCode of each object
-        unsigned int gameWidth = game->GetWidth();
+            unsigned int gameWidth = game->GetWidth();
         unsigned int gameHeight = game->GetHeight();
-        // surfaces, then furnishings, then entities
+        // surfaces, then furnishings, then entities, then overlays
         for (unsigned int row = 0; row < gameHeight; row++)
         {
             for (unsigned int col = 0; col < gameWidth; col++)
             {
-                RenderSprite(row * SPRITE_DIM, col * SPRITE_DIM, game->GetSurfaceAt(Position{ row, col }).getCode());
-                RenderSprite(row * SPRITE_DIM, col * SPRITE_DIM, game->GetFurnishingAt(Position{ row, col }).getCode());
-                RenderSprite(row * SPRITE_DIM, col * SPRITE_DIM, game->GetEntityAt(Position{ row, col }).getCode());
+                RenderSprite(row * SPRITE_DIM, col * SPRITE_DIM, game->GetSurfaceAt(Position{ row, col })->getCode());
+                RenderSprite(row * SPRITE_DIM, col * SPRITE_DIM, game->GetFurnishingAt(Position{ row, col })->getCode());
+                RenderSprite(row * SPRITE_DIM, col * SPRITE_DIM, game->GetEntityAt(Position{ row, col })->getCode());
+                RenderSprite(row * SPRITE_DIM, col * SPRITE_DIM, game->GetOverlayAt(Position{ row, col })->getCode());
             }
         }
 
@@ -171,14 +174,6 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             result = 0;
             wasHandled = true;
             break;
-
-            case WM_TIMER:
-            {
-                InvalidateRect(hwnd, NULL, true); // System will send a WM_PAINT
-            }
-            result = 0;
-            wasHandled = true;
-            break;
 			}
 		}
 
@@ -189,4 +184,9 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 	}
 
 	return result;
+}
+
+void CALLBACK RedrawTimerProc(HWND timerHwnd, UINT msg, UINT_PTR timerId, DWORD dwTime)
+{
+    RedrawWindow(timerHwnd, NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 }

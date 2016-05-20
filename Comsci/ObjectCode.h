@@ -1,8 +1,7 @@
 #pragma once
 
 enum ObjectCode {
-    ZERO,
-    WALL_MARIO = ZERO,
+    WALL_MARIO,
     WALL_BRICK,
 
     MAX_WALL = WALL_BRICK,
@@ -37,5 +36,6 @@ enum ObjectCode {
 
     PLAYER,
 
+    NONE,
     MAX
 };

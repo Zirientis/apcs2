@@ -25,6 +25,7 @@
 
 #define SPRITE_DIM 25
 #define TARGET_FRAMERATE 60
+void CALLBACK RedrawTimerProc(HWND timerHwnd, UINT msg, UINT_PTR timerId, DWORD dwTime);
 
 template <class Interface>
 inline void SafeRelease(
@@ -176,7 +177,7 @@ HRESULT Comsci::Initialize()
 			ShowWindow(m_hwnd, SW_SHOWNORMAL);
 			UpdateWindow(m_hwnd);
 		}
-        SetTimer(m_hwnd, 0, 1000 / TARGET_FRAMERATE, NULL);
+        SetTimer(m_hwnd, 0, 1000 / TARGET_FRAMERATE, &RedrawTimerProc);
 	}
 
 	return hr;

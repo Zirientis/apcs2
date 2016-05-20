@@ -2,35 +2,41 @@
 
 GameObject::GameObject()
 {
-    code = ObjectCode::ZERO;
+    code = ObjectCode::NONE;
 }
 
-GameObject::GameObject(ObjectCode c)
+GameObject::GameObject(const ObjectCode c)
 {
     code = c;
 }
 
-GameObject::GameObject(GameObject& g)
+GameObject::GameObject(const GameObject& g)
 {
     code = g.code;
 }
 
-ObjectCode GameObject::getCode()
+ObjectCode GameObject::getCode() const
 {
     return code;
 }
 
-bool GameObject::onBeforeWalk()
+void GameObject::setCode(ObjectCode c)
 {
-    return code <= ObjectCode::MAX_WALL;
+    code = c;
 }
 
-bool GameObject::onWalk()
+bool GameObject::onBeforeWalk(GameObject& trigger)
 {
+    //return code <= ObjectCode::MAX_WALL;
     return true;
 }
 
-bool GameObject::onAfterWalk()
+void GameObject::onWalk(GameObject& trigger)
+{
+    return;
+}
+
+bool GameObject::onAfterWalk(GameObject& trigger)
 {
     return true;
 }

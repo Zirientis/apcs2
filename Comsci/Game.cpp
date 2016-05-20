@@ -7,12 +7,16 @@
 #include <Windows.h>
 
 #include <vector>
-
 Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*))
 {
     m_pCurrentLevel = nullptr;
     m_numPlayers = numPlayers;
-    //m_pPlayers = new GameObject[numPlayers];
+    m_pPlayers = new GameObject[numPlayers];
+    m_pPlayerPositions = new Position[numPlayers];
+    for (int i = 0; i < m_numPlayers; i++)
+    {
+        m_pPlayerPositions[i] = { 0, 0 };
+    }
     m_activePlayer = 0;
     getInput = getInputFunc;
     synchronizedPos.xTile = 0;
@@ -25,8 +29,10 @@ Game::~Game()
     delete m_pCurrentLevel;
     m_pCurrentLevel = nullptr;
 
-    //delete[] m_pPlayers;
-    //m_pPlayers = nullptr;
+    delete[] m_pPlayers;
+    m_pPlayers = nullptr;
+    delete[] m_pPlayerPositions;
+    m_pPlayerPositions = nullptr;
     getInput = nullptr;
     synchronizedPos.xTile = 0;
     synchronizedPos.yTile = 0;
@@ -41,9 +47,44 @@ void Game::start()
     {
         for (m_activePlayer = 0; m_activePlayer < m_numPlayers; m_activePlayer++)
         {
+            // Set the necessary overlays
+            Position playerPos = m_pPlayerPositions[m_activePlayer];
+            unsigned int ptrOffset = playerPos.yTile * m_pCurrentLevel->GetWidth() + playerPos.xTile;
+            GameObject* overlay = m_pCurrentLevel->m_pOverlays + ptrOffset;
+            overlay->setCode(ObjectCode::INDICATOR_BLUE);
             // Wait for input
             Position p;
-            getInput(this, &p);
+            do
+            {
+                getInput(this, &p);
+            } while (p.xTile >= m_pCurrentLevel->GetWidth() || p.yTile >= m_pCurrentLevel->GetHeight());
+            // deactivate the overlay
+            overlay->setCode(ObjectCode::NONE);
+            // Currently assuming the player can fly to any location in 1 turn.
+            // Only move the player if the surface allows it and there is no other entity already there.
+            // 1. Check to ensure no other entity is present.
+            // 2. Call the surface's onBeforeWalk().
+            // 3. Call the current furnishing's onAfterWalk().
+            // 4. Move the player's GameObject and update m_pPlayerPositions.
+            // 5. Call the furnishing's onWalk().
+            if (m_pCurrentLevel->GetEntityAt(p)->getCode() == ObjectCode::NONE) // tile is empty
+            {
+                Position currentPlayerPos = m_pPlayerPositions[m_activePlayer];
+                GameObject& currentPlayer = m_pPlayers[m_activePlayer];
+                GameObject* surf = m_pCurrentLevel->m_pSurfaces + (p.yTile * m_pCurrentLevel->GetWidth() + p.xTile);
+                GameObject* oldFurn = m_pCurrentLevel->m_pFurnishings + (currentPlayerPos.yTile * m_pCurrentLevel->GetWidth() + currentPlayerPos.xTile);
+
+                if (surf->onBeforeWalk(currentPlayer) && oldFurn->onAfterWalk(currentPlayer))
+                // ok to move to new tile, and old tile allows it (after effects from furnishing run)
+                {
+                    GameObject* ent = m_pCurrentLevel->m_pEntities + (p.yTile * m_pCurrentLevel->GetWidth() + p.xTile);
+                    *ent = currentPlayer;
+                    m_pPlayerPositions[m_activePlayer] = p;
+                    currentPlayerPos = p;
+                    GameObject* newFurn = m_pCurrentLevel->m_pFurnishings + (p.yTile * m_pCurrentLevel->GetWidth() + p.xTile);
+                    newFurn->onWalk(currentPlayer);
+                }
+            }
         }
         // AI logic runs here
     }
@@ -93,19 +134,24 @@ void Game::DefaultMemberGetInput(Position* outPos) // game thread only!
     ResetEvent(inputEvent);
 }
 
-GameObject Game::GetEntityAt(Position p)
+const GameObject* Game::GetEntityAt(Position p)
 {
     return m_pCurrentLevel->GetEntityAt(p);
 }
 
-GameObject Game::GetFurnishingAt(Position p)
+const GameObject* Game::GetFurnishingAt(Position p)
 {
     return m_pCurrentLevel->GetFurnishingAt(p);
 }
 
-GameObject Game::GetSurfaceAt(Position p)
+const GameObject* Game::GetSurfaceAt(Position p)
 {
     return m_pCurrentLevel->GetSurfaceAt(p);
+}
+
+const GameObject* Game::GetOverlayAt(Position p)
+{
+    return m_pCurrentLevel->GetOverlayAt(p);
 }
 
 unsigned int Game::GetWidth()

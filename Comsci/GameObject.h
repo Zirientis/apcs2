@@ -6,11 +6,12 @@ private:
     ObjectCode code;
 public:
     GameObject();
-    GameObject(ObjectCode);
-    GameObject(GameObject&);
-    ObjectCode getCode();
+    GameObject(const ObjectCode);
+    GameObject(const GameObject&);
+    ObjectCode getCode() const;
+    void setCode(ObjectCode);
 
-    bool onBeforeWalk();
-    bool onWalk();
-    bool onAfterWalk();
+    bool onBeforeWalk(GameObject&);
+    void onWalk(GameObject&);
+    bool onAfterWalk(GameObject&);
 };
