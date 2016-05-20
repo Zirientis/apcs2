@@ -24,6 +24,8 @@
 #include "Position.h"
 
 #define SPRITE_DIM 25
+#define TARGET_FRAMERATE 60
+void CALLBACK RedrawTimerProc(HWND timerHwnd, UINT msg, UINT_PTR timerId, DWORD dwTime);
 
 template <class Interface>
 inline void SafeRelease(
@@ -147,7 +149,7 @@ HRESULT Comsci::Initialize()
 		wcex.cbWndExtra = sizeof(LONG_PTR);
 		wcex.hInstance = HINST_THISCOMPONENT;
 		wcex.hbrBackground = NULL;
-		wcex.lpszMenuName = MAKEINTRESOURCE(IDC_COMSCI);
+		wcex.lpszMenuName = /*MAKEINTRESOURCE(IDC_COMSCI)*/ NULL;
 		wcex.hCursor = LoadCursor(NULL, IDI_APPLICATION);
 		wcex.lpszClassName = L"D2DComsci";
 
@@ -162,8 +164,8 @@ HRESULT Comsci::Initialize()
 			WS_OVERLAPPED,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
-			static_cast<UINT>(ceil(640.f * dpiX / 96.f)),
-			static_cast<UINT>(ceil(480.f * dpiY / 96.f)),
+			static_cast<UINT>(ceil(1680.f * dpiX / 96.f)),
+			static_cast<UINT>(ceil(1050.f * dpiY / 96.f)),
 			NULL,
 			NULL,
 			HINST_THISCOMPONENT,
@@ -175,6 +177,7 @@ HRESULT Comsci::Initialize()
 			ShowWindow(m_hwnd, SW_SHOWNORMAL);
 			UpdateWindow(m_hwnd);
 		}
+        SetTimer(m_hwnd, 0, 1000 / TARGET_FRAMERATE, &RedrawTimerProc);
 	}
 
 	return hr;
