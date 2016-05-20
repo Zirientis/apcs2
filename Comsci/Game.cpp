@@ -12,6 +12,10 @@ Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*))
     m_pCurrentLevel = nullptr;
     m_numPlayers = numPlayers;
     m_pPlayers = new GameObject[numPlayers];
+    for (int i = 0; i < m_numPlayers; i++)
+    {
+        m_pPlayers[i] = GameObject(ObjectCode::PLAYER);
+    }
     m_pPlayerPositions = new Position[numPlayers];
     for (int i = 0; i < m_numPlayers; i++)
     {
@@ -60,34 +64,47 @@ void Game::start()
             } while (p.xTile >= m_pCurrentLevel->GetWidth() || p.yTile >= m_pCurrentLevel->GetHeight());
             // deactivate the overlay
             overlay->setCode(ObjectCode::NONE);
-            // Currently assuming the player can fly to any location in 1 turn.
-            // Only move the player if the surface allows it and there is no other entity already there.
-            // 1. Check to ensure no other entity is present.
-            // 2. Call the surface's onBeforeWalk().
-            // 3. Call the current furnishing's onAfterWalk().
-            // 4. Move the player's GameObject and update m_pPlayerPositions.
-            // 5. Call the furnishing's onWalk().
-            if (m_pCurrentLevel->GetEntityAt(p)->getCode() == ObjectCode::NONE) // tile is empty
+            if (move(playerPos, p))
             {
-                Position currentPlayerPos = m_pPlayerPositions[m_activePlayer];
-                GameObject& currentPlayer = m_pPlayers[m_activePlayer];
-                GameObject* surf = m_pCurrentLevel->m_pSurfaces + (p.yTile * m_pCurrentLevel->GetWidth() + p.xTile);
-                GameObject* oldFurn = m_pCurrentLevel->m_pFurnishings + (currentPlayerPos.yTile * m_pCurrentLevel->GetWidth() + currentPlayerPos.xTile);
-
-                if (surf->onBeforeWalk(currentPlayer) && oldFurn->onAfterWalk(currentPlayer))
-                // ok to move to new tile, and old tile allows it (after effects from furnishing run)
-                {
-                    GameObject* ent = m_pCurrentLevel->m_pEntities + (p.yTile * m_pCurrentLevel->GetWidth() + p.xTile);
-                    *ent = currentPlayer;
-                    m_pPlayerPositions[m_activePlayer] = p;
-                    currentPlayerPos = p;
-                    GameObject* newFurn = m_pCurrentLevel->m_pFurnishings + (p.yTile * m_pCurrentLevel->GetWidth() + p.xTile);
-                    newFurn->onWalk(currentPlayer);
-                }
+                m_pPlayerPositions[m_activePlayer] = p;
             }
         }
+
         // AI logic runs here
+        MessageBox(NULL, LPCWSTR(u"AI Thinking..."), LPCWSTR(u"AI Thinking"), 0);
     }
+}
+
+bool Game::move(Position start, Position end)
+{
+    // Currently assuming the player can fly to any location in 1 turn.
+    // Only move the player if the surface allows it and there is no other entity already there.
+    // 1. Check to ensure no other entity is present.
+    // 2. Call the surface's onBeforeWalk().
+    // 3. Call the current furnishing's onAfterWalk().
+    // 4. Move the player's GameObject and update m_pPlayerPositions.
+    // 5. Call the furnishing's onWalk().
+
+    FIXME FIXME FIXME
+    if (m_pCurrentLevel->GetEntityAt(end)->getCode() == ObjectCode::NONE) // tile is empty
+    {
+        GameObject& ent = m_pPlayers[m_activePlayer];
+        GameObject* newSurf = m_pCurrentLevel->m_pSurfaces + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
+        GameObject* oldFurn = m_pCurrentLevel->m_pFurnishings + (start.yTile * m_pCurrentLevel->GetWidth() + start.xTile);
+
+        if (newSurf->onBeforeWalk(ent) && oldFurn->onAfterWalk(ent))
+            // ok to move to new tile, and old tile allows it (after effects from furnishing run)
+        {
+            GameObject* oldEnt = m_pCurrentLevel->m_pEntities + (start.yTile * m_pCurrentLevel->GetWidth() + start.xTile);
+            oldEnt->setCode(ObjectCode::NONE);
+            GameObject* newEnt = m_pCurrentLevel->m_pEntities + (end.yTile * m_pCurrentLevel->GetWidth() + p.xTile);
+            *newEnt = currentPlayer;
+            GameObject* newFurn = m_pCurrentLevel->m_pFurnishings + (end.yTile * m_pCurrentLevel->GetWidth() + p.xTile);
+            newFurn->onWalk(currentPlayer);
+        }
+        return true;
+    }
+    return false;
 }
 
 void Game::advanceLevel()

@@ -15,6 +15,7 @@ private:
     int m_numPlayers;
     int m_activePlayer;
     void (*getInput) (void*, Position*);
+    bool move(Position start, Position end);
     Position synchronizedPos;
     HANDLE inputEvent;
 

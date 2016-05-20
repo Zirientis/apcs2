@@ -107,7 +107,7 @@ Comsci::Comsci() :
     m_pCornflowerBlueBrush(NULL),
     m_pSpriteSheet(NULL)
 {
-    game = new Game(1, &DefaultInputFunc);
+    game = new Game(3, &DefaultInputFunc);
     CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
 }
 
