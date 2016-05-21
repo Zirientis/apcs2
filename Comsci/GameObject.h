@@ -11,7 +11,7 @@ public:
     ObjectCode getCode() const;
     void setCode(ObjectCode);
 
-    bool onBeforeWalk(GameObject&);
-    void onWalk(GameObject&);
-    bool onAfterWalk(GameObject&);
+    bool onBeforeWalk(GameObject*);
+    void onWalk(GameObject*);
+    bool onAfterWalk(GameObject*);
 };

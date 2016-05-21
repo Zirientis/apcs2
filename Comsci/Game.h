@@ -14,11 +14,13 @@ private:
     Position* m_pPlayerPositions; // For Game bookkeeping
     int m_numPlayers;
     int m_activePlayer;
-    void (*getInput) (void*, Position*);
-    bool move(Position start, Position end);
+    bool playersPlaced;
     Position synchronizedPos;
     HANDLE inputEvent;
+    void (*getInput) (void*, Position*);
 
+    bool moveEntity(Position start, Position end);
+    bool placeEntity(GameObject& templateObj, Position pos, bool force);
     void advanceLevel();
 public:
     Game(int, void (*getInput) (void*, Position*));

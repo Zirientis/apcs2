@@ -14,7 +14,7 @@ Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*))
     m_pPlayers = new GameObject[numPlayers];
     for (int i = 0; i < m_numPlayers; i++)
     {
-        m_pPlayers[i] = GameObject(ObjectCode::PLAYER);
+        m_pPlayers[i] = GameObject(ObjectCode::PLAYER_1);
     }
     m_pPlayerPositions = new Position[numPlayers];
     for (int i = 0; i < m_numPlayers; i++)
@@ -22,10 +22,11 @@ Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*))
         m_pPlayerPositions[i] = { 0, 0 };
     }
     m_activePlayer = 0;
-    getInput = getInputFunc;
+    playersPlaced = false;
     synchronizedPos.xTile = 0;
     synchronizedPos.yTile = 0;
     inputEvent = CreateEvent(NULL, true, false, LPCWSTR(u"Game Input Ready"));
+    getInput = getInputFunc;
 }
 
 Game::~Game()
@@ -64,18 +65,28 @@ void Game::start()
             } while (p.xTile >= m_pCurrentLevel->GetWidth() || p.yTile >= m_pCurrentLevel->GetHeight());
             // deactivate the overlay
             overlay->setCode(ObjectCode::NONE);
-            if (move(playerPos, p))
+
+            if (!playersPlaced)
+            {
+                GameObject playerTemplate = GameObject((ObjectCode)(ObjectCode::PLAYER_1 + m_activePlayer));
+                if (placeEntity(playerTemplate, p, false))
+                {
+                    m_pPlayerPositions[m_activePlayer] = p;
+                }
+                // TODO: If players are put on top of other players, it doesn't work as intended.
+            }
+            else if (moveEntity(playerPos, p))
             {
                 m_pPlayerPositions[m_activePlayer] = p;
             }
         }
-
+        playersPlaced = true;
         // AI logic runs here
         MessageBox(NULL, LPCWSTR(u"AI Thinking..."), LPCWSTR(u"AI Thinking"), 0);
     }
 }
 
-bool Game::move(Position start, Position end)
+bool Game::moveEntity(Position start, Position end)
 {
     // Currently assuming the player can fly to any location in 1 turn.
     // Only move the player if the surface allows it and there is no other entity already there.
@@ -85,23 +96,35 @@ bool Game::move(Position start, Position end)
     // 4. Move the player's GameObject and update m_pPlayerPositions.
     // 5. Call the furnishing's onWalk().
 
-    FIXME FIXME FIXME
     if (m_pCurrentLevel->GetEntityAt(end)->getCode() == ObjectCode::NONE) // tile is empty
     {
-        GameObject& ent = m_pPlayers[m_activePlayer];
+        GameObject* oldEnt = m_pCurrentLevel->m_pEntities + (start.yTile * m_pCurrentLevel->GetWidth() + start.xTile);
         GameObject* newSurf = m_pCurrentLevel->m_pSurfaces + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
         GameObject* oldFurn = m_pCurrentLevel->m_pFurnishings + (start.yTile * m_pCurrentLevel->GetWidth() + start.xTile);
 
-        if (newSurf->onBeforeWalk(ent) && oldFurn->onAfterWalk(ent))
-            // ok to move to new tile, and old tile allows it (after effects from furnishing run)
+        if (newSurf->onBeforeWalk(oldEnt) && oldFurn->onAfterWalk(oldEnt))
+        // ok to move to new tile, and old tile allows it (after effects from furnishing run)
         {
-            GameObject* oldEnt = m_pCurrentLevel->m_pEntities + (start.yTile * m_pCurrentLevel->GetWidth() + start.xTile);
+            GameObject* newEnt = m_pCurrentLevel->m_pEntities + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
+            *newEnt = *oldEnt;
             oldEnt->setCode(ObjectCode::NONE);
-            GameObject* newEnt = m_pCurrentLevel->m_pEntities + (end.yTile * m_pCurrentLevel->GetWidth() + p.xTile);
-            *newEnt = currentPlayer;
-            GameObject* newFurn = m_pCurrentLevel->m_pFurnishings + (end.yTile * m_pCurrentLevel->GetWidth() + p.xTile);
-            newFurn->onWalk(currentPlayer);
+            GameObject* newFurn = m_pCurrentLevel->m_pFurnishings + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
+            newFurn->onWalk(newEnt); // TODO: has issues if the trap moves the entity
+            return true;
         }
+    }
+    return false;
+}
+
+bool Game::placeEntity(GameObject& templateObj, Position pos, bool force)
+{
+    GameObject* ent = m_pCurrentLevel->m_pEntities + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
+    GameObject* surf = m_pCurrentLevel->m_pSurfaces + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
+    if (force || (ent->getCode() == ObjectCode::NONE && surf->onBeforeWalk(nullptr)))
+    {
+        *ent = GameObject(templateObj);
+        GameObject* furn = m_pCurrentLevel->m_pFurnishings + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
+        furn->onWalk(ent);
         return true;
     }
     return false;
