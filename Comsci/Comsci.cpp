@@ -41,7 +41,8 @@ void Comsci::RenderSprite(UINT left, UINT top, ObjectCode spriteId)
 {
     if (spriteId == ObjectCode::NONE)
         return;
-	D2D1_RECT_F sprite = D2D1::RectF(left, top, left + SPRITE_DIM, top + SPRITE_DIM);
+	D2D1_RECT_F sprite = D2D1::RectF(left + GAMEBOARD_ORIGIN_X, top + GAMEBOARD_ORIGIN_Y,
+        left + SPRITE_DIM + GAMEBOARD_ORIGIN_X, top + SPRITE_DIM + GAMEBOARD_ORIGIN_Y);
 	D2D1_RECT_F source = D2D1::RectF(spriteId * SPRITE_DIM, 0, SPRITE_DIM * (spriteId + 1), SPRITE_DIM);
 	m_pRenderTarget->DrawBitmap(m_pSpriteSheet, sprite, 1.0f, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, source);
 }
@@ -166,10 +167,14 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 
             case WM_LBUTTONDOWN:
             {
-                UINT xCoord = GET_X_LPARAM(lParam);
-                UINT yCoord = GET_Y_LPARAM(lParam);
-                Position pos = { xCoord / SPRITE_DIM, yCoord / SPRITE_DIM };
-                pComsci->game->MaybeSendPosition(pos);
+                UINT xCoordRaw = GET_X_LPARAM(lParam);
+                UINT yCoordRaw = GET_Y_LPARAM(lParam);
+                if (xCoordRaw >= GAMEBOARD_ORIGIN_X && yCoordRaw >= GAMEBOARD_ORIGIN_Y)
+                {
+                    Position pos = { (xCoordRaw - GAMEBOARD_ORIGIN_X) / SPRITE_DIM,
+                        (yCoordRaw - GAMEBOARD_ORIGIN_Y) / SPRITE_DIM };
+                    pComsci->game->MaybeSendPosition(pos);
+                }
             }
             result = 0;
             wasHandled = true;
