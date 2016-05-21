@@ -83,6 +83,17 @@ void Game::start()
         playersPlaced = true;
         // AI logic runs here
         MessageBox(NULL, LPCWSTR(u"AI Thinking..."), LPCWSTR(u"AI Thinking"), 0);
+
+        // Now allow each non-player entity to act
+        for (unsigned int i = 0; i < m_pCurrentLevel->GetWidth() * m_pCurrentLevel->GetHeight(); i++)
+        {
+            GameObject* npc = m_pCurrentLevel->m_pEntities + i;
+            ObjectCode npcCode = npc->getCode();
+            if (npcCode == NONE || (npcCode >= PLAYER_1 && npcCode <= MAX_PLAYER))
+                continue;
+            // Now do something!
+
+        }
     }
 }
 
