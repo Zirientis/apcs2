@@ -99,6 +99,7 @@ private:
 	unsigned int m_spriteSheetWidth, m_spriteSheetHeight;
 
     Game* game;
+    HANDLE gameTextHandle;
 };
 
 Comsci::Comsci() :
@@ -110,6 +111,7 @@ Comsci::Comsci() :
     m_pSpriteSheet(NULL)
 {
     game = new Game(3, &DefaultInputFunc);
+    gameTextHandle = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT_HANDLE_NAME);
     CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
 }
 

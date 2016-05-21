@@ -5,7 +5,8 @@
 
 #include <vector>
 
-
+#define INPUT_HANDLE_NAME LPCWSTR(u"Game Input Ready")
+#define TEXT_HANDLE_NAME LPCWSTR(u"Text Line Displayed")
 class Game
 {
 private:
@@ -16,12 +17,15 @@ private:
     int m_activePlayer;
     bool playersPlaced;
     Position synchronizedPos;
-    HANDLE inputEvent;
-    void (*getInput) (void*, Position*);
+    const wchar_t* synchronizedTextString;
+    HANDLE inputEvent; // setting this one means input is ready.
+    HANDLE textEvent; // if unsignalled, there is text to show and then signal
+    void(*getInput) (void*, Position*);
 
     bool moveEntity(Position start, Position end);
     bool placeEntity(GameObject& templateObj, Position pos, bool force);
     void advanceLevel();
+    void showText(const wchar_t* textString);
 public:
     Game(int, void (*getInput) (void*, Position*));
     ~Game();
@@ -31,6 +35,7 @@ public:
     //std::vector<Action> getPotentialPlayerActions();
     void DefaultMemberGetInput(Position*); // game thread only!
     bool MaybeSendPosition(Position); // Returns whether the position was set
+    const wchar_t* GetOutputText();
 
     const GameObject* GetEntityAt(Position);
     const GameObject* GetFurnishingAt(Position);

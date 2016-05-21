@@ -68,11 +68,19 @@ HRESULT Comsci::OnRender()
         //RenderSprite(25 * ((i++)%ObjectCode::MAX), 0, (ObjectCode)(i%(int)ObjectCode::MAX));
         //RenderSprite(100, 100, ObjectCode::PLAYER);
 
+        // we have text to render if event is nonsignalled
+        // signal in WndProc when mouse input is recieved.
+        if (WaitForSingleObject(gameTextHandle, 0) == WAIT_TIMEOUT)
+        {
+            // render text
+            OutputDebugString(game->GetOutputText());
+            //MessageBox(m_hwnd, game->GetOutputText(), L"Comsci", 0);
+        }
         // We should query the status of the level and render the contents
         // Pseudocode:
         // Get level map and dimensions.
         // For each layer, render each tile by getting the ObjectCode of each object
-            unsigned int gameWidth = game->GetWidth();
+        unsigned int gameWidth = game->GetWidth();
         unsigned int gameHeight = game->GetHeight();
         // surfaces, then furnishings, then entities, then overlays
         for (unsigned int row = 0; row < gameHeight; row++)
@@ -167,13 +175,20 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 
             case WM_LBUTTONDOWN:
             {
-                UINT xCoordRaw = GET_X_LPARAM(lParam);
-                UINT yCoordRaw = GET_Y_LPARAM(lParam);
-                if (xCoordRaw >= GAMEBOARD_ORIGIN_X && yCoordRaw >= GAMEBOARD_ORIGIN_Y)
+                if (WaitForSingleObject(pComsci->gameTextHandle, 0) == WAIT_TIMEOUT) // if unsignalled
                 {
-                    Position pos = { (xCoordRaw - GAMEBOARD_ORIGIN_X) / SPRITE_DIM,
-                        (yCoordRaw - GAMEBOARD_ORIGIN_Y) / SPRITE_DIM };
-                    pComsci->game->MaybeSendPosition(pos);
+                    BOOL a = SetEvent(pComsci->gameTextHandle);
+                }
+                else
+                {
+                    UINT xCoordRaw = GET_X_LPARAM(lParam);
+                    UINT yCoordRaw = GET_Y_LPARAM(lParam);
+                    if (xCoordRaw >= GAMEBOARD_ORIGIN_X && yCoordRaw >= GAMEBOARD_ORIGIN_Y)
+                    {
+                        Position pos = { (xCoordRaw - GAMEBOARD_ORIGIN_X) / SPRITE_DIM,
+                            (yCoordRaw - GAMEBOARD_ORIGIN_Y) / SPRITE_DIM };
+                        pComsci->game->MaybeSendPosition(pos);
+                    }
                 }
             }
             result = 0;

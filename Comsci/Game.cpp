@@ -25,7 +25,9 @@ Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*))
     playersPlaced = false;
     synchronizedPos.xTile = 0;
     synchronizedPos.yTile = 0;
-    inputEvent = CreateEvent(NULL, true, false, LPCWSTR(u"Game Input Ready"));
+    synchronizedTextString = nullptr;
+    inputEvent = CreateEvent(NULL, true, false, INPUT_HANDLE_NAME);
+    textEvent = CreateEvent(NULL, true, true, TEXT_HANDLE_NAME);
     getInput = getInputFunc;
 }
 
@@ -43,6 +45,8 @@ Game::~Game()
     synchronizedPos.yTile = 0;
     CloseHandle(inputEvent);
     inputEvent = nullptr;
+    CloseHandle(textEvent);
+    textEvent = nullptr;
 }
 
 void Game::start()
@@ -61,6 +65,10 @@ void Game::start()
             Position p;
             do
             {
+                if (!playersPlaced)
+                    showText(L"Place your player...\n");
+                else
+                    showText(L"Make your move...\n");
                 getInput(this, &p);
             } while (p.xTile >= m_pCurrentLevel->GetWidth() || p.yTile >= m_pCurrentLevel->GetHeight());
             // deactivate the overlay
@@ -82,7 +90,7 @@ void Game::start()
         }
         playersPlaced = true;
         // AI logic runs here
-        MessageBox(NULL, LPCWSTR(u"AI Thinking..."), LPCWSTR(u"AI Thinking"), 0);
+        //MessageBox(NULL, LPCWSTR(u"AI Thinking..."), LPCWSTR(u"AI Thinking"), 0);
 
         // Now allow each non-player entity to act
         for (unsigned int i = 0; i < m_pCurrentLevel->GetWidth() * m_pCurrentLevel->GetHeight(); i++)
@@ -183,6 +191,19 @@ void Game::DefaultMemberGetInput(Position* outPos) // game thread only!
     outPos->xTile = synchronizedPos.xTile;
     outPos->yTile = synchronizedPos.yTile;
     ResetEvent(inputEvent);
+}
+
+const wchar_t* Game::GetOutputText()
+{
+    return synchronizedTextString;
+}
+
+void Game::showText(const wchar_t* textString)
+{
+    synchronizedTextString = textString;
+    ResetEvent(textEvent);
+    WaitForSingleObject(textEvent, INFINITE);
+    synchronizedTextString = nullptr;
 }
 
 const GameObject* Game::GetEntityAt(Position p)
