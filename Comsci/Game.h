@@ -5,8 +5,8 @@
 
 #include <vector>
 
-#define INPUT_HANDLE_NAME LPCWSTR(u"Game Input Ready")
-#define TEXT_HANDLE_NAME LPCWSTR(u"Text Line Displayed")
+#define INPUT_HANDLE_NAME L"Game Input Ready"
+#define TEXT_HANDLE_NAME L"Text Line Displayed"
 class Game
 {
 private:
