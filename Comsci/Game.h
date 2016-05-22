@@ -20,20 +20,20 @@ private:
     const wchar_t* synchronizedTextString;
     HANDLE inputEvent; // setting this one means input is ready.
     HANDLE textEvent; // if unsignalled, there is text to show and then signal
-    void(*getInput) (void*, Position*);
+    void(*getInput) (void*, Position*, const wchar_t*);
 
     bool moveEntity(Position start, Position end);
     bool placeEntity(GameObject& templateObj, Position pos, bool force);
     void advanceLevel();
     void showText(const wchar_t* textString);
 public:
-    Game(int, void (*getInput) (void*, Position*));
+    Game(int, void (*getInput) (void*, Position*, const wchar_t*));
     ~Game();
     void start();
 
     int getActivePlayer();
     //std::vector<Action> getPotentialPlayerActions();
-    void DefaultMemberGetInput(Position*); // game thread only!
+    void DefaultMemberGetInput(Position*, const wchar_t*); // game thread only!
     bool MaybeSendPosition(Position); // Returns whether the position was set
     const wchar_t* GetOutputText();
 
@@ -45,5 +45,5 @@ public:
     unsigned int GetHeight();
 };
 
-void DefaultInputFunc(void*, Position*); // Game thread only!
+void DefaultInputFunc(void*, Position*, const wchar_t*); // Game thread only!
 DWORD WINAPI GameThreadEntryProc(void*);

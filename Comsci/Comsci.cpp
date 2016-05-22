@@ -71,16 +71,12 @@ HRESULT Comsci::OnRender()
         m_pRenderTarget->DrawLine(D2D1::Point2F(0, GAMEBOARD_ORIGIN_Y), D2D1::Point2F(width, GAMEBOARD_ORIGIN_Y), m_pBlackBrush);
         // we have text to render if event is nonsignalled
         // signal in WndProc when mouse input is recieved.
-        if (WaitForSingleObject(gameTextHandle, 0) == WAIT_TIMEOUT)
+        const wchar_t* text = game->GetOutputText();
+        if (text)
         {
-            // render text
-            const wchar_t* text = game->GetOutputText();
-            if (text)
-            {
-                //OutputDebugString(text);
-                m_pRenderTarget->DrawText(text, std::wcslen(text), m_pTextFormat, textDisp, m_pBlackBrush);
-                //MessageBox(m_hwnd, game->GetOutputText(), L"Comsci", 0);
-            }
+            //OutputDebugString(text);
+            m_pRenderTarget->DrawText(text, std::wcslen(text), m_pTextFormat, textDisp, m_pBlackBrush);
+            //MessageBox(m_hwnd, game->GetOutputText(), L"Comsci", 0);
         }
         // We should query the status of the level and render the contents
         // Pseudocode:
@@ -88,14 +84,9 @@ HRESULT Comsci::OnRender()
         // For each layer, render each tile by getting the ObjectCode of each object
         unsigned int gameWidth = game->GetWidth();
         unsigned int gameHeight = game->GetHeight();
-        D2D1_POINT_2F boardLeftTop = D2D1::Point2F(GAMEBOARD_ORIGIN_X, GAMEBOARD_ORIGIN_Y);
-        D2D1_POINT_2F boardRightTop = D2D1::Point2F(gameWidth * SPRITE_DIM + GAMEBOARD_ORIGIN_X, GAMEBOARD_ORIGIN_Y);
-        D2D1_POINT_2F boardRightBot = D2D1::Point2F(gameWidth * SPRITE_DIM + GAMEBOARD_ORIGIN_X, gameHeight * SPRITE_DIM + GAMEBOARD_ORIGIN_Y);
-        D2D1_POINT_2F boardLeftBot = D2D1::Point2F(GAMEBOARD_ORIGIN_X, gameHeight * SPRITE_DIM + GAMEBOARD_ORIGIN_Y);
-        m_pRenderTarget->DrawLine(boardLeftTop, boardLeftBot, m_pBlackBrush);
-        m_pRenderTarget->DrawLine(boardLeftBot, boardRightBot, m_pBlackBrush);
-        m_pRenderTarget->DrawLine(boardRightBot, boardRightTop, m_pBlackBrush);
-        m_pRenderTarget->DrawLine(boardRightTop, boardLeftTop, m_pBlackBrush);
+        D2D1_RECT_F board = D2D1::RectF(GAMEBOARD_ORIGIN_X, GAMEBOARD_ORIGIN_Y, gameWidth * SPRITE_DIM + GAMEBOARD_ORIGIN_X,
+            gameHeight * SPRITE_DIM + GAMEBOARD_ORIGIN_Y);
+        m_pRenderTarget->DrawRectangle(board, m_pBlackBrush);
         // surfaces, then furnishings, then entities, then overlays
         for (unsigned int row = 0; row < gameHeight; row++)
         {

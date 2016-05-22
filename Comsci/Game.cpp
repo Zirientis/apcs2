@@ -7,7 +7,7 @@
 #include <Windows.h>
 
 #include <vector>
-Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*))
+Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*, const wchar_t*))
 {
     m_pCurrentLevel = nullptr;
     m_numPlayers = numPlayers;
@@ -65,13 +65,12 @@ void Game::start()
             do
             {
                 if (!playersPlaced)
-                    showText(L"Place your player...\n");
+                    getInput(this, &p, L"Place your player...\n");
                 else
                 {
                     overlay->setCode(ObjectCode::INDICATOR_BLUE);
-                    showText(L"Make your move...\n");
+                    getInput(this, &p, L"Make your move...\n");
                 }
-                getInput(this, &p);
                 overlay->setCode(ObjectCode::NONE);
             } while (p.xTile >= m_pCurrentLevel->GetWidth() || p.yTile >= m_pCurrentLevel->GetHeight());
             // deactivate the overlay
@@ -196,11 +195,13 @@ bool Game::MaybeSendPosition(Position pos) // main thread only!
     return true;
 }
 
-void Game::DefaultMemberGetInput(Position* outPos) // game thread only!
+void Game::DefaultMemberGetInput(Position* outPos, const wchar_t* prompt) // game thread only!
 {
+    synchronizedTextString = prompt;
     WaitForSingleObject(inputEvent, INFINITE);
     outPos->xTile = synchronizedPos.xTile;
     outPos->yTile = synchronizedPos.yTile;
+    synchronizedTextString = nullptr;
     ResetEvent(inputEvent);
 }
 
@@ -247,10 +248,10 @@ unsigned int Game::GetHeight()
     return m_pCurrentLevel->GetHeight();
 }
 
-void DefaultInputFunc(void* pGameVoid, Position* outPos) // game thread only!
+void DefaultInputFunc(void* pGameVoid, Position* outPos, const wchar_t* prompt) // game thread only!
 {
     Game* game = reinterpret_cast<Game*>(pGameVoid);
-    game->DefaultMemberGetInput(outPos);
+    game->DefaultMemberGetInput(outPos, prompt);
 }
 
 DWORD WINAPI GameThreadEntryProc(void* pGameVoid)
