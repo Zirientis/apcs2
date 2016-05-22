@@ -7,6 +7,8 @@
 #include "Game.h"
 #include "Position.h"
 
+#include <dwrite.h>
+
 
 #define MAX_LOADSTRING 100
 
@@ -64,17 +66,21 @@ HRESULT Comsci::OnRender()
 		int width = static_cast<int>(rtSize.width);
 		int height = static_cast<int>(rtSize.height);
 
-        //static int i = 0;    
-        //RenderSprite(25 * ((i++)%ObjectCode::MAX), 0, (ObjectCode)(i%(int)ObjectCode::MAX));
-        //RenderSprite(100, 100, ObjectCode::PLAYER);
-
+        D2D1_RECT_F textDisp = D2D1::RectF(0, 0, width, GAMEBOARD_ORIGIN_Y);
+        //m_pRenderTarget->FillRectangle(textDisp, m_pCornflowerBlueBrush);
+        m_pRenderTarget->DrawLine(D2D1::Point2F(0, GAMEBOARD_ORIGIN_Y), D2D1::Point2F(width, GAMEBOARD_ORIGIN_Y), m_pBlackBrush);
         // we have text to render if event is nonsignalled
         // signal in WndProc when mouse input is recieved.
         if (WaitForSingleObject(gameTextHandle, 0) == WAIT_TIMEOUT)
         {
             // render text
-            OutputDebugString(game->GetOutputText());
-            //MessageBox(m_hwnd, game->GetOutputText(), L"Comsci", 0);
+            const wchar_t* text = game->GetOutputText();
+            if (text)
+            {
+                //OutputDebugString(text);
+                m_pRenderTarget->DrawText(text, std::wcslen(text), m_pTextFormat, textDisp, m_pBlackBrush);
+                //MessageBox(m_hwnd, game->GetOutputText(), L"Comsci", 0);
+            }
         }
         // We should query the status of the level and render the contents
         // Pseudocode:

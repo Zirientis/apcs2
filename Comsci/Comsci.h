@@ -13,6 +13,7 @@
 #include <math.h>
 
 #pragma comment(lib, "d2d1")
+#pragma comment(lib, "dwrite")
 #include <d2d1helper.h>
 #include <dwrite.h>
 #include <wincodec.h>
@@ -92,13 +93,15 @@ private:
 	HWND m_hwnd;
 	ID2D1Factory* m_pDirect2dFactory;
 	ID2D1HwndRenderTarget* m_pRenderTarget;
-	ID2D1SolidColorBrush* m_pLightSlateGrayBrush;
-	ID2D1SolidColorBrush* m_pCornflowerBlueBrush;
+	ID2D1SolidColorBrush* m_pBlackBrush;
 	unsigned char* m_pRawImageData;
 	ID2D1Bitmap* m_pSpriteSheet;
 	unsigned int m_spriteSheetWidth, m_spriteSheetHeight;
+    IDWriteFactory* m_pDirectWriteFactory;
+    IDWriteTextFormat* m_pTextFormat;
 
     Game* game;
+    HANDLE gameThread;
     HANDLE gameTextHandle;
 };
 
@@ -106,22 +109,25 @@ Comsci::Comsci() :
     m_hwnd(NULL),
     m_pDirect2dFactory(NULL),
     m_pRenderTarget(NULL),
-    m_pLightSlateGrayBrush(NULL),
-    m_pCornflowerBlueBrush(NULL),
-    m_pSpriteSheet(NULL)
+    m_pBlackBrush(NULL),
+    m_pSpriteSheet(NULL),
+    m_pDirectWriteFactory(NULL),
+    m_pTextFormat(NULL)
 {
     game = new Game(3, &DefaultInputFunc);
     gameTextHandle = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT_HANDLE_NAME);
-    CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
+    gameThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
 }
 
 Comsci::~Comsci()
 {
 	SafeRelease(&m_pDirect2dFactory);
 	SafeRelease(&m_pRenderTarget);
-	SafeRelease(&m_pLightSlateGrayBrush);
-	SafeRelease(&m_pCornflowerBlueBrush);
+	SafeRelease(&m_pBlackBrush);
 	SafeRelease(&m_pSpriteSheet);
+    SafeRelease(&m_pDirectWriteFactory);
+    SafeRelease(&m_pTextFormat);
+    TerminateThread(gameThread, 0);
     delete game;
     game = nullptr;
 }
@@ -191,6 +197,16 @@ HRESULT Comsci::CreateDeviceIndependentResources()
 {
 	HRESULT hr = S_OK;
 	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pDirect2dFactory);
+    if (!SUCCEEDED(hr))
+    {
+        return hr;
+    }
+    hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(&m_pDirectWriteFactory));
+    if (!SUCCEEDED(hr))
+    {
+        return hr;
+    }
+    hr = m_pDirectWriteFactory->CreateTextFormat(L"Times New Roman", NULL, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 24, L"en-us"/*lazy*/, &m_pTextFormat);
 	lodepng_decode32_file(&m_pRawImageData, &m_spriteSheetWidth, &m_spriteSheetHeight, TEXTURES_DIR "spritesheet.png");
 	for (unsigned int i = 0; i < (4 * m_spriteSheetWidth * m_spriteSheetHeight); i += 4)
 	{
@@ -232,15 +248,8 @@ HRESULT Comsci::CreateDeviceResources()
 		if (SUCCEEDED(hr))
 		{
 			hr = m_pRenderTarget->CreateSolidColorBrush(
-				D2D1::ColorF(D2D1::ColorF::LightSlateGray),
-				&m_pLightSlateGrayBrush
-				);
-		}
-		if (SUCCEEDED(hr))
-		{
-			hr = m_pRenderTarget->CreateSolidColorBrush(
-				D2D1::ColorF(D2D1::ColorF::CornflowerBlue),
-				&m_pCornflowerBlueBrush
+				D2D1::ColorF(D2D1::ColorF::Black),
+				&m_pBlackBrush
 				);
 		}
 		if (SUCCEEDED(hr))
@@ -258,8 +267,8 @@ HRESULT Comsci::CreateDeviceResources()
 void Comsci::DiscardDeviceResources()
 {
 	SafeRelease(&m_pRenderTarget);
-	SafeRelease(&m_pLightSlateGrayBrush);
-	SafeRelease(&m_pCornflowerBlueBrush);
+	SafeRelease(&m_pBlackBrush);
+    SafeRelease(&m_pSpriteSheet);
 }
 
 void Comsci::OnResize(UINT width, UINT height)

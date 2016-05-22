@@ -60,7 +60,6 @@ void Game::start()
             Position playerPos = m_pPlayerPositions[m_activePlayer];
             unsigned int ptrOffset = playerPos.yTile * m_pCurrentLevel->GetWidth() + playerPos.xTile;
             GameObject* overlay = m_pCurrentLevel->m_pOverlays + ptrOffset;
-            overlay->setCode(ObjectCode::INDICATOR_BLUE);
             // Wait for input
             Position p;
             do
@@ -68,11 +67,14 @@ void Game::start()
                 if (!playersPlaced)
                     showText(L"Place your player...\n");
                 else
+                {
+                    overlay->setCode(ObjectCode::INDICATOR_BLUE);
                     showText(L"Make your move...\n");
+                }
                 getInput(this, &p);
+                overlay->setCode(ObjectCode::NONE);
             } while (p.xTile >= m_pCurrentLevel->GetWidth() || p.yTile >= m_pCurrentLevel->GetHeight());
             // deactivate the overlay
-            overlay->setCode(ObjectCode::NONE);
 
             if (!playersPlaced)
             {
@@ -81,16 +83,25 @@ void Game::start()
                 {
                     m_pPlayerPositions[m_activePlayer] = p;
                 }
-                // TODO: If players are put on top of other players, it doesn't work as intended.
+                else
+                {
+                    showText(L"Try again!");
+                    m_activePlayer--;
+                }
             }
             else if (moveEntity(playerPos, p))
             {
                 m_pPlayerPositions[m_activePlayer] = p;
             }
+            else
+            {
+                showText(L"Something was already there! You forfeit your turn.");
+            }
         }
         playersPlaced = true;
         // AI logic runs here
         //MessageBox(NULL, LPCWSTR(u"AI Thinking..."), LPCWSTR(u"AI Thinking"), 0);
+        showText(L"You hear the creatures of the dungeon begin to stir...");
 
         // Now allow each non-player entity to act
         for (unsigned int i = 0; i < m_pCurrentLevel->GetWidth() * m_pCurrentLevel->GetHeight(); i++)
