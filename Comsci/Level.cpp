@@ -4,10 +4,12 @@
 #include "ObjectCode.h"
 
 
-Level::Level(int)
+Level::Level(int diff)
 {
-    width = 50;
-    height = 50;
+    difficulty = diff;
+    unsigned segments = BASE_SEGMENTS_PER_LEVEL + diff / INCR_SEGMENTS_AFTER_COUNT;
+    width = segments * BASE_SEGMENT_LENGTH;
+    height = segments * BASE_SEGMENT_LENGTH;
     m_pEntities = new GameObject[width * height]; 
     m_pFurnishings = new GameObject[width * height];
     m_pSurfaces = new GameObject[width * height];

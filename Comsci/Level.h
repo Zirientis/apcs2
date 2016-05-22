@@ -12,6 +12,10 @@ private:
 
     int difficulty;
     unsigned int width, height;
+
+    const unsigned int BASE_SEGMENTS_PER_LEVEL = 3;
+    const unsigned int INCR_SEGMENTS_AFTER_COUNT = 2;
+    const unsigned int BASE_SEGMENT_LENGTH = 6;
 public:
     Level(int);
     ~Level();
