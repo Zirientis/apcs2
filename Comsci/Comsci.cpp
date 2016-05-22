@@ -88,6 +88,14 @@ HRESULT Comsci::OnRender()
         // For each layer, render each tile by getting the ObjectCode of each object
         unsigned int gameWidth = game->GetWidth();
         unsigned int gameHeight = game->GetHeight();
+        D2D1_POINT_2F boardLeftTop = D2D1::Point2F(GAMEBOARD_ORIGIN_X, GAMEBOARD_ORIGIN_Y);
+        D2D1_POINT_2F boardRightTop = D2D1::Point2F(gameWidth * SPRITE_DIM + GAMEBOARD_ORIGIN_X, GAMEBOARD_ORIGIN_Y);
+        D2D1_POINT_2F boardRightBot = D2D1::Point2F(gameWidth * SPRITE_DIM + GAMEBOARD_ORIGIN_X, gameHeight * SPRITE_DIM + GAMEBOARD_ORIGIN_Y);
+        D2D1_POINT_2F boardLeftBot = D2D1::Point2F(GAMEBOARD_ORIGIN_X, gameHeight * SPRITE_DIM + GAMEBOARD_ORIGIN_Y);
+        m_pRenderTarget->DrawLine(boardLeftTop, boardLeftBot, m_pBlackBrush);
+        m_pRenderTarget->DrawLine(boardLeftBot, boardRightBot, m_pBlackBrush);
+        m_pRenderTarget->DrawLine(boardRightBot, boardRightTop, m_pBlackBrush);
+        m_pRenderTarget->DrawLine(boardRightTop, boardLeftTop, m_pBlackBrush);
         // surfaces, then furnishings, then entities, then overlays
         for (unsigned int row = 0; row < gameHeight; row++)
         {

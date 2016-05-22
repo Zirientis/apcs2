@@ -27,7 +27,7 @@
 #define SPRITE_DIM 25
 #define TARGET_FRAMERATE 60
 #define GAMEBOARD_ORIGIN_X 0
-#define GAMEBOARD_ORIGIN_Y 100
+#define GAMEBOARD_ORIGIN_Y 30
 void CALLBACK RedrawTimerProc(HWND timerHwnd, UINT msg, UINT_PTR timerId, DWORD dwTime);
 
 template <class Interface>
@@ -174,8 +174,8 @@ HRESULT Comsci::Initialize()
 			WS_OVERLAPPED,
 			CW_USEDEFAULT,
 			CW_USEDEFAULT,
-			static_cast<UINT>(ceil(1680.f * dpiX / 96.f)),
-			static_cast<UINT>(ceil(1050.f * dpiY / 96.f)),
+			static_cast<UINT>(ceil(1200.f * dpiX / 96.f)),
+			static_cast<UINT>(ceil(800.f * dpiY / 96.f)),
 			NULL,
 			NULL,
 			HINST_THISCOMPONENT,
