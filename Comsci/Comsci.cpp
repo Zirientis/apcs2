@@ -124,7 +124,7 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 		::SetWindowLongPtrW(
 			hwnd,
 			GWLP_USERDATA,
-			PtrToUlong(pComsci)
+			(LONG_PTR)pComsci
 			);
 
 		result = 1;
