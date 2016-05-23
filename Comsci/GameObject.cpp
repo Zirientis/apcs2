@@ -37,6 +37,6 @@ void GameObject::onWalk(GameObject* trigger)
 }
 
 bool GameObject::onAfterWalk(GameObject* trigger)
-{
+{ 
     return true;
 }

@@ -15,7 +15,7 @@ private:
 
     const unsigned int BASE_SEGMENTS_PER_LEVEL = 3;
     const unsigned int INCR_SEGMENTS_AFTER_COUNT = 2;
-    const unsigned int BASE_SEGMENT_LENGTH = 7;
+    const unsigned int BASE_SEGMENT_LENGTH = 11;
     void drawRect(GameObject*, unsigned int, unsigned int,
         unsigned int, unsigned int, ObjectCode);
     void fillRect(GameObject*, unsigned int, unsigned int,

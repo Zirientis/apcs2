@@ -76,6 +76,8 @@ void Game::start()
             } while (p.xTile >= m_pCurrentLevel->GetWidth() || p.yTile >= m_pCurrentLevel->GetHeight());
             // deactivate the overlay
 
+            ObjectCode targetEntCode = m_pCurrentLevel->m_pEntities[p.yTile * m_pCurrentLevel->GetWidth() + p.xTile].getCode();
+            ObjectCode targetSurfCode = m_pCurrentLevel->m_pSurfaces[p.yTile * m_pCurrentLevel->GetWidth() + p.xTile].getCode();
             if (!playersPlaced)
             {
                 GameObject playerTemplate = GameObject((ObjectCode)(ObjectCode::PLAYER_1 + m_activePlayer));
@@ -93,7 +95,15 @@ void Game::start()
             {
                 m_pPlayerPositions[m_activePlayer] = p;
             }
-            else if (p != playerPos && m_pCurrentLevel->m_pEntities[p.yTile * m_pCurrentLevel->GetWidth() + p.xTile].getCode() != NONE)
+            else if (p == playerPos)
+            {
+                showText(L"You shuffle your feet.");
+            }
+            else if (targetEntCode >= PLAYER_1 && targetEntCode <= MAX_PLAYER)
+            {
+                showText(L"You can't attack your teammate!");
+            }
+            else if (p != playerPos && targetSurfCode > MAX_WALL)
             {
                 // attack
                 showText(L"You attack the creature!");
