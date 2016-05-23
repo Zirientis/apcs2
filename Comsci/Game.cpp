@@ -93,6 +93,11 @@ void Game::start()
             {
                 m_pPlayerPositions[m_activePlayer] = p;
             }
+            else if (p != playerPos && m_pCurrentLevel->m_pEntities[p.yTile * m_pCurrentLevel->GetWidth() + p.xTile].getCode() != NONE)
+            {
+                // attack
+                showText(L"You attack the creature!");
+            }
             else
             {
                 showText(L"Something was already there! You forfeit your turn.");
