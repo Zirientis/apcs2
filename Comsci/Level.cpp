@@ -18,13 +18,13 @@ Level::Level(int diff)
     {
         for (unsigned int col = 0; col < width; col += BASE_SEGMENT_LENGTH)
         {
-            drawRect(m_pEntities, col, row, col + BASE_SEGMENT_LENGTH,
-                row + BASE_SEGMENT_LENGTH, WALL_MARIO);
+            //drawRect(m_pEntities, col, row, col + BASE_SEGMENT_LENGTH,
+            //    row + BASE_SEGMENT_LENGTH, WALL_MARIO);
             unsigned int holePunchOffset = BASE_SEGMENT_LENGTH / 2;
-            m_pEntities[(row + holePunchOffset) * width + col].setCode(NONE);
-            m_pEntities[(row + holePunchOffset) * width + col + BASE_SEGMENT_LENGTH - 1].setCode(NONE);
-            m_pEntities[row * width + col + holePunchOffset].setCode(NONE);
-            m_pEntities[(row + BASE_SEGMENT_LENGTH - 1) * width + col + holePunchOffset].setCode(NONE);
+            m_pEntities[(row + holePunchOffset) * width + col].setCode(WALL_MARIO);
+            m_pEntities[(row + holePunchOffset) * width + col + BASE_SEGMENT_LENGTH - 1].setCode(WALL_MARIO);
+            m_pEntities[row * width + col + holePunchOffset].setCode(WALL_BRICK);
+            m_pEntities[(row + BASE_SEGMENT_LENGTH - 1) * width + col + holePunchOffset].setCode(WALL_BRICK);
         }
     }
 }
