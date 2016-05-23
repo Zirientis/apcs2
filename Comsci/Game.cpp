@@ -52,6 +52,7 @@ Game::~Game()
 void Game::start()
 {
     advanceLevel();
+    showText(L"Welcome to Comsci\u2122!\n");
     for (;;) // forever
     {
         for (m_activePlayer = 0; m_activePlayer < m_numPlayers; m_activePlayer++)

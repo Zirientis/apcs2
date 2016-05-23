@@ -7,13 +7,26 @@
 Level::Level(int diff)
 {
     difficulty = diff;
-    unsigned segments = BASE_SEGMENTS_PER_LEVEL + diff / INCR_SEGMENTS_AFTER_COUNT;
+    unsigned int segments = BASE_SEGMENTS_PER_LEVEL + diff / INCR_SEGMENTS_AFTER_COUNT;
     width = segments * BASE_SEGMENT_LENGTH;
     height = segments * BASE_SEGMENT_LENGTH;
-    m_pEntities = new GameObject[width * height]; 
+    m_pEntities = new GameObject[width * height];
     m_pFurnishings = new GameObject[width * height];
     m_pSurfaces = new GameObject[width * height];
     m_pOverlays = new GameObject[width * height];
+    for (unsigned int row = 0; row < height; row += BASE_SEGMENT_LENGTH)
+    {
+        for (unsigned int col = 0; col < width; col += BASE_SEGMENT_LENGTH)
+        {
+            drawRect(m_pEntities, col, row, col + BASE_SEGMENT_LENGTH,
+                row + BASE_SEGMENT_LENGTH, WALL_MARIO);
+            unsigned int holePunchOffset = BASE_SEGMENT_LENGTH / 2;
+            m_pEntities[(row + holePunchOffset) * width + col].setCode(NONE);
+            m_pEntities[(row + holePunchOffset) * width + col + BASE_SEGMENT_LENGTH - 1].setCode(NONE);
+            m_pEntities[row * width + col + holePunchOffset].setCode(NONE);
+            m_pEntities[(row + BASE_SEGMENT_LENGTH - 1) * width + col + holePunchOffset].setCode(NONE);
+        }
+    }
 }
 
 Level::~Level()
@@ -26,6 +39,28 @@ Level::~Level()
     m_pSurfaces = nullptr;
     delete[] m_pOverlays;
     m_pOverlays = nullptr;
+}
+
+void Level::drawRect(GameObject* arr, unsigned int left, unsigned int top,
+    unsigned int right, unsigned int bottom, ObjectCode code)
+{
+    // Go top, bottom, left, right. On sides, remember that corners are done.
+    fillRect(arr, left, top, right, top + 1, code);
+    fillRect(arr, left, bottom - 1, right, bottom, code);
+    fillRect(arr, left, top + 1, left + 1, bottom - 1, code);
+    fillRect(arr, right - 1, top + 1, right, bottom - 1, code);
+}
+
+void Level::fillRect(GameObject* arr, unsigned int left, unsigned int top,
+    unsigned int right, unsigned int bottom, ObjectCode code)
+{
+    for (unsigned int r = top; r < bottom; r++)
+    {
+        for (unsigned int c = left; c < right; c++)
+        {
+            arr[r * width + c].setCode(code);
+        }
+    }
 }
 
 const GameObject* Level::GetOverlayAt(Position p)

@@ -27,8 +27,8 @@ void GameObject::setCode(ObjectCode c)
 
 bool GameObject::onBeforeWalk(GameObject* trigger)
 {
-    //return code <= ObjectCode::MAX_WALL;
-    return true;
+    return code > ObjectCode::MAX_WALL;
+    //return true;
 }
 
 void GameObject::onWalk(GameObject* trigger)
