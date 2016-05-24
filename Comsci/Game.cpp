@@ -49,7 +49,7 @@ void Game::start()
 {
     advanceLevel();
     showText(L"Welcome to Comsci\u2122!\n");
-    for (;;) // forever
+    for (uint64_t turn = 0;;turn++) // forever
     {
         const unsigned int width = m_pCurrentLevel->GetWidth();
         const unsigned int height = m_pCurrentLevel->GetHeight();
@@ -150,7 +150,7 @@ void Game::start()
                 continue;
             else if (npcCode >= MIN_SPAWN && npcCode <= MAX_SPAWN)
             {
-                if (npcPos.xTile > 0 && npcPos.xTile < width - 1 && npcPos.yTile > 0 && npcPos.yTile < height - 1)
+                if (npcPos.xTile > 0 && npcPos.xTile < width - 1 && npcPos.yTile > 0 && npcPos.yTile < height - 1 && turn % 16 == 0)
                 {
                     //npc->setCode(GetSpawnedItem(npcCode));
                     Position spawneePos = Position{ npcPos.xTile + (random() % 3) - 1, npcPos.yTile + (random() % 3) - 1 };
