@@ -105,9 +105,12 @@ void Game::start()
             {
                 // attack
                 showText(L"You attack the creature!");
-                GameObject& npc = m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile];
-                if (npc.changeHealth(-PLAYER_DAMAGE) < 0)
+                GameObject* npc = m_pCurrentLevel->m_pEntities + (p.yTile * width + p.xTile);
+                if (npc->attack(PLAYER_DAMAGE) < 0)
+                {
                     showText(L"You have mortally wounded it!");
+                    *npc = GameObject();
+                }
             }
             else
             {
@@ -132,7 +135,6 @@ void Game::start()
             // On death, monster *should* have a chance to turn into a spawner.
             if (npc->getHealth() <= 0)
             {
-                *npc = GameObject();
                 continue;
             }
             else if (npcCode >= MIN_MONST && npcCode <= MAX_MONST)
@@ -141,7 +143,10 @@ void Game::start()
                 {
                     Position movePos = Position{ npcPos.xTile + (random() % 3) - 1, npcPos.yTile + (random() % 3) - 1 };
                     AssertPositionChangeValid(npcPos, movePos);
-                    moveEntity(npcPos, movePos);
+                    if (!moveEntity(npcPos, movePos))
+                    {
+                        //
+                    }
                 }
             }
         }
@@ -154,7 +159,7 @@ void Game::start()
                 continue;
             else if (npcCode >= MIN_SPAWN && npcCode <= MAX_SPAWN)
             {
-                if (npcPos.xTile > 0 && npcPos.xTile < width - 1 && npcPos.yTile > 0 && npcPos.yTile < height - 1 && turn % 16 == 0)
+                if (npcPos.xTile > 0 && npcPos.xTile < width - 1 && npcPos.yTile > 0 && npcPos.yTile < height - 1 && turn % 4 == 0)
                 {
                     //npc->setCode(GetSpawnedItem(npcCode));
                     Position spawneePos = Position{ npcPos.xTile + (random() % 3) - 1, npcPos.yTile + (random() % 3) - 1 };

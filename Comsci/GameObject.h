@@ -14,6 +14,8 @@ public:
     int getHealth();
     int setHealth(int);
     int changeHealth(int);
+    bool isAttackable();
+    int attack(int);
 
     bool onBeforeWalk(GameObject*);
     void onWalk(GameObject*);
