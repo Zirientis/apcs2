@@ -105,6 +105,9 @@ void Game::start()
             {
                 // attack
                 showText(L"You attack the creature!");
+                GameObject& npc = m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile];
+                if (npc.changeHealth(-PLAYER_DAMAGE) < 0)
+                    showText(L"You have mortally wounded it!");
             }
             else
             {
@@ -129,7 +132,8 @@ void Game::start()
             // On death, monster *should* have a chance to turn into a spawner.
             if (npc->getHealth() <= 0)
             {
-                DebugBreak();
+                *npc = GameObject();
+                continue;
             }
             else if (npcCode >= MIN_MONST && npcCode <= MAX_MONST)
             {

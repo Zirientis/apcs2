@@ -11,6 +11,7 @@
 class Game
 {
 private:
+    static const int PLAYER_DAMAGE = 30;
     Level* m_pCurrentLevel;
     Position* m_pPlayerPositions; // For Game bookkeeping
     int m_numPlayers;
