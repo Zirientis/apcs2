@@ -31,6 +31,7 @@ Level::Level(int diff)
             m_pEntities[(row + holePunchOffset) * width + col + holePunchOffset] = GameObject(SPAWN_SPIDER, 1);
         }
     }
+    drawRect(m_pSurfaces, 0, 0, width, height, GameObject(WALL_BRICK, -1));
 }
 
 Level::~Level()
