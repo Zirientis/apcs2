@@ -1,6 +1,8 @@
 #pragma once
 #include "GameObject.h"
 #include "Position.h"
+
+#include <random>
 class Level
 {
     friend class Game;
@@ -21,7 +23,7 @@ private:
     void fillRect(GameObject*, unsigned int, unsigned int,
         unsigned int, unsigned int, GameObject&);
 public:
-    Level(int);
+    Level(int, std::mt19937);
     ~Level();
     const GameObject* GetOverlayAt(Position);
     const GameObject* GetEntityAt(Position);

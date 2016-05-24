@@ -3,8 +3,9 @@
 #include "Position.h"
 #include "ObjectCode.h"
 
+#include <random>
 
-Level::Level(int diff)
+Level::Level(int diff, std::mt19937 rng)
 {
     difficulty = diff;
     unsigned int segments = BASE_SEGMENTS_PER_LEVEL + diff / INCR_SEGMENTS_AFTER_COUNT;
@@ -32,6 +33,9 @@ Level::Level(int diff)
         }
     }
     drawRect(m_pSurfaces, 0, 0, width, height, GameObject(WALL_BRICK, -1));
+    unsigned int row = rng() % height;
+    unsigned int col = rng() % width;
+    m_pSurfaces[row * width + col] = GameObject(STAIRS, -1);
 }
 
 Level::~Level()

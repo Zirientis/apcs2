@@ -219,7 +219,7 @@ void Game::advanceLevel()
         oldDiff = m_pCurrentLevel->difficulty;
         delete m_pCurrentLevel;
     }
-    m_pCurrentLevel = new Level(oldDiff + 1);
+    m_pCurrentLevel = new Level(oldDiff + 1, random);
 }
 
 int Game::getActivePlayer() // main thread, and only when locked
