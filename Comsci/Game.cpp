@@ -7,15 +7,13 @@
 #include <Windows.h>
 
 #include <vector>
+#include <random>
 Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*, const wchar_t*))
 {
+    std::random_device rd;
+    random = std::mt19937(rd());
     m_pCurrentLevel = nullptr;
     m_numPlayers = numPlayers;
-    m_pPlayers = new GameObject[numPlayers];
-    for (int i = 0; i < m_numPlayers; i++)
-    {
-        m_pPlayers[i] = GameObject(ObjectCode::PLAYER_1);
-    }
     m_pPlayerPositions = new Position[numPlayers];
     for (int i = 0; i < m_numPlayers; i++)
     {
@@ -36,8 +34,6 @@ Game::~Game()
     delete m_pCurrentLevel;
     m_pCurrentLevel = nullptr;
 
-    delete[] m_pPlayers;
-    m_pPlayers = nullptr;
     delete[] m_pPlayerPositions;
     m_pPlayerPositions = nullptr;
     getInput = nullptr;
@@ -55,11 +51,13 @@ void Game::start()
     showText(L"Welcome to Comsci\u2122!\n");
     for (;;) // forever
     {
+        const unsigned int width = m_pCurrentLevel->GetWidth();
+        const unsigned int height = m_pCurrentLevel->GetHeight();
         for (m_activePlayer = 0; m_activePlayer < m_numPlayers; m_activePlayer++)
         {
             // Set the necessary overlays
             Position playerPos = m_pPlayerPositions[m_activePlayer];
-            unsigned int ptrOffset = playerPos.yTile * m_pCurrentLevel->GetWidth() + playerPos.xTile;
+            unsigned int ptrOffset = playerPos.yTile * width + playerPos.xTile;
             GameObject* overlay = m_pCurrentLevel->m_pOverlays + ptrOffset;
             // Wait for input
             Position p;
@@ -73,14 +71,14 @@ void Game::start()
                     getInput(this, &p, L"Make your move...\n");
                 }
                 overlay->setCode(ObjectCode::NONE);
-            } while (p.xTile >= m_pCurrentLevel->GetWidth() || p.yTile >= m_pCurrentLevel->GetHeight());
+            } while (p.xTile >= width || p.yTile >= height);
             // deactivate the overlay
 
-            ObjectCode targetEntCode = m_pCurrentLevel->m_pEntities[p.yTile * m_pCurrentLevel->GetWidth() + p.xTile].getCode();
-            ObjectCode targetSurfCode = m_pCurrentLevel->m_pSurfaces[p.yTile * m_pCurrentLevel->GetWidth() + p.xTile].getCode();
+            ObjectCode targetEntCode = m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile].getCode();
+            ObjectCode targetSurfCode = m_pCurrentLevel->m_pSurfaces[p.yTile * width + p.xTile].getCode();
             if (!playersPlaced)
             {
-                GameObject playerTemplate = GameObject((ObjectCode)(ObjectCode::PLAYER_1 + m_activePlayer));
+                GameObject playerTemplate = GameObject((ObjectCode)(ObjectCode::PLAYER_1 + m_activePlayer), 100);
                 if (placeEntity(playerTemplate, p, false))
                 {
                     m_pPlayerPositions[m_activePlayer] = p;
@@ -97,7 +95,7 @@ void Game::start()
             }
             else if (p == playerPos)
             {
-                showText(L"You shuffle your feet.");
+                showText(L"You look around curiously.");
             }
             else if (targetEntCode >= PLAYER_1 && targetEntCode <= MAX_PLAYER)
             {
@@ -119,14 +117,47 @@ void Game::start()
         showText(L"You hear the creatures of the dungeon begin to stir...");
 
         // Now allow each non-player entity to act
-        for (unsigned int i = 0; i < m_pCurrentLevel->GetWidth() * m_pCurrentLevel->GetHeight(); i++)
+        // FIXME: GameObject should take a turnCreated, if objects should sleep for 1 turn.
+        for (unsigned int i = 0; i < width * height; i++)
         {
             GameObject* npc = m_pCurrentLevel->m_pEntities + i;
             ObjectCode npcCode = npc->getCode();
-            if (npcCode == NONE || (npcCode >= PLAYER_1 && npcCode <= MAX_PLAYER))
+            Position npcPos = Position{ i % width, i / width };
+            if (npcCode == NONE || (npcCode >= MIN_PLAYER && npcCode <= MAX_PLAYER))
                 continue;
             // Now do something!
-
+            // On death, monster *should* have a chance to turn into a spawner.
+            if (npc->getHealth() <= 0)
+            {
+                DebugBreak();
+            }
+            else if (npcCode >= MIN_MONST && npcCode <= MAX_MONST)
+            {
+                if (npcPos.xTile > 0 && npcPos.xTile < width - 1 && npcPos.yTile > 0 && npcPos.yTile < height - 1)
+                {
+                    Position movePos = Position{ npcPos.xTile + (random() % 3) - 1, npcPos.yTile + (random() % 3) - 1 };
+                    AssertPositionChangeValid(npcPos, movePos);
+                    moveEntity(npcPos, movePos);
+                }
+            }
+        }
+        for (unsigned int i = 0; i < width * height; i++)
+        {
+            GameObject* npc = m_pCurrentLevel->m_pEntities + i;
+            ObjectCode npcCode = npc->getCode();
+            Position npcPos = Position{ i / width, i % width };
+            if (npcCode == NONE || (npcCode >= MIN_PLAYER && npcCode <= MAX_PLAYER))
+                continue;
+            else if (npcCode >= MIN_SPAWN && npcCode <= MAX_SPAWN)
+            {
+                if (npcPos.xTile > 0 && npcPos.xTile < width - 1 && npcPos.yTile > 0 && npcPos.yTile < height - 1)
+                {
+                    //npc->setCode(GetSpawnedItem(npcCode));
+                    Position spawneePos = Position{ npcPos.xTile + (random() % 3) - 1, npcPos.yTile + (random() % 3) - 1 };
+                    AssertPositionChangeValid(npcPos, spawneePos);
+                    placeEntity(GameObject(GetSpawnedItem(npcCode), 25), spawneePos, false);
+                }
+            }
         }
     }
 }
@@ -141,6 +172,11 @@ bool Game::moveEntity(Position start, Position end)
     // 4. Move the player's GameObject and update m_pPlayerPositions.
     // 5. Call the furnishing's onWalk().
 
+    if (start == end)
+    {
+        return true; // Nothing happens!
+    }
+
     if (m_pCurrentLevel->GetEntityAt(end)->getCode() == ObjectCode::NONE) // tile is empty
     {
         GameObject* oldEnt = m_pCurrentLevel->m_pEntities + (start.yTile * m_pCurrentLevel->GetWidth() + start.xTile);
@@ -152,7 +188,7 @@ bool Game::moveEntity(Position start, Position end)
         {
             GameObject* newEnt = m_pCurrentLevel->m_pEntities + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
             *newEnt = *oldEnt;
-            oldEnt->setCode(ObjectCode::NONE);
+            *oldEnt = GameObject();
             GameObject* newFurn = m_pCurrentLevel->m_pFurnishings + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
             newFurn->onWalk(newEnt); // TODO: has issues if the trap moves the entity
             return true;

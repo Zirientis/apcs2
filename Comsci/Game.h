@@ -4,6 +4,7 @@
 #include <Windows.h>
 
 #include <vector>
+#include <random>
 
 #define INPUT_HANDLE_NAME L"Game Input Ready"
 #define TEXT_HANDLE_NAME L"Text Line Displayed"
@@ -11,7 +12,6 @@ class Game
 {
 private:
     Level* m_pCurrentLevel;
-    GameObject* m_pPlayers;
     Position* m_pPlayerPositions; // For Game bookkeeping
     int m_numPlayers;
     int m_activePlayer;
@@ -21,6 +21,7 @@ private:
     HANDLE inputEvent; // setting this one means input is ready.
     HANDLE textEvent; // if unsignalled, there is text to show and then signal
     void(*getInput) (void*, Position*, const wchar_t*);
+    std::mt19937 random;
 
     bool moveEntity(Position start, Position end);
     bool placeEntity(GameObject& templateObj, Position pos, bool force);
@@ -47,3 +48,13 @@ public:
 
 void DefaultInputFunc(void*, Position*, const wchar_t*); // Game thread only!
 DWORD WINAPI GameThreadEntryProc(void*);
+
+inline void AssertPositionChangeValid(Position start, Position end)
+{
+    const int xDiff = start.xTile - end.xTile;
+    if (!(xDiff == 1 || xDiff == 0 || xDiff == -1))
+        DebugBreak();
+    const int yDiff = start.yTile - end.yTile;
+    if (!(yDiff == 1 || yDiff == 0 || yDiff == -1))
+        DebugBreak();
+}

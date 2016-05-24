@@ -19,16 +19,16 @@ Level::Level(int diff)
         for (unsigned int col = 0; col < width; col += BASE_SEGMENT_LENGTH)
         {
             drawRect(m_pSurfaces, col, row, col + BASE_SEGMENT_LENGTH,
-                row + BASE_SEGMENT_LENGTH, WALL_MARIO);
+                row + BASE_SEGMENT_LENGTH, GameObject(WALL_MARIO, -1));
             fillRect(m_pSurfaces, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,
-                row + BASE_SEGMENT_LENGTH - 1, FLOOR_DIRT);
+                row + BASE_SEGMENT_LENGTH - 1, GameObject(FLOOR_DIRT, -1));
             unsigned int holePunchOffset = BASE_SEGMENT_LENGTH / 2;
             m_pSurfaces[(row + holePunchOffset) * width + col].setCode(FLOOR_DIRT);
             m_pSurfaces[(row + holePunchOffset) * width + col + BASE_SEGMENT_LENGTH - 1].setCode(FLOOR_DIRT);
             m_pSurfaces[row * width + col + holePunchOffset].setCode(FLOOR_DIRT);
             m_pSurfaces[(row + BASE_SEGMENT_LENGTH - 1) * width + col + holePunchOffset].setCode(FLOOR_DIRT);
 
-            m_pEntities[(row + holePunchOffset) * width + col + holePunchOffset].setCode(MONST_SPIDER);
+            m_pEntities[(row + holePunchOffset) * width + col + holePunchOffset] = GameObject(SPAWN_SPIDER, 1);
         }
     }
 }
@@ -46,23 +46,23 @@ Level::~Level()
 }
 
 void Level::drawRect(GameObject* arr, unsigned int left, unsigned int top,
-    unsigned int right, unsigned int bottom, ObjectCode code)
+    unsigned int right, unsigned int bottom, GameObject& templ)
 {
     // Go top, bottom, left, right. On sides, remember that corners are done.
-    fillRect(arr, left, top, right, top + 1, code);
-    fillRect(arr, left, bottom - 1, right, bottom, code);
-    fillRect(arr, left, top + 1, left + 1, bottom - 1, code);
-    fillRect(arr, right - 1, top + 1, right, bottom - 1, code);
+    fillRect(arr, left, top, right, top + 1, templ);
+    fillRect(arr, left, bottom - 1, right, bottom, templ);
+    fillRect(arr, left, top + 1, left + 1, bottom - 1, templ);
+    fillRect(arr, right - 1, top + 1, right, bottom - 1, templ);
 }
 
 void Level::fillRect(GameObject* arr, unsigned int left, unsigned int top,
-    unsigned int right, unsigned int bottom, ObjectCode code)
+    unsigned int right, unsigned int bottom, GameObject& templ)
 {
     for (unsigned int r = top; r < bottom; r++)
     {
         for (unsigned int c = left; c < right; c++)
         {
-            arr[r * width + c].setCode(code);
+            arr[r * width + c] = GameObject(templ);
         }
     }
 }
