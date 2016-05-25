@@ -27,7 +27,7 @@
 #define SPRITE_DIM 25
 #define TARGET_FRAMERATE 30
 #define GAMEBOARD_ORIGIN_X 0
-#define GAMEBOARD_ORIGIN_Y 30
+#define GAMEBOARD_ORIGIN_Y 60
 void CALLBACK RedrawTimerProc(HWND timerHwnd, UINT msg, UINT_PTR timerId, DWORD dwTime);
 
 template <class Interface>

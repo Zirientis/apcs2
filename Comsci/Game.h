@@ -39,6 +39,8 @@ public:
     void DefaultMemberGetInput(Position*, const wchar_t*); // game thread only!
     bool MaybeSendPosition(Position); // Returns whether the position was set
     const wchar_t* GetOutputText();
+    const int GetDifficulty();
+    const int GetScore();
 
     const GameObject* GetEntityAt(Position);
     const GameObject* GetFurnishingAt(Position);

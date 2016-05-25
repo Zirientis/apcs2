@@ -8,6 +8,7 @@
 #include "Position.h"
 
 #include <dwrite.h>
+#include <string>
 
 
 #define MAX_LOADSTRING 100
@@ -72,12 +73,14 @@ HRESULT Comsci::OnRender()
         // we have text to render if event is nonsignalled
         // signal in WndProc when mouse input is recieved.
         const wchar_t* text = game->GetOutputText();
+        std::wstring str = L"Level ";
+        str += std::to_wstring(game->GetDifficulty());
+        str += L" Score ";
+        str += std::to_wstring(game->GetScore());
+        str += L"\n";
         if (text)
-        {
-            //OutputDebugString(text);
-            m_pRenderTarget->DrawText(text, std::wcslen(text), m_pTextFormat, textDisp, m_pBlackBrush);
-            //MessageBox(m_hwnd, game->GetOutputText(), L"Comsci", 0);
-        }
+            str += text;
+        m_pRenderTarget->DrawText(str.data(), str.length(), m_pTextFormat, textDisp, m_pBlackBrush);
         // We should query the status of the level and render the contents
         // Pseudocode:
         // Get level map and dimensions.

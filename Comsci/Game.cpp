@@ -123,7 +123,7 @@ void Game::start()
                 }
                 else
                     m_pPlayerPositions[m_activePlayer] = p;
-                showText(L"You quaff the potion.");
+                showText(L"You quaff the potion. You feel a vague sense of improvement.");
             }
             else if (p == playerPos)
             {
@@ -302,6 +302,16 @@ void Game::DefaultMemberGetInput(Position* outPos, const wchar_t* prompt) // gam
 const wchar_t* Game::GetOutputText()
 {
     return synchronizedTextString;
+}
+
+const int Game::GetDifficulty()
+{
+    return m_pCurrentLevel->difficulty;
+}
+
+const int Game::GetScore()
+{
+    return score;
 }
 
 void Game::showText(const wchar_t* textString)
