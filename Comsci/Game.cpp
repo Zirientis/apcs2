@@ -13,6 +13,7 @@ Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*, const wchar_t
 {
     std::random_device rd;
     random = std::mt19937(rd());
+    score = 0;
     m_pCurrentLevel = nullptr;
     m_numPlayers = numPlayers;
     m_pPlayerPositions = new Position[numPlayers];
@@ -101,6 +102,7 @@ void Game::start()
             else if (targetEntCode >= MIN_POTION && targetEntCode <= MAX_POTION)
             {
                 showText(L"You quaff the potion.");
+                score += GetScoreChange(targetEntCode);
                 m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile] = GameObject();
                 if (!moveEntity(playerPos, p))
                 {
@@ -126,6 +128,7 @@ void Game::start()
                 if (npc->attack(PLAYER_DAMAGE) < 0)
                 {
                     showText(L"You have mortally wounded it!");
+                    score += GetScoreChange(targetEntCode);
                     *npc = GameObject();
                 }
             }

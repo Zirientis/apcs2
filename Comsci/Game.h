@@ -21,6 +21,7 @@ private:
     const wchar_t* synchronizedTextString;
     HANDLE inputEvent; // setting this one means input is ready.
     HANDLE textEvent; // if unsignalled, there is text to show and then signal
+    int64_t score;
     void(*getInput) (void*, Position*, const wchar_t*);
     std::mt19937 random;
 

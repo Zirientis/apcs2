@@ -111,3 +111,12 @@ inline ObjectCode GetSpawner(ObjectCode spawnee)
         return SPAWN_OOZE;
     }
 }
+
+inline int GetScoreChange(ObjectCode query)
+{
+    if (query >= MIN_POTION && query <= MAX_POTION)
+        return 100;
+    if (query >= MIN_MONST && query <= MAX_MONST)
+        return 25;
+    return 0;
+}
