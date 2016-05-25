@@ -52,10 +52,10 @@ DWORD WINAPI GameThreadEntryProc(void*);
 
 inline void AssertPositionChangeValid(Position start, Position end)
 {
-    const int xDiff = start.xTile - end.xTile;
+    const int xDiff = (int)start.xTile - (int)end.xTile;
     if (!(xDiff == 1 || xDiff == 0 || xDiff == -1))
         DebugBreak();
-    const int yDiff = start.yTile - end.yTile;
+    const int yDiff = (int)start.yTile - (int)end.yTile;
     if (!(yDiff == 1 || yDiff == 0 || yDiff == -1))
         DebugBreak();
 }

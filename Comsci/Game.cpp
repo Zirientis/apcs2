@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <random>
+#include <cmath>
 Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*, const wchar_t*))
 {
     std::random_device rd;
@@ -61,6 +62,7 @@ void Game::start()
             GameObject* overlay = m_pCurrentLevel->m_pOverlays + ptrOffset;
             // Wait for input
             Position p;
+            int xDiff, yDiff;
             do
             {
                 if (!playersPlaced)
@@ -71,7 +73,10 @@ void Game::start()
                     getInput(this, &p, L"Make your move...\n");
                 }
                 overlay->setCode(ObjectCode::NONE);
-            } while (p.xTile >= width || p.yTile >= height);
+                xDiff = std::abs((int)p.xTile - (int)playerPos.xTile);
+                yDiff = std::abs((int)p.yTile - (int)playerPos.yTile);
+            } while (p.xTile >= width || p.yTile >= height ||
+                (playersPlaced && (xDiff > 1 || yDiff > 1)));
             // deactivate the overlay
 
             ObjectCode targetEntCode = m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile].getCode();
@@ -92,6 +97,18 @@ void Game::start()
             else if (moveEntity(playerPos, p))
             {
                 m_pPlayerPositions[m_activePlayer] = p;
+            }
+            else if (targetEntCode >= MIN_POTION && targetEntCode <= MAX_POTION)
+            {
+                showText(L"You quaff the potion.");
+                m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile] = GameObject();
+                if (!moveEntity(playerPos, p))
+                {
+                    // ASSERT: Couldn't move to square after taking potion!
+                    DebugBreak();
+                }
+                else
+                    m_pPlayerPositions[m_activePlayer] = p;
             }
             else if (p == playerPos)
             {
