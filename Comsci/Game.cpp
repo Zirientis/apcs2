@@ -2,6 +2,7 @@
 
 #include "GameObject.h"
 #include "ObjectCode.h"
+#include "ActionCode.h"
 #include "Position.h"
 
 #include <Windows.h>
@@ -240,7 +241,11 @@ bool Game::moveEntity(Position start, Position end)
             *newEnt = *oldEnt;
             *oldEnt = GameObject();
             GameObject* newFurn = m_pCurrentLevel->m_pFurnishings + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
-            newFurn->onWalk(newEnt); // TODO: has issues if the trap moves the entity
+            ActionCode result = newFurn->onWalk(newEnt); // TODO: has issues if the trap moves the entity
+            if (result == AC_STAIR_TRIGGERED)
+            {
+                showText(L"The stairs don't seem to go anywhere...");
+            }
             return true;
         }
     }

@@ -1,5 +1,6 @@
 #pragma once
 #include "ObjectCode.h"
+#include "ActionCode.h"
 class GameObject
 {
 private:
@@ -18,6 +19,6 @@ public:
     int attack(int);
 
     bool onBeforeWalk(GameObject*);
-    void onWalk(GameObject*);
+    ActionCode onWalk(GameObject*);
     bool onAfterWalk(GameObject*);
 };

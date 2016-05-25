@@ -1,4 +1,6 @@
 #include "GameObject.h"
+#include "ObjectCode.h"
+#include "ActionCode.h"
 
 GameObject::GameObject()
 {
@@ -63,13 +65,13 @@ bool GameObject::onBeforeWalk(GameObject* trigger)
 }
 
 // should return an ActionCode
-void GameObject::onWalk(GameObject* trigger)
+ActionCode GameObject::onWalk(GameObject* trigger)
 {
     if (code == STAIRS)
     {
-
+        return ActionCode::AC_STAIR_TRIGGERED;
     }
-    return;
+    return ActionCode::AC_NONE;
 }
 
 bool GameObject::onAfterWalk(GameObject* trigger)

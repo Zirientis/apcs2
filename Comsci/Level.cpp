@@ -34,12 +34,15 @@ Level::Level(int diff, std::mt19937 rng)
     }
     drawRect(m_pSurfaces, 0, 0, width, height, GameObject(WALL_BRICK, -1));
     unsigned int row, col;
+    ObjectCode surf;
     do
     {
         row = rng() % height;
         col = rng() % width;
-    } while (m_pEntities[row * width + col].getCode() != ObjectCode::NONE);
-    m_pSurfaces[row * width + col] = GameObject(STAIRS, -1);
+        surf = m_pSurfaces[row * width + col].getCode();
+    } while (m_pEntities[row * width + col].getCode() != ObjectCode::NONE ||
+        (surf >= MIN_WALL && surf < MAX_WALL));
+    m_pFurnishings[row * width + col] = GameObject(STAIRS, -1);
 }
 
 Level::~Level()
