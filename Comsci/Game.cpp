@@ -99,9 +99,8 @@ void Game::start()
             {
                 m_pPlayerPositions[m_activePlayer] = p;
             }
-            else if (targetEntCode >= MIN_POTION && targetEntCode <= MAX_POTION)
+            else if (targetEntCode == COIN)
             {
-                showText(L"You quaff the potion.");
                 score += GetScoreChange(targetEntCode);
                 m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile] = GameObject();
                 if (!moveEntity(playerPos, p))
@@ -111,6 +110,20 @@ void Game::start()
                 }
                 else
                     m_pPlayerPositions[m_activePlayer] = p;
+                showText(L"You pick up the coins.");
+            }
+            else if (targetEntCode >= MIN_POTION && targetEntCode <= MAX_POTION)
+            {
+                score += GetScoreChange(targetEntCode);
+                m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile] = GameObject();
+                if (!moveEntity(playerPos, p))
+                {
+                    // ASSERT: Couldn't move to square after taking potion!
+                    DebugBreak();
+                }
+                else
+                    m_pPlayerPositions[m_activePlayer] = p;
+                showText(L"You quaff the potion.");
             }
             else if (p == playerPos)
             {
@@ -129,7 +142,7 @@ void Game::start()
                 {
                     showText(L"You have mortally wounded it!");
                     score += GetScoreChange(targetEntCode);
-                    *npc = GameObject();
+                    *npc = GameObject(ObjectCode::COIN, 1);
                 }
             }
             else
