@@ -33,26 +33,11 @@ enum ObjectCode {
     MAX_TRAP = TRAP_PUDDLE,
 
     MIN_SPAWN,
-    SPAWN_ZOMBIE = MIN_SPAWN,
+    SPAWN_EYEBALL = MIN_SPAWN,
     SPAWN_SPIDER,
     SPAWN_OOZE,
-    MAX_SPAWN = SPAWN_OOZE,
-
-    U_1,
-    U_2,
-    U_3,
-    U_4,
-    U_5,
-    U_6,
-    U_7,
-    U_8,
-    U_9,
-    U_10,
-    U_11,
-    U_12,
-    U_13,
-    U_14,
-    U_15,
+    SPAWN_SNAKE,
+    MAX_SPAWN = SPAWN_SNAKE,
 
 
     MIN_PLAYER,
@@ -62,8 +47,30 @@ enum ObjectCode {
     PLAYER_4,
     MAX_PLAYER = PLAYER_4,
 
+    COIN,
+
+    MIN_POTION,
+    POTION_RED = MIN_POTION,
+    POTION_PURPLE,
+    POTION_YELLOW,
+    MAX_POTION = POTION_YELLOW,
+
+    MIN_WEAPON,
+    WEAPON_SWORD = MIN_WEAPON,
+    WEAPON_FLAIL,
+    MAX_WEAPON = WEAPON_FLAIL,
+
+    u1,
+    u2,
+    u3,
+    u4,
+    u5,
+    u6,
+
     MIN_MONST,
-    MONST_ZOMBIE = MIN_MONST,
+    MONST_PLAYER_GHOST = MIN_MONST,
+    MONST_SNAKE,
+    MONST_EYEBALL,
     MONST_SPIDER,
     MONST_OOZE,
     MAX_MONST = MONST_OOZE,
@@ -76,12 +83,15 @@ inline ObjectCode GetSpawnedItem(ObjectCode spawner)
 {
     switch (spawner)
     {
-    case SPAWN_ZOMBIE:
-        return MONST_ZOMBIE;
+    case SPAWN_SNAKE:
+        return MONST_SNAKE;
     case SPAWN_SPIDER:
         return MONST_SPIDER;
+    case SPAWN_EYEBALL:
+        return MONST_EYEBALL;
     case SPAWN_OOZE:
         return MONST_OOZE;
+    case MONST_PLAYER_GHOST: // fall through
     default:
         return NONE;
     }
@@ -91,8 +101,10 @@ inline ObjectCode GetSpawner(ObjectCode spawnee)
 {
     switch (spawnee)
     {
-    case MONST_ZOMBIE:
-        return SPAWN_ZOMBIE;
+    case MONST_SNAKE:
+        return SPAWN_SNAKE;
+    case MONST_EYEBALL:
+        return SPAWN_EYEBALL;
     case MONST_SPIDER:
         return SPAWN_SPIDER;
     case MONST_OOZE:
