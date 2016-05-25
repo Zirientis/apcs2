@@ -62,6 +62,7 @@ bool GameObject::onBeforeWalk(GameObject* trigger)
     //return true;
 }
 
+// should return an ActionCode
 void GameObject::onWalk(GameObject* trigger)
 {
     if (code == STAIRS)

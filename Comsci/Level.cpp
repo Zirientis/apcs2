@@ -33,8 +33,12 @@ Level::Level(int diff, std::mt19937 rng)
         }
     }
     drawRect(m_pSurfaces, 0, 0, width, height, GameObject(WALL_BRICK, -1));
-    unsigned int row = rng() % height;
-    unsigned int col = rng() % width;
+    unsigned int row, col;
+    do
+    {
+        row = rng() % height;
+        col = rng() % width;
+    } while (m_pEntities[row * width + col].getCode() != ObjectCode::NONE);
     m_pSurfaces[row * width + col] = GameObject(STAIRS, -1);
 }
 

@@ -50,7 +50,9 @@ Game::~Game()
 void Game::start()
 {
     advanceLevel();
-    showText(L"Welcome to Comsci\u2122!\n");
+    showText(L"Welcome to Comsci\u2122! (Build 0.1alpha)\n");
+    showText(L"1. Survive the spider onslaught!");
+    showText(L"2. Get a high score!");
     for (uint64_t turn = 0;;turn++) // forever
     {
         const unsigned int width = m_pCurrentLevel->GetWidth();
@@ -136,14 +138,19 @@ void Game::start()
             else if (p != playerPos && targetSurfCode > MAX_WALL)
             {
                 // attack
-                showText(L"You attack the creature!");
                 GameObject* npc = m_pCurrentLevel->m_pEntities + (p.yTile * width + p.xTile);
-                if (npc->attack(PLAYER_DAMAGE) < 0)
+                if (npc->isAttackable())
                 {
-                    showText(L"You have mortally wounded it!");
-                    score += GetScoreChange(targetEntCode);
-                    *npc = GameObject(ObjectCode::COIN, 1);
+                    showText(L"You attack the creature!");
+                    if (npc->attack(PLAYER_DAMAGE) < 0)
+                    {
+                        showText(L"You have mortally wounded it!");
+                        score += GetScoreChange(targetEntCode);
+                        *npc = GameObject(ObjectCode::COIN, 1);
+                    }
                 }
+                else
+                    showText(L"You can't attack that!");
             }
             else
             {
@@ -201,7 +208,8 @@ void Game::start()
                 }
             }
         }
-    }
+        score += 5;
+    } // forever
 }
 
 bool Game::moveEntity(Position start, Position end)
