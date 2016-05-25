@@ -127,7 +127,7 @@ Comsci::~Comsci()
 	SafeRelease(&m_pSpriteSheet);
     SafeRelease(&m_pDirectWriteFactory);
     SafeRelease(&m_pTextFormat);
-    TerminateThread(gameThread, 0);
+    TerminateThread(gameThread, 1);
     CloseHandle(gameThread);
     CloseHandle(gameTextHandle);
     delete game;
