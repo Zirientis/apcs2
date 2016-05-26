@@ -1,62 +1,35 @@
-========================================================================
-    WIN32 APPLICATION : Comsci Project Overview
-========================================================================
+README for Comsci
+Table of Contents:
+==================
+	1. Introduction
+	2. How-to
+	3. Score
+	4. Game-modes
+	5. Credits
 
-AppWizard has created this Comsci application for you.
+1. Introduction
+Welcome to Comsci! Comsci is a turn-based dungeon game. To get started, simply
+extract the archive and run the Comsci.exe executable file. The game will start
+and prompt you to begin.
 
-This file contains a summary of what you will find in each of the files that
-make up your Comsci application.
+2. How-to
+As of Build 0.1alpha, a new game will start automatically upon launching the
+application. When prompted to place your player, select an open square and
+left-click it to start your player there. When prompted to move, a blue outline
+will surround the player whose turn it is to move. Select an adjacent square to
+move to it. You will automatically pick up any collectible items on that square
+and fight any monster located there.
 
+3. Score
+Score is attained by defeating monsters and collecting coins, potions, and
+other items. One point is lost at the start of each turn. Certain game-modes
+may have other specific score rules.
 
-Comsci.vcxproj
-    This is the main project file for VC++ projects generated using an Application Wizard.
-    It contains information about the version of Visual C++ that generated the file, and
-    information about the platforms, configurations, and project features selected with the
-    Application Wizard.
+4. Game-modes
+As of Build 0.1alpha, the implemented game mode is Spider Rush, where you
+try to maximize your score while fighting of a horde of spiders! You are given
+three player characters, and must fight to achieve the maximum possible total
+score. Classic mode is coming soon!
 
-Comsci.vcxproj.filters
-    This is the filters file for VC++ projects generated using an Application Wizard. 
-    It contains information about the association between the files in your project 
-    and the filters. This association is used in the IDE to show grouping of files with
-    similar extensions under a specific node (for e.g. ".cpp" files are associated with the
-    "Source Files" filter).
-
-Comsci.cpp
-    This is the main application source file.
-
-/////////////////////////////////////////////////////////////////////////////
-AppWizard has created the following resources:
-
-Comsci.rc
-    This is a listing of all of the Microsoft Windows resources that the
-    program uses.  It includes the icons, bitmaps, and cursors that are stored
-    in the RES subdirectory.  This file can be directly edited in Microsoft
-    Visual C++.
-
-Resource.h
-    This is the standard header file, which defines new resource IDs.
-    Microsoft Visual C++ reads and updates this file.
-
-Comsci.ico
-    This is an icon file, which is used as the application's icon (32x32).
-    This icon is included by the main resource file Comsci.rc.
-
-small.ico
-    This is an icon file, which contains a smaller version (16x16)
-    of the application's icon. This icon is included by the main resource
-    file Comsci.rc.
-
-/////////////////////////////////////////////////////////////////////////////
-Other standard files:
-
-StdAfx.h, StdAfx.cpp
-    These files are used to build a precompiled header (PCH) file
-    named Comsci.pch and a precompiled types file named StdAfx.obj.
-
-/////////////////////////////////////////////////////////////////////////////
-Other notes:
-
-AppWizard uses "TODO:" comments to indicate parts of the source code you
-should add to or customize.
-
-/////////////////////////////////////////////////////////////////////////////
+5. Credits
+Comsci was built by Ryan Later and Michael Shuen.

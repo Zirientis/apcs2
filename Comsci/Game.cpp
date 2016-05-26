@@ -88,7 +88,7 @@ void Game::start()
             if (!playersPlaced)
             {
                 GameObject playerTemplate = GameObject((ObjectCode)(ObjectCode::PLAYER_1 + m_activePlayer), 100);
-                if (placeEntity(playerTemplate, p, false))
+                if (placeEntity(playerTemplate, p, false) == AC_NONE)
                 {
                     m_pPlayerPositions[m_activePlayer] = p;
                 }
@@ -98,7 +98,7 @@ void Game::start()
                     m_activePlayer--;
                 }
             }
-            else if (moveEntity(playerPos, p))
+            else if (moveEntity(playerPos, p) == AC_NONE)
             {
                 m_pPlayerPositions[m_activePlayer] = p;
             }
@@ -106,7 +106,7 @@ void Game::start()
             {
                 score += GetScoreChange(targetEntCode);
                 m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile] = GameObject();
-                if (!moveEntity(playerPos, p))
+                if (moveEntity(playerPos, p) != AC_NONE)
                 {
                     // ASSERT: Couldn't move to square after taking potion!
                     DebugBreak();
@@ -119,7 +119,7 @@ void Game::start()
             {
                 score += GetScoreChange(targetEntCode);
                 m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile] = GameObject();
-                if (!moveEntity(playerPos, p))
+                if (moveEntity(playerPos, p) != AC_NONE)
                 {
                     // ASSERT: Couldn't move to square after taking potion!
                     DebugBreak();
@@ -147,7 +147,10 @@ void Game::start()
                     {
                         showText(L"You have mortally wounded it!");
                         score += GetScoreChange(targetEntCode);
-                        *npc = GameObject(ObjectCode::COIN, 1);
+                        if (random() & 1)
+                            *npc = GameObject(ObjectCode::COIN, 1);
+                        else
+                            *npc = GameObject();
                     }
                 }
                 else
@@ -184,7 +187,7 @@ void Game::start()
                 {
                     Position movePos = Position{ npcPos.xTile + (random() % 3) - 1, npcPos.yTile + (random() % 3) - 1 };
                     AssertPositionChangeValid(npcPos, movePos);
-                    if (!moveEntity(npcPos, movePos))
+                    if (moveEntity(npcPos, movePos) != AC_NONE)
                     {
                         //
                     }
@@ -209,11 +212,11 @@ void Game::start()
                 }
             }
         }
-        score += 5;
+        score--;
     } // forever
 }
 
-bool Game::moveEntity(Position start, Position end)
+ActionCode Game::moveEntity(Position start, Position end)
 {
     // Currently assuming the player can fly to any location in 1 turn.
     // Only move the player if the surface allows it and there is no other entity already there.
@@ -225,7 +228,7 @@ bool Game::moveEntity(Position start, Position end)
 
     if (start == end)
     {
-        return true; // Nothing happens!
+        return AC_NONE; // Nothing happens!
     }
 
     if (m_pCurrentLevel->GetEntityAt(end)->getCode() == ObjectCode::NONE) // tile is empty
@@ -244,15 +247,18 @@ bool Game::moveEntity(Position start, Position end)
             ActionCode result = newFurn->onWalk(newEnt); // TODO: has issues if the trap moves the entity
             if (result == AC_STAIR_TRIGGERED)
             {
-                showText(L"The stairs don't seem to go anywhere...");
+                ObjectCode npcCode = newEnt->getCode();
+                if (npcCode >= MIN_PLAYER && npcCode <= MAX_PLAYER)
+                    //return AC_STAIR_TRIGGERED;
+                    showText(L"The stairs don't seem to go anywhere...");
             }
-            return true;
+            return AC_NONE;
         }
     }
-    return false;
+    return AC_MOVE_FAIL;
 }
 
-bool Game::placeEntity(GameObject& templateObj, Position pos, bool force)
+ActionCode Game::placeEntity(GameObject& templateObj, Position pos, bool force)
 {
     GameObject* ent = m_pCurrentLevel->m_pEntities + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
     GameObject* surf = m_pCurrentLevel->m_pSurfaces + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
@@ -261,9 +267,9 @@ bool Game::placeEntity(GameObject& templateObj, Position pos, bool force)
         *ent = GameObject(templateObj);
         GameObject* furn = m_pCurrentLevel->m_pFurnishings + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
         furn->onWalk(ent);
-        return true;
+        return AC_NONE;
     }
-    return false;
+    return AC_PLACE_FAIL;
 }
 
 void Game::advanceLevel()

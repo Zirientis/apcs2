@@ -1,6 +1,7 @@
 #pragma once
 #include "Level.h"
 #include "Position.h"
+#include "ActionCode.h"
 #include <Windows.h>
 
 #include <vector>
@@ -25,8 +26,8 @@ private:
     void(*getInput) (void*, Position*, const wchar_t*);
     std::mt19937 random;
 
-    bool moveEntity(Position start, Position end);
-    bool placeEntity(GameObject& templateObj, Position pos, bool force);
+    ActionCode moveEntity(Position start, Position end);
+    ActionCode placeEntity(GameObject& templateObj, Position pos, bool force);
     void advanceLevel();
     void showText(const wchar_t* textString);
 public:

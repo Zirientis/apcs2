@@ -8,7 +8,9 @@
 Level::Level(int diff, std::mt19937 rng)
 {
     difficulty = diff;
-    unsigned int segments = BASE_SEGMENTS_PER_LEVEL + diff / INCR_SEGMENTS_AFTER_COUNT;
+    unsigned int segments = BASE_SEGMENTS_PER_LEVEL;
+    if (INCR_SEGMENTS_AFTER_COUNT)
+        segments += diff / INCR_SEGMENTS_AFTER_COUNT;
     width = segments * BASE_SEGMENT_LENGTH;
     height = segments * BASE_SEGMENT_LENGTH;
     m_pEntities = new GameObject[width * height];
