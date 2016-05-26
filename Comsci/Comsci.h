@@ -103,6 +103,7 @@ private:
     Game* game;
     HANDLE gameThread;
     HANDLE gameTextHandle;
+    bool gameStarted;
 };
 
 Comsci::Comsci() :
@@ -112,7 +113,8 @@ Comsci::Comsci() :
     m_pBlackBrush(NULL),
     m_pSpriteSheet(NULL),
     m_pDirectWriteFactory(NULL),
-    m_pTextFormat(NULL)
+    m_pTextFormat(NULL),
+    gameStarted(false)
 {
     game = new Game(3, &DefaultInputFunc);
     gameTextHandle = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT_HANDLE_NAME);

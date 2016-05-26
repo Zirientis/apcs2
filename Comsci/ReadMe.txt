@@ -13,8 +13,8 @@ extract the archive and run the Comsci.exe executable file. The game will start
 and prompt you to begin.
 
 2. How-to
-As of Build 0.1alpha, a new game will start automatically upon launching the
-application. When prompted to place your player, select an open square and
+As of Build 0.1alpha, a new game will start after clicking on the prompt on the
+title screen. When prompted to place your player, select an open square and
 left-click it to start your player there. When prompted to move, a blue outline
 will surround the player whose turn it is to move. Select an adjacent square to
 move to it. You will automatically pick up any collectible items on that square

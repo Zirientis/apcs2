@@ -10,6 +10,7 @@
 #include <vector>
 #include <random>
 #include <cmath>
+#include <string>
 Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*, const wchar_t*))
 {
     std::random_device rd;
@@ -54,8 +55,9 @@ void Game::start()
     showText(L"Welcome to Comsci\u2122! (Build 0.1alpha)\n");
     showText(L"Please read the ReadMe if you have not already done so.");
     showText(L"Game mode is Spider Onslaught! (3 player)");
-    showText(L"1. Survive the spider onslaught!");
-    showText(L"2. Get a high score!");
+    showText(L"Objectives:");
+    showText(L"(1/2) Survive the spider onslaught!");
+    showText(L"(2/2) Get a high score!");
     for (uint64_t turn = 0;;turn++) // forever
     {
         const unsigned int width = m_pCurrentLevel->GetWidth();
@@ -254,8 +256,20 @@ ActionCode Game::moveEntity(Position start, Position end)
             {
                 ObjectCode npcCode = newEnt->getCode();
                 if (npcCode >= MIN_PLAYER && npcCode <= MAX_PLAYER)
+                {
                     //return AC_STAIR_TRIGGERED;
-                    showText(L"The stairs don't seem to go anywhere...");
+                    showText(L"The stairs collapse downward!");
+                    showText(L"It seems that your adventure is over!");
+                    {
+                        // HACKETY HACK HACK
+                        std::wstring outstr;
+                        outstr += L"Game Over! Your score was ";
+                        outstr += std::to_wstring(score);
+                        MessageBox(NULL, outstr.data(), L"Comsci", 0);
+                        //delete this;
+                        ExitThread(0);
+                    }
+                }
             }
             return AC_NONE;
         }
