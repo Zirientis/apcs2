@@ -43,7 +43,7 @@ Level::Level(int diff, std::mt19937 rng)
         col = rng() % width;
         surf = m_pSurfaces[row * width + col].getCode();
     } while (m_pEntities[row * width + col].getCode() != ObjectCode::NONE ||
-        (surf >= MIN_WALL && surf < MAX_WALL));
+        (surf >= MIN_WALL && surf <= MAX_WALL));
     m_pFurnishings[row * width + col] = GameObject(STAIRS, -1);
 }
 

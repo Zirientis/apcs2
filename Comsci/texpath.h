@@ -1,4 +1,5 @@
 #pragma once
-
-#define TEXTURES_DIR "H:\\apcs2\\Comsci\\textures\\"
+#ifndef TEXTURES_DIR
+#define TEXTURES_DIR "C:\\Foo\\Bar\\"
+#endif
 // Path to the 'textures' folder goes above in quotes, with trailing backslash.
