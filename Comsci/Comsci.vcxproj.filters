@@ -63,6 +63,12 @@
     <ClInclude Include="ActionCode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LevelType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -1,8 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include "Position.h"
-
-#include <random>
+#include "LevelType.h"
 
 #ifndef BASE_SEGMENTS_PER_LEVEL
 #define BASE_SEGMENTS_PER_LEVEL 3
@@ -19,6 +18,7 @@
 class Level
 {
     friend class Game;
+    friend class LevelGenerator;
 private:
     GameObject* m_pOverlays;
     GameObject* m_pEntities;
@@ -27,13 +27,8 @@ private:
 
     int difficulty;
     unsigned int width, height;
-
-    void drawRect(GameObject*, unsigned int, unsigned int,
-        unsigned int, unsigned int, GameObject&);
-    void fillRect(GameObject*, unsigned int, unsigned int,
-        unsigned int, unsigned int, GameObject&);
 public:
-    Level(int, std::mt19937);
+    Level(int, LevelType);
     ~Level();
     const GameObject* GetOverlayAt(Position);
     const GameObject* GetEntityAt(Position);

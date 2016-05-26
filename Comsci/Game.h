@@ -24,6 +24,7 @@ private:
     HANDLE textEvent; // if unsignalled, there is text to show and then signal
     int64_t score;
     void(*getInput) (void*, Position*, const wchar_t*);
+    LevelType gameType;
     std::mt19937 random;
 
     ActionCode moveEntity(Position start, Position end);
@@ -41,7 +42,7 @@ public:
     bool MaybeSendPosition(Position); // Returns whether the position was set
     const wchar_t* GetOutputText();
     const int GetDifficulty();
-    const int GetScore();
+    const int64_t GetScore();
 
     const GameObject* GetEntityAt(Position);
     const GameObject* GetFurnishingAt(Position);

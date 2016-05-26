@@ -4,6 +4,7 @@
 #include "ObjectCode.h"
 #include "ActionCode.h"
 #include "Position.h"
+#include "LevelType.h"
 
 #include <Windows.h>
 
@@ -31,6 +32,7 @@ Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*, const wchar_t
     inputEvent = CreateEvent(NULL, true, false, INPUT_HANDLE_NAME);
     textEvent = CreateEvent(NULL, true, true, TEXT_HANDLE_NAME);
     getInput = getInputFunc;
+    gameType = LevelType::LT_SPIDER;
 }
 
 Game::~Game()
@@ -299,7 +301,7 @@ void Game::advanceLevel()
         oldDiff = m_pCurrentLevel->difficulty;
         delete m_pCurrentLevel;
     }
-    m_pCurrentLevel = new Level(oldDiff + 1, random);
+    m_pCurrentLevel = new Level(oldDiff + 1, gameType);
 }
 
 int Game::getActivePlayer() // main thread, and only when locked
@@ -347,7 +349,7 @@ const int Game::GetDifficulty()
     return m_pCurrentLevel->difficulty;
 }
 
-const int Game::GetScore()
+const int64_t Game::GetScore()
 {
     return score;
 }

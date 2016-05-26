@@ -99,7 +99,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;INCR_SEGMENTS_AFTER_COUNT=0;TEXTURES_DIR="C:\\Users\\Michael\\apcs2\\Comsci\\textures\\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;INCR_SEGMENTS_AFTER_COUNT=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -155,6 +155,8 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Level.h" />
+    <ClInclude Include="LevelGenerator.h" />
+    <ClInclude Include="LevelType.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="ObjectCode.h" />
     <ClInclude Include="Position.h" />
