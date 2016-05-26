@@ -52,6 +52,8 @@ void Game::start()
 {
     advanceLevel();
     showText(L"Welcome to Comsci\u2122! (Build 0.1alpha)\n");
+    showText(L"Please read the ReadMe if you have not already done so.");
+    showText(L"Game mode is Spider Onslaught! (3 player)");
     showText(L"1. Survive the spider onslaught!");
     showText(L"2. Get a high score!");
     for (uint64_t turn = 0;;turn++) // forever
@@ -147,8 +149,11 @@ void Game::start()
                     {
                         showText(L"You have mortally wounded it!");
                         score += GetScoreChange(targetEntCode);
-                        if (random() & 1)
+                        int randRes = random() & 0b1111;
+                        if (randRes <= 0b0111)
                             *npc = GameObject(ObjectCode::COIN, 1);
+                        else if (randRes == 0b1111)
+                            *npc = GameObject(ObjectCode::POTION_PURPLE, 1);
                         else
                             *npc = GameObject();
                     }

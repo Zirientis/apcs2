@@ -26,7 +26,7 @@ other items. One point is lost at the start of each turn. Certain game-modes
 may have other specific score rules.
 
 4. Game-modes
-As of Build 0.1alpha, the implemented game mode is Spider Rush, where you
+As of Build 0.1alpha, the implemented game mode is Spider Onslaught!, where you
 try to maximize your score while fighting of a horde of spiders! You are given
 three player characters, and must fight to achieve the maximum possible total
 score. Classic mode is coming soon!
