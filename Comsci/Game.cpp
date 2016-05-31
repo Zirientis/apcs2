@@ -32,7 +32,7 @@ Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*, const wchar_t
     inputEvent = CreateEvent(NULL, true, false, INPUT_HANDLE_NAME);
     textEvent = CreateEvent(NULL, true, true, TEXT_HANDLE_NAME);
     getInput = getInputFunc;
-    gameType = LevelType::LT_SPIDER;
+    gameType = LevelType::LT_CLASSIC_1;
 }
 
 Game::~Game()
@@ -86,7 +86,7 @@ void Game::start()
                 xDiff = std::abs((int)p.xTile - (int)playerPos.xTile);
                 yDiff = std::abs((int)p.yTile - (int)playerPos.yTile);
             } while (p.xTile >= width || p.yTile >= height ||
-                (playersPlaced && (xDiff > 1 || yDiff > 1)));
+                (playersPlaced && (xDiff > 1 || yDiff > 1)) && !WIZARD_MODE);
             // deactivate the overlay
 
             ObjectCode targetEntCode = m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile].getCode();

@@ -9,6 +9,13 @@
 
 #define INPUT_HANDLE_NAME L"Game Input Ready"
 #define TEXT_HANDLE_NAME L"Text Line Displayed"
+
+#ifdef _DEBUG
+#define WIZARD_MODE true
+#else
+#define WIZARD_MODE false
+#endif
+
 class Game
 {
 private:

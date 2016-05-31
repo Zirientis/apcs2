@@ -11,11 +11,45 @@ public:
         case LT_SPIDER:
             GenerateSpiderLevel(l);
             return;
+        case LT_CLASSIC_1:
+            GenerateClassic1Level(l);
+            return;
         default:
             __debugbreak();
             // Unknown level type!
         }
     }
+
+    static void GenerateClassic1Level(Level* l)
+    {
+        std::random_device rd;
+        std::mt19937 rng = std::mt19937(rd());
+        unsigned int segments = BASE_SEGMENTS_PER_LEVEL;
+        if (INCR_SEGMENTS_AFTER_COUNT != 0)
+            segments += l->difficulty / INCR_SEGMENTS_AFTER_COUNT;
+        l->width = (segments - 1) * (BASE_SEGMENT_LENGTH - 1) + BASE_SEGMENT_LENGTH;
+        l->height = (segments - 1) * (BASE_SEGMENT_LENGTH - 1) + BASE_SEGMENT_LENGTH;
+
+        l->m_pEntities = new GameObject[l->width * l->height];
+        l->m_pFurnishings = new GameObject[l->width * l->height];
+        l->m_pSurfaces = new GameObject[l->width * l->height];
+        l->m_pOverlays = new GameObject[l->width * l->height];
+        for (unsigned int row = 0; row < l->height; row += (BASE_SEGMENT_LENGTH - 1))
+        {
+            if (row + BASE_SEGMENT_LENGTH - 1 >= l->height)
+                continue;
+            for (unsigned int col = 0; col < l->width; col += (BASE_SEGMENT_LENGTH - 1))
+            {
+                if (col + BASE_SEGMENT_LENGTH - 1 >= l->width)
+                    continue;
+                drawRect(l->m_pSurfaces, col, row, col + BASE_SEGMENT_LENGTH,
+                    row + BASE_SEGMENT_LENGTH, l->width, GameObject(WALL_MARIO, -1));
+                fillRect(l->m_pSurfaces, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,
+                    row + BASE_SEGMENT_LENGTH - 1, l->width, GameObject(FLOOR_STONE, -1));
+            }
+        }
+    }
+
     static void GenerateSpiderLevel(Level* l)
     {
         std::random_device rd;
