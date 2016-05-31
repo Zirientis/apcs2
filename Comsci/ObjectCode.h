@@ -36,8 +36,8 @@ enum ObjectCode {
     SPAWN_EYEBALL = MIN_SPAWN,
     SPAWN_SPIDER,
     SPAWN_OOZE,
-    SPAWN_SNAKE,
-    MAX_SPAWN = SPAWN_SNAKE,
+    SPAWN_SNEK, // [sic]
+    MAX_SPAWN = SPAWN_SNEK,
 
 
     MIN_PLAYER,
@@ -69,7 +69,7 @@ enum ObjectCode {
 
     MIN_MONST,
     MONST_PLAYER_GHOST = MIN_MONST,
-    MONST_SNAKE,
+    MONST_SNEK,
     MONST_EYEBALL,
     MONST_SPIDER,
     MONST_OOZE,
@@ -83,8 +83,8 @@ inline ObjectCode GetSpawnedItem(ObjectCode spawner)
 {
     switch (spawner)
     {
-    case SPAWN_SNAKE:
-        return MONST_SNAKE;
+    case SPAWN_SNEK:
+        return MONST_SNEK;
     case SPAWN_SPIDER:
         return MONST_SPIDER;
     case SPAWN_EYEBALL:
@@ -101,8 +101,8 @@ inline ObjectCode GetSpawner(ObjectCode spawnee)
 {
     switch (spawnee)
     {
-    case MONST_SNAKE:
-        return SPAWN_SNAKE;
+    case MONST_SNEK:
+        return SPAWN_SNEK;
     case MONST_EYEBALL:
         return SPAWN_EYEBALL;
     case MONST_SPIDER:
