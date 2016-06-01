@@ -6,6 +6,7 @@
 #include "ObjectCode.h"
 #include "Game.h"
 #include "Position.h"
+#include "GameType.h"
 
 #include <dwrite.h>
 #include <string>
@@ -78,7 +79,9 @@ HRESULT Comsci::OnRender()
             std::wstring str = L"Welcome to Comsci!\n";
             str += L"Build 0.1alpha\n";
             str += L"Demonstration:\n";
-            str += L"   Game Mode: Spider Onslaught!\n";
+            str += L"   Game Mode: ";
+            str += GetGameTypeStringW(GameType::GT_CLASSIC);
+            str += L"\n";
             str += L"   (3 player)\n";
             str += L"Left-click to continue...\n";
             str += L"Right-click to quit.";

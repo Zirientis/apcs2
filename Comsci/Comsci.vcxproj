@@ -154,6 +154,7 @@
     <ClInclude Include="Comsci.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GameType.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LevelGenerator.h" />
     <ClInclude Include="LevelType.h" />

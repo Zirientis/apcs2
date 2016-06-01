@@ -23,6 +23,7 @@
 #include "GameObject.h"
 #include "ObjectCode.h"
 #include "Position.h"
+#include "GameType.h"
 
 #define SPRITE_DIM 25
 #define TARGET_FRAMERATE 30
