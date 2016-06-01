@@ -109,6 +109,8 @@ inline ObjectCode GetSpawner(ObjectCode spawnee)
         return SPAWN_SPIDER;
     case MONST_OOZE:
         return SPAWN_OOZE;
+    default:
+        return NONE;
     }
 }
 

@@ -48,10 +48,15 @@ public:
                 fillRect(l->m_pSurfaces, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,
                     row + BASE_SEGMENT_LENGTH - 1, l->width, floorTempl);
                 unsigned int holePunchOffset = BASE_SEGMENT_LENGTH / 2;
-                l->m_pSurfaces[(row + holePunchOffset) * l->width + col].setCode(FLOOR_DIRT);
-                l->m_pSurfaces[(row + holePunchOffset) * l->width + col + BASE_SEGMENT_LENGTH - 1].setCode(FLOOR_DIRT);
-                l->m_pSurfaces[row * l->width + col + holePunchOffset].setCode(FLOOR_DIRT);
-                l->m_pSurfaces[(row + BASE_SEGMENT_LENGTH - 1) * l->width + col + holePunchOffset].setCode(FLOOR_DIRT);
+                if (col != 0)
+                    l->m_pSurfaces[(row + holePunchOffset) * l->width + col] = floorTempl;
+                if (col + BASE_SEGMENT_LENGTH != l->width)
+                    l->m_pSurfaces[(row + holePunchOffset) * l->width + col + BASE_SEGMENT_LENGTH - 1] = floorTempl;
+                if (row != 0)
+                    l->m_pSurfaces[row * l->width + col + holePunchOffset] = floorTempl;
+                if (row + BASE_SEGMENT_LENGTH != l->height)
+                    l->m_pSurfaces[(row + BASE_SEGMENT_LENGTH - 1) * l->width + col + holePunchOffset] = floorTempl;
+                // add some monsters (medium prb) and statues (low prb) and a chance of player 5
             }
         }
     }

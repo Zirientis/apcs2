@@ -121,7 +121,7 @@ Comsci::Comsci() :
     game(nullptr),
     gameTextHandle(NULL),
     gameThread(NULL),
-    gameType(GameType::GT_CLASSIC)
+    gameType(GameType::GT_SPIDER)
 {
 }
 

@@ -160,6 +160,8 @@ void Game::start()
                         int randRes = random() & 0b1111;
                         if (randRes <= 0b0111)
                             *npc = GameObject(ObjectCode::COIN, 1);
+                        else if (randRes <= 0b1100)
+                            *npc = GameObject(GetSpawner(npc->getCode()), 1);
                         else if (randRes == 0b1111)
                             *npc = GameObject(ObjectCode::POTION_PURPLE, 1);
                         else
