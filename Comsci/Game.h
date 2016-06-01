@@ -66,8 +66,8 @@ inline void AssertPositionChangeValid(Position start, Position end)
 {
     const int xDiff = (int)start.xTile - (int)end.xTile;
     if (!(xDiff == 1 || xDiff == 0 || xDiff == -1))
-        DebugBreak();
+        __debugbreak();
     const int yDiff = (int)start.yTile - (int)end.yTile;
     if (!(yDiff == 1 || yDiff == 0 || yDiff == -1))
-        DebugBreak();
+        __debugbreak();
 }
