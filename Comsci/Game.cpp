@@ -34,7 +34,7 @@ Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*, const wchar_t
     inputEvent = CreateEvent(NULL, true, false, INPUT_HANDLE_NAME);
     textEvent = CreateEvent(NULL, true, true, TEXT_HANDLE_NAME);
     getInput = getInputFunc;
-    gameType = LevelType::LT_CLASSIC_1;
+    gameType = LevelType::LT_SNEK;
 }
 
 Game::~Game()

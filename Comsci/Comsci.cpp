@@ -90,11 +90,16 @@ HRESULT Comsci::OnRender()
             str += L"Build 0.1alpha\n";
             str += L"Demonstration:\n";
             str += L"   Game Mode: ";
-            str += GetGameTypeStringW(GameType::GT_CLASSIC);
+            str += GetGameTypeStringW(GameType::GT_SNEK);
             str += L"\n   (";
-            str += std::to_wstring(GetGameTypeMinPlayer(GameType::GT_CLASSIC));
-            str += L"-";
-            str += std::to_wstring(GetGameTypeMaxPlayer(GameType::GT_CLASSIC));
+            unsigned int minPlayer = GetGameTypeMinPlayer(GameType::GT_SNEK);
+            unsigned int maxPlayer = GetGameTypeMaxPlayer(GameType::GT_SNEK);
+            str += std::to_wstring(minPlayer);
+            if (minPlayer != maxPlayer)
+            {
+                str += L"-";
+                str += std::to_wstring(maxPlayer);
+            }
             str += L" player)\n";
             str += L"Left-click to continue...\n";
             str += L"Right-click to quit.";

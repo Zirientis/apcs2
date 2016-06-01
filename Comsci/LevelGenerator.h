@@ -1,6 +1,7 @@
 #pragma once
 #include "LevelType.h"
 #include <random>
+#include <limits>
 class LevelGenerator
 {
 public:
@@ -11,8 +12,11 @@ public:
         case LT_SPIDER:
             GenerateSpiderLevel(l);
             return;
+        case LT_SNEK:
+            GenerateSnekLevel(l);
+            return;
         case LT_CLASSIC_1:
-            GenerateClassic1Level(l);
+            //GenerateClassic1Level(l);
             return;
         default:
             __debugbreak();
@@ -20,7 +24,7 @@ public:
         }
     }
 
-    static void GenerateClassic1Level(Level* l)
+    static void GenerateSnekLevel(Level* l)
     {
         std::random_device rd;
         std::mt19937 rng = std::mt19937(rd());
@@ -46,8 +50,9 @@ public:
                     row + BASE_SEGMENT_LENGTH, l->width, GameObject(WALL_MARIO, -1));
                 fillRect(l->m_pSurfaces, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,
                     row + BASE_SEGMENT_LENGTH - 1, l->width, GameObject(FLOOR_STONE, -1));
-                fillRect(l->m_pEntities, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,
-                    row + BASE_SEGMENT_LENGTH - 1, l->width, GameObject(MONST_SNEK, 0x7FFFFFFF));
+                fillRectPrb(l->m_pEntities, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,
+                    row + BASE_SEGMENT_LENGTH - 1, l->width, GameObject(MONST_SNEK, 0x7FFFFFFF),
+                    &rng, std::numeric_limits<unsigned int>::max() >> 1);
             }
         }
         l->m_pEntities[l->width + 1] = GameObject();
@@ -114,6 +119,20 @@ public:
             for (unsigned int c = left; c < right; c++)
             {
                 arr[r * width + c] = GameObject(templ);
+            }
+        }
+    }
+
+    static void fillRectPrb(GameObject* arr, unsigned int left, unsigned int top,
+        unsigned int right, unsigned int bottom, unsigned int width, GameObject templ,
+        std::mt19937* rng, unsigned int prbThreshLTCreate)
+    {
+        for (unsigned int r = top; r < bottom; r++)
+        {
+            for (unsigned int c = left; c < right; c++)
+            {
+                if (rng->operator()() < prbThreshLTCreate)
+                    arr[r * width + c] = GameObject(templ);
             }
         }
     }
