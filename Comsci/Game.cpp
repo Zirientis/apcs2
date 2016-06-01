@@ -13,7 +13,7 @@
 #include <random>
 #include <cmath>
 #include <string>
-Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*, const wchar_t*))
+Game::Game(int numPlayers, GameType mode, void (*getInputFunc) (void*, Position*, const wchar_t*))
     : ready(false)
 {
     std::random_device rd;
@@ -34,7 +34,7 @@ Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*, const wchar_t
     inputEvent = CreateEvent(NULL, true, false, INPUT_HANDLE_NAME);
     textEvent = CreateEvent(NULL, true, true, TEXT_HANDLE_NAME);
     getInput = getInputFunc;
-    gameType = LevelType::LT_SNEK;
+    gameType = mode;
 }
 
 Game::~Game()
@@ -310,7 +310,7 @@ void Game::advanceLevel()
         oldDiff = m_pCurrentLevel->difficulty;
         delete m_pCurrentLevel;
     }
-    m_pCurrentLevel = new Level(oldDiff + 1, gameType);
+    m_pCurrentLevel = new Level(oldDiff + 1, LevelTypeFromGameType(gameType));
 }
 
 int Game::getActivePlayer() // main thread, and only when locked

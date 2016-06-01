@@ -51,8 +51,8 @@ public:
                 fillRect(l->m_pSurfaces, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,
                     row + BASE_SEGMENT_LENGTH - 1, l->width, GameObject(FLOOR_STONE, -1));
                 fillRectPrb(l->m_pEntities, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,
-                    row + BASE_SEGMENT_LENGTH - 1, l->width, GameObject(MONST_SNEK, 0x7FFFFFFF),
-                    &rng, std::numeric_limits<unsigned int>::max() >> 1);
+                    row + BASE_SEGMENT_LENGTH - 1, l->width, GameObject(MONST_SNEK, 10),
+                    &rng, std::numeric_limits<unsigned int>::max() >> 2);
             }
         }
         l->m_pEntities[l->width + 1] = GameObject();

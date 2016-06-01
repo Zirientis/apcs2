@@ -63,6 +63,7 @@ class Comsci
 public:
 	Comsci();
 	~Comsci();
+    void CreateGame(GameType);
 
 	HRESULT Initialize();
 
@@ -115,11 +116,11 @@ Comsci::Comsci() :
     m_pSpriteSheet(NULL),
     m_pDirectWriteFactory(NULL),
     m_pTextFormat(NULL),
-    gameStarted(false)
+    gameStarted(false),
+    game(nullptr),
+    gameTextHandle(NULL),
+    gameThread(NULL)
 {
-    game = new Game(3, &DefaultInputFunc);
-    gameTextHandle = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT_HANDLE_NAME);
-    gameThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
 }
 
 Comsci::~Comsci()
@@ -135,6 +136,13 @@ Comsci::~Comsci()
     CloseHandle(gameTextHandle);
     delete game;
     game = nullptr;
+}
+
+void Comsci::CreateGame(GameType type)
+{
+    game = new Game(3, type, &DefaultInputFunc);
+    gameTextHandle = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT_HANDLE_NAME);
+    gameThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
 }
 
 void Comsci::RunMessageLoop()

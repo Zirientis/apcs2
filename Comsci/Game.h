@@ -2,6 +2,7 @@
 #include "Level.h"
 #include "Position.h"
 #include "ActionCode.h"
+#include "GameType.h"
 #include <Windows.h>
 
 #include <vector>
@@ -32,7 +33,7 @@ private:
     HANDLE textEvent; // if unsignalled, there is text to show and then signal
     int64_t score;
     void(*getInput) (void*, Position*, const wchar_t*);
-    LevelType gameType;
+    GameType gameType;
     std::mt19937 random;
 
     ActionCode moveEntity(Position start, Position end);
@@ -40,7 +41,7 @@ private:
     void advanceLevel();
     void showText(const wchar_t* textString);
 public:
-    Game(int, void (*getInput) (void*, Position*, const wchar_t*));
+    Game(int, GameType, void (*getInput) (void*, Position*, const wchar_t*));
     ~Game();
     void start();
 

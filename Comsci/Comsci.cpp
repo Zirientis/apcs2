@@ -64,7 +64,7 @@ void Comsci::RenderSprite(UINT left, UINT top, ObjectCode spriteId)
 
 HRESULT Comsci::OnRender()
 {
-    if (WaitForSingleObject(gameThread, 0) != WAIT_TIMEOUT)
+    if (gameStarted && game->IsReady() && WaitForSingleObject(gameThread, 0) != WAIT_TIMEOUT)
     {
         PostQuitMessage(0);
     }
@@ -232,6 +232,7 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             {
                 if (!pComsci->gameStarted)
                 {
+                    pComsci->CreateGame(GT_SNEK);
                     pComsci->gameStarted = true;
                 }
                 else if (!pComsci->game->IsReady()) {}
