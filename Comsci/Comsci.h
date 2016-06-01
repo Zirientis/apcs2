@@ -106,6 +106,7 @@ private:
     HANDLE gameThread;
     HANDLE gameTextHandle;
     bool gameStarted;
+    GameType gameType;
 };
 
 Comsci::Comsci() :
@@ -119,7 +120,8 @@ Comsci::Comsci() :
     gameStarted(false),
     game(nullptr),
     gameTextHandle(NULL),
-    gameThread(NULL)
+    gameThread(NULL),
+    gameType(GameType::GT_CLASSIC)
 {
 }
 

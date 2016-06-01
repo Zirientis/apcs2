@@ -43,7 +43,7 @@ inline unsigned int GetGameTypeMaxPlayer(GameType t)
     case GT_SNEK:
         return 1;
     case GT_CLASSIC:
-        return 4;
+        return 1;
     default:
         __debugbreak();
         return -1;

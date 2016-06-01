@@ -16,11 +16,43 @@ public:
             GenerateSnekLevel(l);
             return;
         case LT_CLASSIC_1:
-            //GenerateClassic1Level(l);
+            GenerateClassic1Level(l);
             return;
         default:
             __debugbreak();
             // Unknown level type!
+        }
+    }
+
+    static void GenerateClassic1Level(Level* l)
+    {
+        std::random_device rd;
+        std::mt19937 rng = std::mt19937(rd());
+        unsigned int segments = BASE_SEGMENTS_PER_LEVEL;
+        if (INCR_SEGMENTS_AFTER_COUNT != 0)
+            segments += l->difficulty / INCR_SEGMENTS_AFTER_COUNT;
+        l->width = segments * BASE_SEGMENT_LENGTH;
+        l->height = segments * BASE_SEGMENT_LENGTH;
+        l->m_pEntities = new GameObject[l->width * l->height];
+        l->m_pFurnishings = new GameObject[l->width * l->height];
+        l->m_pSurfaces = new GameObject[l->width * l->height];
+        l->m_pOverlays = new GameObject[l->width * l->height];
+        for (unsigned int row = 0; row < l->height; row += BASE_SEGMENT_LENGTH)
+        {
+            for (unsigned int col = 0; col < l->width; col += BASE_SEGMENT_LENGTH)
+            {
+                GameObject wallTempl = GameObject(GetRandomWallCode(&rng), -1);
+                GameObject floorTempl = GameObject(GetRandomFloorCode(&rng), -1);
+                drawRect(l->m_pSurfaces, col, row, col + BASE_SEGMENT_LENGTH,
+                    row + BASE_SEGMENT_LENGTH, l->width, wallTempl);
+                fillRect(l->m_pSurfaces, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,
+                    row + BASE_SEGMENT_LENGTH - 1, l->width, floorTempl);
+                unsigned int holePunchOffset = BASE_SEGMENT_LENGTH / 2;
+                l->m_pSurfaces[(row + holePunchOffset) * l->width + col].setCode(FLOOR_DIRT);
+                l->m_pSurfaces[(row + holePunchOffset) * l->width + col + BASE_SEGMENT_LENGTH - 1].setCode(FLOOR_DIRT);
+                l->m_pSurfaces[row * l->width + col + holePunchOffset].setCode(FLOOR_DIRT);
+                l->m_pSurfaces[(row + BASE_SEGMENT_LENGTH - 1) * l->width + col + holePunchOffset].setCode(FLOOR_DIRT);
+            }
         }
     }
 

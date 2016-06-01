@@ -90,10 +90,10 @@ HRESULT Comsci::OnRender()
             str += L"Build 0.1alpha\n";
             str += L"Demonstration:\n";
             str += L"   Game Mode: ";
-            str += GetGameTypeStringW(GameType::GT_SNEK);
+            str += GetGameTypeStringW(gameType);
             str += L"\n   (";
-            unsigned int minPlayer = GetGameTypeMinPlayer(GameType::GT_SNEK);
-            unsigned int maxPlayer = GetGameTypeMaxPlayer(GameType::GT_SNEK);
+            unsigned int minPlayer = GetGameTypeMinPlayer(gameType);
+            unsigned int maxPlayer = GetGameTypeMaxPlayer(gameType);
             str += std::to_wstring(minPlayer);
             if (minPlayer != maxPlayer)
             {
@@ -232,7 +232,7 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             {
                 if (!pComsci->gameStarted)
                 {
-                    pComsci->CreateGame(GT_SNEK);
+                    pComsci->CreateGame(pComsci->gameType);
                     pComsci->gameStarted = true;
                 }
                 else if (!pComsci->game->IsReady()) {}

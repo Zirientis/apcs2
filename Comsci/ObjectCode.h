@@ -1,5 +1,5 @@
 #pragma once
-
+#include <random>
 enum ObjectCode {
     MIN_WALL,
     WALL_MARIO = MIN_WALL,
@@ -121,4 +121,16 @@ inline int GetScoreChange(ObjectCode query)
     if (query >= MIN_MONST && query <= MAX_MONST)
         return 25;
     return 0;
+}
+
+inline ObjectCode GetRandomWallCode(std::mt19937* rng)
+{
+    unsigned int numOfWalls = MAX_WALL - MIN_WALL + 1;
+    return static_cast<ObjectCode>(MIN_WALL + (rng->operator()() % numOfWalls));
+}
+
+inline ObjectCode GetRandomFloorCode(std::mt19937* rng)
+{
+    unsigned int numOfFloors = MAX_FLOOR - MIN_FLOOR + 1;
+    return static_cast<ObjectCode>(MIN_FLOOR + (rng->operator()() % numOfFloors));
 }
