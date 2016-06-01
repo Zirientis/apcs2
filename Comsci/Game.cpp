@@ -5,6 +5,7 @@
 #include "ActionCode.h"
 #include "Position.h"
 #include "LevelType.h"
+#include "GameType.h"
 
 #include <Windows.h>
 
@@ -13,6 +14,7 @@
 #include <cmath>
 #include <string>
 Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*, const wchar_t*))
+    : ready(false)
 {
     std::random_device rd;
     random = std::mt19937(rd());
@@ -37,6 +39,7 @@ Game::Game(int numPlayers, void (*getInputFunc) (void*, Position*, const wchar_t
 
 Game::~Game()
 {
+    ready = false;
     delete m_pCurrentLevel;
     m_pCurrentLevel = nullptr;
 
@@ -54,6 +57,7 @@ Game::~Game()
 void Game::start()
 {
     advanceLevel();
+    ready = true;
     showText(L"Welcome to Comsci\u2122! (Build 0.1alpha)\n");
     showText(L"Please read the ReadMe if you have not already done so.");
     showText(L"Game mode is Spider Onslaught! (3 player)");
@@ -223,6 +227,11 @@ void Game::start()
         }
         score--;
     } // forever
+}
+
+bool Game::IsReady()
+{
+    return ready;
 }
 
 ActionCode Game::moveEntity(Position start, Position end)

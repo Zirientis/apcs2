@@ -19,6 +19,7 @@
 class Game
 {
 private:
+    bool ready;
     static const int PLAYER_DAMAGE = 30;
     Level* m_pCurrentLevel;
     Position* m_pPlayerPositions; // For Game bookkeeping
@@ -42,6 +43,8 @@ public:
     Game(int, void (*getInput) (void*, Position*, const wchar_t*));
     ~Game();
     void start();
+
+    bool IsReady();
 
     int getActivePlayer();
     //std::vector<Action> getPotentialPlayerActions();

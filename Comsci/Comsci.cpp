@@ -14,16 +14,8 @@
 
 #define MAX_LOADSTRING 100
 
-int WINAPI WinMain(
-	HINSTANCE /* hInstance */,
-	HINSTANCE /* hPrevInstance */,
-	LPSTR /* lpCmdLine */,
-	int /* nCmdShow */
-	)
-
+bool RealMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-	HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
-
 	if (SUCCEEDED(CoInitialize(NULL)))
 	{
 		{
@@ -37,7 +29,25 @@ int WINAPI WinMain(
 		CoUninitialize();
 	}
 
-	return 0;
+	return false;
+}
+
+int WINAPI WinMain(
+	HINSTANCE  hInstance,
+	HINSTANCE hPrevInstance,
+	LPSTR lpCmdLine,
+	int nCmdShow
+	)
+
+{
+    HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
+    bool playAgain = false;
+    do
+    {
+        playAgain = RealMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
+    } while (playAgain);
+
+    return 0;
 }
 
 
@@ -81,10 +91,19 @@ HRESULT Comsci::OnRender()
             str += L"Demonstration:\n";
             str += L"   Game Mode: ";
             str += GetGameTypeStringW(GameType::GT_CLASSIC);
-            str += L"\n";
-            str += L"   (3 player)\n";
+            str += L"\n   (";
+            str += std::to_wstring(GetGameTypeMinPlayer(GameType::GT_CLASSIC));
+            str += L"-";
+            str += std::to_wstring(GetGameTypeMaxPlayer(GameType::GT_CLASSIC));
+            str += L" player)\n";
             str += L"Left-click to continue...\n";
             str += L"Right-click to quit.";
+            m_pRenderTarget->DrawText(str.data(), str.length(), m_pTextFormat, fullScreen, m_pBlackBrush);
+        }
+        else if (!game->IsReady())
+        {
+            D2D1_SIZE_F rtSize = m_pRenderTarget->GetSize();
+            std::wstring str = L"Waiting for game...";
             m_pRenderTarget->DrawText(str.data(), str.length(), m_pTextFormat, fullScreen, m_pBlackBrush);
         }
         else
@@ -210,6 +229,7 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
                 {
                     pComsci->gameStarted = true;
                 }
+                else if (!pComsci->game->IsReady()) {}
                 else if (WaitForSingleObject(pComsci->gameTextHandle, 0) == WAIT_TIMEOUT) // if unsignalled
                 {
                     BOOL a = SetEvent(pComsci->gameTextHandle);
