@@ -26,7 +26,10 @@ inline wchar_t* GetGameTypeStringW(GameType t)
 inline unsigned int GetGameTypeMinPlayer(GameType t)
 {
     if (t >= GameType::GT_MAX)
+    {
         __debugbreak();
+        return -1;
+    }
     else
         return 1;
 }
