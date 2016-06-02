@@ -8,6 +8,7 @@ private:
     int health;
 public:
     GameObject(); // NONE
+    GameObject(const ObjectCode);
     GameObject(const ObjectCode, int);
     GameObject(const GameObject&);
     ObjectCode getCode() const;

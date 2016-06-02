@@ -41,8 +41,8 @@ public:
         {
             for (unsigned int col = 0; col < l->width; col += BASE_SEGMENT_LENGTH)
             {
-                GameObject wallTempl = GameObject(GetRandomWallCode(&rng), -1);
-                GameObject floorTempl = GameObject(GetRandomFloorCode(&rng), -1);
+                GameObject wallTempl = GameObject(GetRandomWallCode(&rng));
+                GameObject floorTempl = GameObject(GetRandomFloorCode(&rng));
                 drawRect(l->m_pSurfaces, col, row, col + BASE_SEGMENT_LENGTH,
                     row + BASE_SEGMENT_LENGTH, l->width, wallTempl);
                 fillRect(l->m_pSurfaces, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,
@@ -57,6 +57,24 @@ public:
                 if (row + BASE_SEGMENT_LENGTH != l->height)
                     l->m_pSurfaces[(row + BASE_SEGMENT_LENGTH - 1) * l->width + col + holePunchOffset] = floorTempl;
                 // add some monsters (medium prb) and statues (low prb) and a chance of player 5
+                fillRectPrbMonst(l->m_pEntities,
+                    col + 1,
+                    row + 1,
+                    col + BASE_SEGMENT_LENGTH - 1,
+                    row + BASE_SEGMENT_LENGTH - 1,
+                    l->width,
+                    &rng,
+                    std::numeric_limits<unsigned int>::max() >> 5
+                );
+                fillRectPrbSpawner(l->m_pEntities,
+                    col + 1,
+                    row + 1,
+                    col + BASE_SEGMENT_LENGTH - 1,
+                    row + BASE_SEGMENT_LENGTH - 1,
+                    l->width,
+                    &rng,
+                    std::numeric_limits<unsigned int>::max() >> 7
+                );
             }
         }
     }
@@ -84,11 +102,11 @@ public:
                 if (col + BASE_SEGMENT_LENGTH - 1 >= l->width)
                     continue;
                 drawRect(l->m_pSurfaces, col, row, col + BASE_SEGMENT_LENGTH,
-                    row + BASE_SEGMENT_LENGTH, l->width, GameObject(WALL_MARIO, -1));
+                    row + BASE_SEGMENT_LENGTH, l->width, GameObject(WALL_MARIO));
                 fillRect(l->m_pSurfaces, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,
-                    row + BASE_SEGMENT_LENGTH - 1, l->width, GameObject(FLOOR_STONE, -1));
+                    row + BASE_SEGMENT_LENGTH - 1, l->width, GameObject(FLOOR_STONE));
                 fillRectPrb(l->m_pEntities, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,
-                    row + BASE_SEGMENT_LENGTH - 1, l->width, GameObject(MONST_SNEK, 10),
+                    row + BASE_SEGMENT_LENGTH - 1, l->width, GameObject(MONST_SNEK),
                     &rng, std::numeric_limits<unsigned int>::max() >> 2);
             }
         }
@@ -113,19 +131,19 @@ public:
             for (unsigned int col = 0; col < l->width; col += BASE_SEGMENT_LENGTH)
             {
                 drawRect(l->m_pSurfaces, col, row, col + BASE_SEGMENT_LENGTH,
-                    row + BASE_SEGMENT_LENGTH, l->width, GameObject(WALL_MARIO, -1));
+                    row + BASE_SEGMENT_LENGTH, l->width, GameObject(WALL_MARIO));
                 fillRect(l->m_pSurfaces, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,
-                    row + BASE_SEGMENT_LENGTH - 1, l->width, GameObject(FLOOR_DIRT, -1));
+                    row + BASE_SEGMENT_LENGTH - 1, l->width, GameObject(FLOOR_DIRT));
                 unsigned int holePunchOffset = BASE_SEGMENT_LENGTH / 2;
                 l->m_pSurfaces[(row + holePunchOffset) * l->width + col].setCode(FLOOR_DIRT);
                 l->m_pSurfaces[(row + holePunchOffset) * l->width + col + BASE_SEGMENT_LENGTH - 1].setCode(FLOOR_DIRT);
                 l->m_pSurfaces[row * l->width + col + holePunchOffset].setCode(FLOOR_DIRT);
                 l->m_pSurfaces[(row + BASE_SEGMENT_LENGTH - 1) * l->width + col + holePunchOffset].setCode(FLOOR_DIRT);
 
-                l->m_pEntities[(row + holePunchOffset) * l->width + col + holePunchOffset] = GameObject(SPAWN_SPIDER, 1);
+                l->m_pEntities[(row + holePunchOffset) * l->width + col + holePunchOffset] = GameObject(SPAWN_SPIDER);
             }
         }
-        drawRect(l->m_pSurfaces, 0, 0, l->width, l->height, l->width, GameObject(WALL_BRICK, -1));
+        drawRect(l->m_pSurfaces, 0, 0, l->width, l->height, l->width, GameObject(WALL_BRICK));
         unsigned int row, col;
         ObjectCode surf;
         do
@@ -135,7 +153,7 @@ public:
             surf = l->m_pSurfaces[row * l->width + col].getCode();
         } while (l->m_pEntities[row * l->width + col].getCode() != ObjectCode::NONE ||
             (surf >= MIN_WALL && surf <= MAX_WALL));
-        l->m_pFurnishings[row * l->width + col] = GameObject(STAIRS, -1);
+        l->m_pFurnishings[row * l->width + col] = GameObject(STAIRS);
     }
 
     static void drawRect(GameObject* arr, unsigned int left, unsigned int top,
@@ -161,7 +179,7 @@ public:
     }
 
     static void fillRectPrb(GameObject* arr, unsigned int left, unsigned int top,
-        unsigned int right, unsigned int bottom, unsigned int width, GameObject templ,
+        unsigned int right, unsigned int bottom, unsigned int width, GameObject& templ,
         std::mt19937* rng, unsigned int prbThreshLTCreate)
     {
         for (unsigned int r = top; r < bottom; r++)
@@ -170,6 +188,40 @@ public:
             {
                 if (rng->operator()() < prbThreshLTCreate)
                     arr[r * width + c] = GameObject(templ);
+            }
+        }
+    }
+
+    static void fillRectPrbMonst(GameObject* arr, unsigned int left, unsigned int top,
+        unsigned int right, unsigned int bottom, unsigned int width,
+        std::mt19937* rng, unsigned int prbThreshLTCreate)
+    {
+        for (unsigned int r = top; r < bottom; r++)
+        {
+            for (unsigned int c = left; c < right; c++)
+            {
+                if (rng->operator()() < prbThreshLTCreate)
+                {
+                    ObjectCode code = GetRandomMonstCode(rng);
+                    arr[r * width + c] = GameObject(code);
+                }
+            }
+        }
+    }
+
+    static void fillRectPrbSpawner(GameObject* arr, unsigned int left, unsigned int top,
+        unsigned int right, unsigned int bottom, unsigned int width,
+        std::mt19937* rng, unsigned int prbThreshLTCreate)
+    {
+        for (unsigned int r = top; r < bottom; r++)
+        {
+            for (unsigned int c = left; c < right; c++)
+            {
+                if (rng->operator()() < prbThreshLTCreate)
+                {
+                    ObjectCode code = GetRandomSpawnerCode(rng);
+                    arr[r * width + c] = GameObject(code);
+                }
             }
         }
     }

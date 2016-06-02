@@ -97,7 +97,7 @@ void Game::start()
             ObjectCode targetSurfCode = m_pCurrentLevel->m_pSurfaces[p.yTile * width + p.xTile].getCode();
             if (!playersPlaced)
             {
-                GameObject playerTemplate = GameObject((ObjectCode)(ObjectCode::PLAYER_1 + m_activePlayer), 100);
+                GameObject playerTemplate = GameObject((ObjectCode)(ObjectCode::PLAYER_1 + m_activePlayer));
                 if (placeEntity(playerTemplate, p, false) == AC_NONE)
                 {
                     m_pPlayerPositions[m_activePlayer] = p;
@@ -159,11 +159,11 @@ void Game::start()
                         score += GetScoreChange(targetEntCode);
                         int randRes = random() & 0b1111;
                         if (randRes <= 0b0111)
-                            *npc = GameObject(ObjectCode::COIN, 1);
+                            *npc = GameObject(ObjectCode::COIN);
                         else if (randRes <= 0b1100)
-                            *npc = GameObject(GetSpawner(npc->getCode()), 1);
+                            *npc = GameObject(GetSpawner(npc->getCode()));
                         else if (randRes == 0b1111)
-                            *npc = GameObject(ObjectCode::POTION_PURPLE, 1);
+                            *npc = GameObject(ObjectCode::POTION_PURPLE);
                         else
                             *npc = GameObject();
                     }
@@ -214,16 +214,16 @@ void Game::start()
             GameObject* npc = m_pCurrentLevel->m_pEntities + i;
             ObjectCode npcCode = npc->getCode();
             Position npcPos = Position{ i / width, i % width };
-            if (npcCode == NONE || (npcCode >= MIN_PLAYER && npcCode <= MAX_PLAYER))
+            if (IsCodeNone(npcCode) || IsCodePlayer(npcCode))
                 continue;
-            else if (npcCode >= MIN_SPAWN && npcCode <= MAX_SPAWN)
+            else if (IsCodeSpawner(npcCode))
             {
                 if (npcPos.xTile > 0 && npcPos.xTile < width - 1 && npcPos.yTile > 0 && npcPos.yTile < height - 1 && turn % 4 == 0)
                 {
                     //npc->setCode(GetSpawnedItem(npcCode));
                     Position spawneePos = Position{ npcPos.xTile + (random() % 3) - 1, npcPos.yTile + (random() % 3) - 1 };
                     AssertPositionChangeValid(npcPos, spawneePos);
-                    placeEntity(GameObject(GetSpawnedItem(npcCode), 25), spawneePos, false);
+                    placeEntity(GameObject(GetSpawnedItem(npcCode)), spawneePos, false);
                 }
             }
         }

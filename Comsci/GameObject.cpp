@@ -8,7 +8,13 @@ GameObject::GameObject()
     health = -1;
 }
 
-GameObject::GameObject(const ObjectCode c, int hp)
+GameObject::GameObject(const ObjectCode c)
+{
+    code = c;
+    health = GetDefaultHealth(c);
+}
+
+GameObject::GameObject(const ObjectCode c, int hp) // expert use only!
 {
     code = c;
     health = hp;

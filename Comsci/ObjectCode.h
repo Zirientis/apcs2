@@ -69,7 +69,8 @@ enum ObjectCode {
 
     MIN_MONST,
     MONST_PLAYER_GHOST = MIN_MONST,
-    MONST_SNEK,
+    MIN_RAND_MONST,
+    MONST_SNEK = MIN_RAND_MONST,
     MONST_EYEBALL,
     MONST_SPIDER,
     MONST_OOZE,
@@ -78,6 +79,47 @@ enum ObjectCode {
     NONE,
     MAX
 };
+
+
+inline bool IsCodeNone(ObjectCode query)
+{
+    return query == NONE;
+}
+
+inline bool IsCodeWall(ObjectCode query)
+{
+    return query >= MIN_WALL && query <= MAX_WALL;
+}
+
+inline bool IsCodeFloor(ObjectCode query)
+{
+    return query >= MIN_FLOOR && query <= MAX_FLOOR;
+}
+
+inline bool IsCodePotion(ObjectCode query)
+{
+    return query >= MIN_POTION && query <= MAX_POTION;
+}
+
+inline bool IsCodeCoin(ObjectCode query)
+{
+    return query == COIN;
+}
+
+inline bool IsCodeMonst(ObjectCode query)
+{
+    return query >= MIN_MONST && query <= MAX_MONST;
+}
+
+inline bool IsCodeSpawner(ObjectCode query)
+{
+    return query >= MIN_SPAWN && query <= MAX_SPAWN;
+}
+
+inline bool IsCodePlayer(ObjectCode query)
+{
+    return query >= MIN_PLAYER && query <= MAX_PLAYER;
+}
 
 inline ObjectCode GetSpawnedItem(ObjectCode spawner)
 {
@@ -116,13 +158,40 @@ inline ObjectCode GetSpawner(ObjectCode spawnee)
 
 inline int GetScoreChange(ObjectCode query)
 {
-    if (query >= MIN_POTION && query <= MAX_POTION)
+    if (IsCodePotion(query))
         return 100;
-    if (query == COIN)
+    if (IsCodeCoin(query))
         return 50;
-    if (query >= MIN_MONST && query <= MAX_MONST)
+    if (IsCodeMonst(query))
         return 25;
     return 0;
+}
+
+inline int GetDefaultHealth(ObjectCode query)
+{
+    if (IsCodeSpawner(query))
+        return 1;
+    if (IsCodeCoin(query) || IsCodePotion(query))
+        return 1;
+    if (IsCodePlayer(query))
+        return 100;
+    if (IsCodeMonst(query))
+        switch (query)
+        {
+        case MONST_SNEK:
+            return 10;
+        case MONST_SPIDER:
+            return 25;
+        case MONST_PLAYER_GHOST:
+            return 100;
+        case MONST_EYEBALL:
+            return 50;
+        case MONST_OOZE:
+            return 75;
+        default:
+            return 50;
+        }
+    return -1;
 }
 
 inline ObjectCode GetRandomWallCode(std::mt19937* rng)
@@ -135,4 +204,16 @@ inline ObjectCode GetRandomFloorCode(std::mt19937* rng)
 {
     unsigned int numOfFloors = MAX_FLOOR - MIN_FLOOR + 1;
     return static_cast<ObjectCode>(MIN_FLOOR + (rng->operator()() % numOfFloors));
+}
+
+inline ObjectCode GetRandomMonstCode(std::mt19937* rng)
+{
+    unsigned int numOfMonst = MAX_MONST - MIN_RAND_MONST + 1;
+    return static_cast<ObjectCode>(MIN_RAND_MONST + (rng->operator()() % numOfMonst));
+}
+
+inline ObjectCode GetRandomSpawnerCode(std::mt19937* rng)
+{
+    unsigned int numOfSpawner = MAX_SPAWN - MIN_SPAWN + 1;
+    return static_cast<ObjectCode>(MIN_SPAWN + (rng->operator()() % numOfSpawner));
 }
