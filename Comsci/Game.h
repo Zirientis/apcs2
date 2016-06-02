@@ -13,9 +13,16 @@
 
 #ifdef _DEBUG
 #define WIZARD_MODE true
+#ifndef DEBUG_SPAWNER
+#define DEBUG_SPAWNER true
+#endif // DEBUG_SPAWNER
 #else
 #define WIZARD_MODE false
-#endif
+#ifdef DEBUG_SPAWNER
+#undef DEBUG_SPAWNER
+#endif // DEBUG_SPAWNER
+#define DEBUG_SPAWNER false
+#endif // _DEBUG
 
 class Game
 {

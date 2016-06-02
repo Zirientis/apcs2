@@ -213,7 +213,7 @@ void Game::start()
         {
             GameObject* npc = m_pCurrentLevel->m_pEntities + i;
             ObjectCode npcCode = npc->getCode();
-            Position npcPos = Position{ i / width, i % width };
+            Position npcPos = Position{ i % width, i / width };
             if (IsCodeNone(npcCode) || IsCodePlayer(npcCode))
                 continue;
             else if (IsCodeSpawner(npcCode))
@@ -223,7 +223,24 @@ void Game::start()
                     //npc->setCode(GetSpawnedItem(npcCode));
                     Position spawneePos = Position{ npcPos.xTile + (random() % 3) - 1, npcPos.yTile + (random() % 3) - 1 };
                     AssertPositionChangeValid(npcPos, spawneePos);
-                    placeEntity(GameObject(GetSpawnedItem(npcCode)), spawneePos, false);
+                    ActionCode res = placeEntity(GameObject(GetSpawnedItem(npcCode)), spawneePos, false);
+                    if (DEBUG_SPAWNER && res != AC_PLACE_FAIL)
+                    {
+                        m_pCurrentLevel->m_pOverlays[npcPos.yTile * width + npcPos.xTile].setCode(INDICATOR_RED);
+                        m_pCurrentLevel->m_pOverlays[spawneePos.yTile * width + spawneePos.xTile].setCode(INDICATOR_GREEN);
+                        std::wstring str = L"Spawner at (";
+                        str += std::to_wstring(npcPos.xTile);
+                        str += L", ";
+                        str += std::to_wstring(npcPos.yTile);
+                        str += L") created object at (";
+                        str += std::to_wstring(spawneePos.xTile);
+                        str += L", ";
+                        str += std::to_wstring(spawneePos.yTile);
+                        str += L").";
+                        MessageBox(NULL, str.data(), L"Comsci DEBUG", 0);
+                        m_pCurrentLevel->m_pOverlays[npcPos.yTile * width + npcPos.xTile].setCode(NONE);
+                        m_pCurrentLevel->m_pOverlays[spawneePos.yTile * width + spawneePos.xTile].setCode(NONE);
+                    }
                 }
             }
         }
