@@ -144,6 +144,7 @@ public:
             }
         }
         drawRect(l->m_pSurfaces, 0, 0, l->width, l->height, l->width, GameObject(WALL_BRICK));
+        // should refactor the following into a function
         unsigned int row, col;
         ObjectCode surf;
         do
