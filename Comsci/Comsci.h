@@ -121,7 +121,7 @@ Comsci::Comsci() :
     game(nullptr),
     gameTextHandle(NULL),
     gameThread(NULL),
-    gameType(GameType::GT_SPIDER)
+    gameType(GameType::GT_CLASSIC)
 {
 }
 
@@ -142,7 +142,7 @@ Comsci::~Comsci()
 
 void Comsci::CreateGame(GameType type)
 {
-    game = new Game(3, type, &DefaultInputFunc);
+    game = new Game(GetGameTypeMaxPlayer(type), type, &DefaultInputFunc);
     gameTextHandle = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT_HANDLE_NAME);
     gameThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
 }
