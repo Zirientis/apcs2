@@ -28,7 +28,7 @@ private:
     int difficulty;
     unsigned int width, height;
 public:
-    Level(int, LevelType);
+    Level(int, LevelType, const unsigned int);
     ~Level();
     const GameObject* GetOverlayAt(Position);
     const GameObject* GetEntityAt(Position);

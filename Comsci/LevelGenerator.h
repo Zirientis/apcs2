@@ -5,18 +5,18 @@
 class LevelGenerator
 {
 public:
-    static void GenerateLevel(Level* l, LevelType type)
+    static void GenerateLevel(Level* l, LevelType type, const unsigned int seed)
     {
         switch (type)
         {
         case LT_SPIDER:
-            GenerateSpiderLevel(l);
+            GenerateSpiderLevel(l, seed);
             return;
         case LT_SNEK:
-            GenerateSnekLevel(l);
+            GenerateSnekLevel(l, seed);
             return;
         case LT_CLASSIC_1:
-            GenerateClassic1Level(l);
+            GenerateClassic1Level(l, seed);
             return;
         default:
             __debugbreak();
@@ -24,10 +24,9 @@ public:
         }
     }
 
-    static void GenerateClassic1Level(Level* l)
+    static void GenerateClassic1Level(Level* l, const unsigned int seed)
     {
-        std::random_device rd;
-        std::mt19937 rng = std::mt19937(rd());
+        std::mt19937 rng = std::mt19937(seed);
         unsigned int segments = BASE_SEGMENTS_PER_LEVEL;
         if (INCR_SEGMENTS_AFTER_COUNT != 0)
             segments += l->difficulty / INCR_SEGMENTS_AFTER_COUNT;
@@ -79,10 +78,9 @@ public:
         }
     }
 
-    static void GenerateSnekLevel(Level* l)
+    static void GenerateSnekLevel(Level* l, const unsigned int seed)
     {
-        std::random_device rd;
-        std::mt19937 rng = std::mt19937(rd());
+        std::mt19937 rng = std::mt19937(seed);
         unsigned int segments = BASE_SEGMENTS_PER_LEVEL;
         if (INCR_SEGMENTS_AFTER_COUNT != 0)
             segments += l->difficulty / INCR_SEGMENTS_AFTER_COUNT;
@@ -113,10 +111,9 @@ public:
         l->m_pEntities[l->width + 1] = GameObject();
     }
 
-    static void GenerateSpiderLevel(Level* l)
+    static void GenerateSpiderLevel(Level* l, const unsigned int seed)
     {
-        std::random_device rd;
-        std::mt19937 rng = std::mt19937(rd());
+        std::mt19937 rng = std::mt19937(seed);
         unsigned int segments = BASE_SEGMENTS_PER_LEVEL;
         if (INCR_SEGMENTS_AFTER_COUNT != 0)
             segments += l->difficulty / INCR_SEGMENTS_AFTER_COUNT;

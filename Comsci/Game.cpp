@@ -160,7 +160,7 @@ void Game::start()
                         int randRes = random() & 0b1111;
                         if (randRes <= 0b0111)
                             *npc = GameObject(ObjectCode::COIN);
-                        else if (randRes <= 0b1100)
+                        else if (randRes <= 0b1001)
                             *npc = GameObject(GetSpawner(npc->getCode()));
                         else if (randRes == 0b1111)
                             *npc = GameObject(ObjectCode::POTION_PURPLE);
@@ -218,6 +218,8 @@ void Game::start()
                 continue;
             else if (IsCodeSpawner(npcCode))
             {
+                if (random() & 2) // 50% chance a spawner will activate
+                    continue;
                 if (npcPos.xTile > 0 && npcPos.xTile < width - 1 && npcPos.yTile > 0 && npcPos.yTile < height - 1 && turn % 4 == 0)
                 {
                     //npc->setCode(GetSpawnedItem(npcCode));
@@ -329,7 +331,7 @@ void Game::advanceLevel()
         oldDiff = m_pCurrentLevel->difficulty;
         delete m_pCurrentLevel;
     }
-    m_pCurrentLevel = new Level(oldDiff + 1, LevelTypeFromGameType(gameType));
+    m_pCurrentLevel = new Level(oldDiff + 1, LevelTypeFromGameType(gameType), random());
 }
 
 int Game::getActivePlayer() // main thread, and only when locked

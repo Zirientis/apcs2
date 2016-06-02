@@ -5,10 +5,10 @@
 #include "LevelType.h"
 #include "LevelGenerator.h"
 
-Level::Level(int diff, LevelType type)
+Level::Level(int diff, LevelType type, const unsigned int seed)
 {
     difficulty = diff;
-    LevelGenerator::GenerateLevel(this, type);
+    LevelGenerator::GenerateLevel(this, type, seed);
 }
 
 Level::~Level()
