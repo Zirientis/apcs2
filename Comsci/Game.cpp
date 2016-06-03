@@ -218,7 +218,7 @@ void Game::start()
                 continue;
             else if (IsCodeSpawner(npcCode))
             {
-                if (random() & 2) // 50% chance a spawner will activate
+                if (random() & 1) // 50% chance a spawner will activate
                     continue;
                 if (npcPos.xTile > 0 && npcPos.xTile < width - 1 && npcPos.yTile > 0 && npcPos.yTile < height - 1 && turn % 4 == 0)
                 {
