@@ -56,7 +56,7 @@ int GameObject::changeHealth(int changeAmt)
 
 bool GameObject::isAttackable()
 {
-    return code >= MIN_MONST && code <= MAX_MONST;
+    return IsCodeMonst(code) || IsCodePlayer(code);
 }
 
 int GameObject::attack(int dmg)
@@ -66,7 +66,7 @@ int GameObject::attack(int dmg)
 
 bool GameObject::onBeforeWalk(GameObject* trigger)
 {
-    return code > ObjectCode::MAX_WALL;
+    return !IsCodeWall(code);
     //return true;
 }
 

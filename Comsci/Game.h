@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <random>
+#include <string>
 
 #define INPUT_HANDLE_NAME L"Game Input Ready"
 #define TEXT_HANDLE_NAME L"Text Line Displayed"
@@ -84,7 +85,7 @@ inline void AssertPositionChangeValid(Position start, Position end)
         __debugbreak();
 }
 
-void Game::doStairAction(ObjectCode triggerCode)
+inline void Game::doStairAction(ObjectCode triggerCode)
 {
     switch (gameType)
     {
@@ -107,5 +108,8 @@ void Game::doStairAction(ObjectCode triggerCode)
         break;
     case GT_CLASSIC:
         // here we go
+        break;
+    default:
+        break;
     }
 }

@@ -202,7 +202,19 @@ void Game::start()
                     AssertPositionChangeValid(npcPos, movePos);
                     if (moveEntity(npcPos, movePos) != AC_NONE)
                     {
-                        //
+                        GameObject* blockingEntity = m_pCurrentLevel->m_pEntities + (movePos.yTile * width + movePos.xTile);
+                        if (IsCodePlayer(blockingEntity->getCode()))
+                        {
+                            showText(L"The creature attacks you!");
+                            int hp = blockingEntity->attack(1);
+                            showText(L"You lost 1 health!");
+                            if (hp <= 0) // FIXME: Death should be handled at a central location!
+                            {
+                                showText(L"You 'died'");
+                                __debugbreak();
+                                // We need to end the game now!
+                            }
+                        }
                     }
                 }
             }

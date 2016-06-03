@@ -30,9 +30,6 @@
     <ClInclude Include="Comsci.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Desktop\Cygwin\home\Reyn\FinalProject\GameObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\..\Desktop\Cygwin\home\Reyn\FinalProject\ObjectCode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
