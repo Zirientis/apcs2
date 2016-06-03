@@ -112,7 +112,7 @@ void Game::start()
             {
                 m_pPlayerPositions[m_activePlayer] = p;
             }
-            else if (targetEntCode == COIN)
+            else if (IsCodeCoin(targetEntCode))
             {
                 score += GetScoreChange(targetEntCode);
                 m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile] = GameObject();
@@ -125,7 +125,7 @@ void Game::start()
                     m_pPlayerPositions[m_activePlayer] = p;
                 showText(L"You pick up the coins.");
             }
-            else if (targetEntCode >= MIN_POTION && targetEntCode <= MAX_POTION)
+            else if (IsCodePotion(targetEntCode))
             {
                 score += GetScoreChange(targetEntCode);
                 m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile] = GameObject();
@@ -142,11 +142,11 @@ void Game::start()
             {
                 showText(L"You look around curiously.");
             }
-            else if (targetEntCode >= PLAYER_1 && targetEntCode <= MAX_PLAYER)
+            else if (IsCodePlayer(targetEntCode))
             {
                 showText(L"You can't attack your teammate!");
             }
-            else if (p != playerPos && targetSurfCode > MAX_WALL)
+            else if (p != playerPos && !IsCodeWall(targetSurfCode))
             {
                 // attack
                 GameObject* npc = m_pCurrentLevel->m_pEntities + (p.yTile * width + p.xTile);
@@ -172,9 +172,7 @@ void Game::start()
                     showText(L"You can't attack that!");
             }
             else
-            {
                 showText(L"Something was already there! You forfeit your turn.");
-            }
         }
         playersPlaced = true;
         // AI logic runs here
@@ -188,7 +186,7 @@ void Game::start()
             GameObject* npc = m_pCurrentLevel->m_pEntities + i;
             ObjectCode npcCode = npc->getCode();
             Position npcPos = Position{ i % width, i / width };
-            if (npcCode == NONE || (npcCode >= MIN_PLAYER && npcCode <= MAX_PLAYER))
+            if (IsCodeNone(npcCode) || IsCodePlayer(npcCode))
                 continue;
             // Now do something!
             // On death, monster *should* have a chance to turn into a spawner.
@@ -196,7 +194,7 @@ void Game::start()
             {
                 continue;
             }
-            else if (npcCode >= MIN_MONST && npcCode <= MAX_MONST)
+            else if (IsCodeMonst(npcCode))
             {
                 if (npcPos.xTile > 0 && npcPos.xTile < width - 1 && npcPos.yTile > 0 && npcPos.yTile < height - 1)
                 {
@@ -270,7 +268,7 @@ ActionCode Game::moveEntity(Position start, Position end)
         return AC_NONE; // Nothing happens!
     }
 
-    if (m_pCurrentLevel->GetEntityAt(end)->getCode() == ObjectCode::NONE) // tile is empty
+    if (IsCodeNone(m_pCurrentLevel->GetEntityAt(end)->getCode())) // tile is empty
     {
         GameObject* oldEnt = m_pCurrentLevel->m_pEntities + (start.yTile * m_pCurrentLevel->GetWidth() + start.xTile);
         GameObject* newSurf = m_pCurrentLevel->m_pSurfaces + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
@@ -287,21 +285,6 @@ ActionCode Game::moveEntity(Position start, Position end)
             if (result == AC_STAIR_TRIGGERED)
             {
                 ObjectCode npcCode = newEnt->getCode();
-                if (npcCode >= MIN_PLAYER && npcCode <= MAX_PLAYER)
-                {
-                    //return AC_STAIR_TRIGGERED;
-                    showText(L"The stairs collapse downward!");
-                    showText(L"It seems that your adventure is over!");
-                    {
-                        // HACKETY HACK HACK
-                        std::wstring outstr;
-                        outstr += L"Game Over! Your score was ";
-                        outstr += std::to_wstring(score);
-                        MessageBox(NULL, outstr.data(), L"Comsci", 0);
-                        //delete this;
-                        ExitThread(0);
-                    }
-                }
             }
             return AC_NONE;
         }
@@ -313,7 +296,7 @@ ActionCode Game::placeEntity(GameObject& templateObj, Position pos, bool force)
 {
     GameObject* ent = m_pCurrentLevel->m_pEntities + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
     GameObject* surf = m_pCurrentLevel->m_pSurfaces + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
-    if (force || (ent->getCode() == ObjectCode::NONE && surf->onBeforeWalk(nullptr)))
+    if (force || (IsCodeNone(ent->getCode()) && surf->onBeforeWalk(nullptr)))
     {
         *ent = GameObject(templateObj);
         GameObject* furn = m_pCurrentLevel->m_pFurnishings + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);

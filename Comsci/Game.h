@@ -47,6 +47,7 @@ private:
     ActionCode placeEntity(GameObject& templateObj, Position pos, bool force);
     void advanceLevel();
     void showText(const wchar_t* textString);
+    void doStairAction(ObjectCode);
 public:
     Game(int, GameType, void (*getInput) (void*, Position*, const wchar_t*));
     ~Game();
@@ -81,4 +82,30 @@ inline void AssertPositionChangeValid(Position start, Position end)
     const int yDiff = (int)start.yTile - (int)end.yTile;
     if (!(yDiff == 1 || yDiff == 0 || yDiff == -1))
         __debugbreak();
+}
+
+void Game::doStairAction(ObjectCode triggerCode)
+{
+    switch (gameType)
+    {
+    case GT_SPIDER:
+        if (IsCodePlayer(triggerCode))
+        {
+            //return AC_STAIR_TRIGGERED;
+            showText(L"The stairs collapse downward!");
+            showText(L"It seems that your adventure is over!");
+            {
+                // HACKETY HACK HACK
+                std::wstring outstr;
+                outstr += L"Game Over! Your score was ";
+                outstr += std::to_wstring(score);
+                MessageBox(NULL, outstr.data(), L"Comsci", 0);
+                //delete this;
+                ExitThread(0);
+            }
+        }
+        break;
+    case GT_CLASSIC:
+        // here we go
+    }
 }

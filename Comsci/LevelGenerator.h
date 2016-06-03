@@ -76,6 +76,9 @@ public:
                 );
             }
         }
+        randPlaceOneInLevel(l, &rng, GameObject(STAIRS));
+        if (rng() < std::numeric_limits<unsigned int>::max() >> 4)
+            randPlaceOneInLevel(l, &rng, GameObject(MONST_PLAYER_GHOST));
     }
 
     static void GenerateSnekLevel(Level* l, const unsigned int seed)
@@ -141,17 +144,7 @@ public:
             }
         }
         drawRect(l->m_pSurfaces, 0, 0, l->width, l->height, l->width, GameObject(WALL_BRICK));
-        // should refactor the following into a function
-        unsigned int row, col;
-        ObjectCode surf;
-        do
-        {
-            row = rng() % l->height;
-            col = rng() % l->width;
-            surf = l->m_pSurfaces[row * l->width + col].getCode();
-        } while (l->m_pEntities[row * l->width + col].getCode() != ObjectCode::NONE ||
-            (surf >= MIN_WALL && surf <= MAX_WALL));
-        l->m_pFurnishings[row * l->width + col] = GameObject(STAIRS);
+        randPlaceOneInLevel(l, &rng, GameObject(STAIRS));
     }
 
     static void drawRect(GameObject* arr, unsigned int left, unsigned int top,
@@ -222,5 +215,20 @@ public:
                 }
             }
         }
+    }
+
+    static void randPlaceOneInLevel(Level* l, std::mt19937* rng, GameObject& templ)
+    {
+        // should refactor the following into a function
+        unsigned int row, col;
+        ObjectCode surf;
+        do
+        {
+            row = rng->operator()() % l->height;
+            col = rng->operator()() % l->width;
+            surf = l->m_pSurfaces[row * l->width + col].getCode();
+        } while (l->m_pEntities[row * l->width + col].getCode() != ObjectCode::NONE ||
+            (surf >= MIN_WALL && surf <= MAX_WALL));
+        l->m_pFurnishings[row * l->width + col] = GameObject(templ);
     }
 };
