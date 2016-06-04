@@ -119,7 +119,7 @@ void Game::start()
                 if (moveEntity(playerPos, p) != AC_NONE)
                 {
                     // ASSERT: Couldn't move to square after taking potion!
-                    DebugBreak();
+                    __debugbreak();
                 }
                 else
                     m_pPlayerPositions[m_activePlayer] = p;
@@ -132,7 +132,7 @@ void Game::start()
                 if (moveEntity(playerPos, p) != AC_NONE)
                 {
                     // ASSERT: Couldn't move to square after taking potion!
-                    DebugBreak();
+                    __debugbreak();
                 }
                 else
                     m_pPlayerPositions[m_activePlayer] = p;
@@ -297,6 +297,7 @@ ActionCode Game::moveEntity(Position start, Position end)
             if (result == AC_STAIR_TRIGGERED)
             {
                 ObjectCode npcCode = newEnt->getCode();
+                doStairAction(npcCode);
             }
             return AC_NONE;
         }
@@ -345,7 +346,7 @@ bool Game::MaybeSendPosition(Position pos) // main thread only!
     // It should be nonsignalled. If signaled, game thread is still active.
     if (WaitForSingleObject(inputEvent, 0) != WAIT_TIMEOUT)
     {
-        //DebugBreak();
+        //__debugbreak();
         return false;
     }
     synchronizedPos.xTile = pos.xTile;

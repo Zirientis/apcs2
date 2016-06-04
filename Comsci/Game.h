@@ -108,6 +108,7 @@ inline void Game::doStairAction(ObjectCode triggerCode)
         break;
     case GT_CLASSIC:
         // here we go
+        __debugbreak();
         break;
     default:
         break;
