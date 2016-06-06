@@ -7,6 +7,8 @@
 #include "LevelType.h"
 #include "GameType.h"
 
+#include "version.h"
+
 #include <Windows.h>
 
 #include <vector>
@@ -58,12 +60,7 @@ void Game::start()
 {
     advanceLevel();
     ready = true;
-    showText(L"Welcome to Comsci\u2122! (Build 0.1alpha)\n");
-    showText(L"Please read the ReadMe if you have not already done so.");
-    showText(L"Game mode is Spider Onslaught! (3 player)");
-    showText(L"Objectives:");
-    showText(L"(1/2) Survive the spider onslaught!");
-    showText(L"(2/2) Get a high score!");
+    showBanner();
     for (uint64_t turn = 0;;turn++) // forever
     {
         const unsigned int width = m_pCurrentLevel->GetWidth();
@@ -206,14 +203,15 @@ void Game::start()
                         if (IsCodePlayer(blockingEntity->getCode()))
                         {
                             showText(L"The creature attacks you!");
-                            int hp = blockingEntity->attack(1);
-                            showText(L"You lost 1 health!");
-                            if (hp <= 0) // FIXME: Death should be handled at a central location!
-                            {
-                                showText(L"You 'died'");
-                                __debugbreak();
-                                // We need to end the game now!
-                            }
+                            int lostHealth = (random() % 4) + 1;
+                            int hp = blockingEntity->attack(lostHealth);
+                            std::wstring dmgStr = L"You lost ";
+                            dmgStr += std::to_wstring(lostHealth);
+                            dmgStr += L" health. You have ";
+                            dmgStr += std::to_wstring(hp);
+                            dmgStr += L" health remaining.";
+                            showText(dmgStr.data());
+                            REAPER(hp); // We may need to end the game.
                         }
                     }
                 }
@@ -317,6 +315,30 @@ ActionCode Game::placeEntity(GameObject& templateObj, Position pos, bool force)
         return AC_NONE;
     }
     return AC_PLACE_FAIL;
+}
+
+void Game::showBanner()
+{
+    showText(L"Welcome to Comsci\u2122! [Build " COMSCI_VERSION_STR "]");
+    showText(L"Please read the ReadMe if you have not already done so.");
+    std::wstring gameStr = L"Game mode is ";
+    gameStr += GetGameTypeStringW(gameType);
+    showText(gameStr.data());
+    showText(L"Objectives:");
+    switch (gameType)
+    {
+    case GT_SPIDER:
+        showText(L"(1/2) Survive the spider onslaught!");
+        showText(L"(2/2) Get a high score!");
+        break;
+    case GT_SNEK:
+        showText(L"Destroy all the SNEKs!");
+        break;
+    case GT_CLASSIC:
+        showText(L"Begin your adventure!");
+    default:
+        break;
+    }
 }
 
 void Game::advanceLevel()

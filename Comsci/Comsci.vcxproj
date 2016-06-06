@@ -99,7 +99,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;INCR_SEGMENTS_AFTER_COUNT=0;TEXTURES_DIR="textures\\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;INCR_SEGMENTS_AFTER_COUNT=0;TEXTURES_DIR="textures\\";NO_DEBUG_SPAWNER=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -164,6 +164,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="texpath.h" />
+    <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Comsci.cpp" />

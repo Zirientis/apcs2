@@ -8,6 +8,8 @@
 #include "Position.h"
 #include "GameType.h"
 
+#include "version.h"
+
 #include <dwrite.h>
 #include <string>
 
@@ -87,7 +89,7 @@ HRESULT Comsci::OnRender()
         {
             D2D1_SIZE_F rtSize = m_pRenderTarget->GetSize();
             std::wstring str = L"Welcome to Comsci!\n";
-            str += L"Build 0.1alpha\n";
+            str += L"[Build " COMSCI_VERSION_STR L"]\n";
             str += L"Demonstration:\n";
             str += L"   Game Mode: ";
             str += GetGameTypeStringW(gameType);

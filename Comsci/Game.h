@@ -14,8 +14,10 @@
 
 #ifdef _DEBUG
 #define WIZARD_MODE true
-#ifndef DEBUG_SPAWNER
+#ifndef NO_DEBUG_SPAWNER
 #define DEBUG_SPAWNER true
+#else
+#define DEBUG_SPAWNER false
 #endif // DEBUG_SPAWNER
 #else
 #define WIZARD_MODE false
@@ -46,8 +48,11 @@ private:
 
     ActionCode moveEntity(Position start, Position end);
     ActionCode placeEntity(GameObject& templateObj, Position pos, bool force);
+    void showBanner();
     void advanceLevel();
     void showText(const wchar_t* textString);
+    void DEATH();
+    void REAPER(int hp);
     void doStairAction(ObjectCode);
 public:
     Game(int, GameType, void (*getInput) (void*, Position*, const wchar_t*));
@@ -85,6 +90,26 @@ inline void AssertPositionChangeValid(Position start, Position end)
         __debugbreak();
 }
 
+inline void Game::DEATH()
+{
+    // HACKETY HACK HACK
+    std::wstring outstr;
+    outstr += L"Game Over! Your score was ";
+    outstr += std::to_wstring(score);
+    MessageBox(NULL, outstr.data(), L"Comsci", 0);
+    //delete this;
+    ExitThread(0);
+}
+
+inline void Game::REAPER(int hp)
+{
+    if (hp <= 0)
+    {
+        showText(L"You have died!");
+        DEATH();
+    }
+}
+
 inline void Game::doStairAction(ObjectCode triggerCode)
 {
     switch (gameType)
@@ -95,20 +120,15 @@ inline void Game::doStairAction(ObjectCode triggerCode)
             //return AC_STAIR_TRIGGERED;
             showText(L"The stairs collapse downward!");
             showText(L"It seems that your adventure is over!");
-            {
-                // HACKETY HACK HACK
-                std::wstring outstr;
-                outstr += L"Game Over! Your score was ";
-                outstr += std::to_wstring(score);
-                MessageBox(NULL, outstr.data(), L"Comsci", 0);
-                //delete this;
-                ExitThread(0);
-            }
+            DEATH();
         }
         break;
     case GT_CLASSIC:
         // here we go
-        __debugbreak();
+        if (IsCodePlayer(triggerCode))
+        {
+            showText(L"You descend the stairs.");
+        }
         break;
     default:
         break;
