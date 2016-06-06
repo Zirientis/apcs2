@@ -59,7 +59,6 @@ Game::~Game()
 void Game::start()
 {
     advanceLevel();
-    ready = true;
     showBanner();
     for (uint64_t turn = 0;;turn++) // forever
     {
@@ -193,6 +192,8 @@ void Game::tick(uint64_t turn)
     for (unsigned int i = 0; i < width * height; i++)
     {
         GameObject* npc = m_pCurrentLevel->m_pEntities + i;
+        if (npc->isActionPerformed())
+            continue;
         ObjectCode npcCode = npc->getCode();
         Position npcPos = Position{ i % width, i / width };
         if (IsCodeNone(npcCode) || IsCodePlayer(npcCode))
@@ -246,6 +247,8 @@ void Game::tick(uint64_t turn)
                 Position spawneePos = Position{ npcPos.xTile + (random() % 3) - 1, npcPos.yTile + (random() % 3) - 1 };
                 AssertPositionChangeValid(npcPos, spawneePos);
                 ActionCode res = placeEntity(GameObject(GetSpawnedItem(npcCode)), spawneePos, false);
+                if (res != AC_PLACE_FAIL)
+                    npc->setActionPerformed(true);
                 if (DEBUG_SPAWNER && res != AC_PLACE_FAIL)
                 {
                     m_pCurrentLevel->m_pOverlays[npcPos.yTile * width + npcPos.xTile].setCode(INDICATOR_RED);
@@ -265,6 +268,11 @@ void Game::tick(uint64_t turn)
                 }
             }
         }
+    }
+    for (unsigned int i = 0; i < width * height; i++)
+    {
+        GameObject* npc = m_pCurrentLevel->m_pEntities + i;
+        npc->setActionPerformed(false);
     }
 }
 
@@ -299,9 +307,27 @@ ActionCode Game::moveEntity(Position start, Position end)
         {
             GameObject* newEnt = m_pCurrentLevel->m_pEntities + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
             *newEnt = *oldEnt;
+            newEnt->setActionPerformed(true);
             *oldEnt = GameObject();
             GameObject* newFurn = m_pCurrentLevel->m_pFurnishings + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
             ActionCode result = newFurn->onWalk(newEnt); // TODO: has issues if the trap moves the entity
+            if (DEBUG_MOVE)
+            {
+                m_pCurrentLevel->m_pOverlays[start.yTile * m_pCurrentLevel->GetWidth() + start.xTile].setCode(INDICATOR_RED);
+                m_pCurrentLevel->m_pOverlays[end.yTile * m_pCurrentLevel->GetWidth() + end.xTile].setCode(INDICATOR_GREEN);
+                std::wstring debugStr = L"Move from (";
+                debugStr += std::to_wstring(start.xTile);
+                debugStr += L", ";
+                debugStr += std::to_wstring(start.yTile);
+                debugStr += L") to (";
+                debugStr += std::to_wstring(end.xTile);
+                debugStr += L", ";
+                debugStr += std::to_wstring(end.yTile);
+                debugStr += L")";
+                MessageBox(NULL, debugStr.data(), L"Comsci DEBUG", 0);
+                m_pCurrentLevel->m_pOverlays[start.yTile * m_pCurrentLevel->GetWidth() + start.xTile].setCode(NONE);
+                m_pCurrentLevel->m_pOverlays[end.yTile * m_pCurrentLevel->GetWidth() + end.xTile].setCode(NONE);
+            }
             if (result == AC_STAIR_TRIGGERED)
             {
                 ObjectCode npcCode = newEnt->getCode();

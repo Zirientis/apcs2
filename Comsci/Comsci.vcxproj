@@ -99,7 +99,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;INCR_SEGMENTS_AFTER_COUNT=0;TEXTURES_DIR="textures\\";NO_DEBUG_SPAWNER=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;INCR_SEGMENTS_AFTER_COUNT=0;TEXTURES_DIR="textures\\";NO_DEBUG_SPAWNER=1;NO_DEBUG_MOVE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>

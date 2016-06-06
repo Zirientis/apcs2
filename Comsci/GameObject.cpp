@@ -6,30 +6,35 @@ GameObject::GameObject()
 {
     code = ObjectCode::NONE;
     health = -1;
+    actionPerformed = false;
 }
 
 GameObject::GameObject(const ObjectCode c)
 {
     code = c;
     health = GetDefaultHealth(c);
+    actionPerformed = true;
 }
 
 GameObject::GameObject(const ObjectCode c, double factorDefaultHealth)
 {
     code = c;
     health = (int)(factorDefaultHealth * GetDefaultHealth(c));
+    actionPerformed = true;
 }
 
 GameObject::GameObject(const ObjectCode c, int hp) // expert use only!
 {
     code = c;
     health = hp;
+    actionPerformed = true;
 }
 
 GameObject::GameObject(const GameObject& g)
 {
     code = g.code;
     health = g.health;
+    actionPerformed = g.actionPerformed;
 }
 
 ObjectCode GameObject::getCode() const
@@ -68,6 +73,16 @@ bool GameObject::isAttackable()
 int GameObject::attack(int dmg)
 {
     return isAttackable() ? changeHealth(-dmg) : health;
+}
+
+bool GameObject::isActionPerformed()
+{
+    return actionPerformed;
+}
+
+void GameObject::setActionPerformed(bool state)
+{
+    actionPerformed = state;
 }
 
 bool GameObject::onBeforeWalk(GameObject* trigger)

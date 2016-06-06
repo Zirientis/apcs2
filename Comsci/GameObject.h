@@ -6,6 +6,7 @@ class GameObject
 private:
     ObjectCode code;
     int health;
+    bool actionPerformed;
 public:
     GameObject(); // NONE
     GameObject(const ObjectCode);
@@ -19,6 +20,8 @@ public:
     int changeHealth(int);
     bool isAttackable();
     int attack(int);
+    bool isActionPerformed();
+    void setActionPerformed(bool);
 
     bool onBeforeWalk(GameObject*);
     ActionCode onWalk(GameObject*);

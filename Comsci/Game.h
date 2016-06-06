@@ -20,12 +20,21 @@
 #else
 #define DEBUG_SPAWNER false
 #endif // DEBUG_SPAWNER
+#ifndef NO_DEBUG_MOVE
+#define DEBUG_MOVE true
+#else
+#define DEBUG_MOVE false
+#endif // DEBUG_MOVE
 #else
 #define WIZARD_MODE false
 #ifdef DEBUG_SPAWNER
 #undef DEBUG_SPAWNER
 #endif // DEBUG_SPAWNER
 #define DEBUG_SPAWNER false
+#ifdef DEBUG_MOVE
+#undef DEBUG_MOVE
+#endif // DEBUG_MOVE
+#define DEBUG_MOVE false
 #endif // _DEBUG
 
 class Game
@@ -84,11 +93,11 @@ DWORD WINAPI GameThreadEntryProc(void*);
 
 inline void AssertPositionChangeValid(Position start, Position end)
 {
-    const int xDiff = (int)start.xTile - (int)end.xTile;
-    if (!(xDiff == 1 || xDiff == 0 || xDiff == -1))
+    const int xDiff = ((int)start.xTile) - ((int)end.xTile);
+    if (std::abs(xDiff) > 1)
         __debugbreak();
-    const int yDiff = (int)start.yTile - (int)end.yTile;
-    if (!(yDiff == 1 || yDiff == 0 || yDiff == -1))
+    const int yDiff = ((int)start.yTile) - ((int)end.yTile);
+    if (std::abs(yDiff) > 1)
         __debugbreak();
 }
 
