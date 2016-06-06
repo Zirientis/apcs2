@@ -354,6 +354,7 @@ void Game::showBanner()
 
 void Game::advanceLevel()
 {
+    ready = false;
     int oldDiff = 0;
     if (m_pCurrentLevel)
     {
@@ -361,6 +362,7 @@ void Game::advanceLevel()
         delete m_pCurrentLevel;
     }
     m_pCurrentLevel = new Level(oldDiff + 1, LevelTypeFromGameType(gameType), random());
+    ready = true;
 }
 
 int Game::getActivePlayer() // main thread, and only when locked
