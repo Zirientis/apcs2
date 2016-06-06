@@ -1,5 +1,6 @@
 #pragma once
 #include "Level.h"
+#include "LevelGenerator.h"
 #include "Position.h"
 #include "ActionCode.h"
 #include "GameType.h"
@@ -53,7 +54,8 @@ private:
     void showText(const wchar_t* textString);
     void DEATH();
     void REAPER(int hp);
-    void doStairAction(ObjectCode);
+    bool doStairAction(ObjectCode); // true if invalidation req
+    void tick(uint64_t);
 public:
     Game(int, GameType, void (*getInput) (void*, Position*, const wchar_t*));
     ~Game();
@@ -110,7 +112,8 @@ inline void Game::REAPER(int hp)
     }
 }
 
-inline void Game::doStairAction(ObjectCode triggerCode)
+// If this returns true, the level has been invalidated.
+inline bool Game::doStairAction(ObjectCode triggerCode)
 {
     switch (gameType)
     {
@@ -128,9 +131,14 @@ inline void Game::doStairAction(ObjectCode triggerCode)
         if (IsCodePlayer(triggerCode))
         {
             showText(L"You descend the stairs.");
+            advanceLevel();
+            Position playerPos = LevelGenerator::randPlaceOneInLevel(m_pCurrentLevel, m_pCurrentLevel->m_pEntities, &random, GameObject(PLAYER_1));
+            m_pPlayerPositions[m_activePlayer] = playerPos;
+            return true;
         }
         break;
     default:
         break;
     }
+    return false;
 }

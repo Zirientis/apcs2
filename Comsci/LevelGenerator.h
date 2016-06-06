@@ -2,6 +2,7 @@
 #include "LevelType.h"
 #include <random>
 #include <limits>
+#undef max // really??
 class LevelGenerator
 {
 public:
@@ -63,7 +64,8 @@ public:
                     row + BASE_SEGMENT_LENGTH - 1,
                     l->width,
                     &rng,
-                    std::numeric_limits<unsigned int>::max() >> 5
+                    std::numeric_limits<unsigned int>::max() >> 5,
+                    ((double)l->difficulty / 10) + 0.9
                 );
                 fillRectPrbSpawner(l->m_pEntities,
                     col + 1,
@@ -76,9 +78,9 @@ public:
                 );
             }
         }
-        randPlaceOneInLevel(l, &rng, GameObject(STAIRS));
+        randPlaceOneInLevel(l, l->m_pFurnishings, &rng, GameObject(STAIRS));
         if (rng() < std::numeric_limits<unsigned int>::max() >> 4)
-            randPlaceOneInLevel(l, &rng, GameObject(MONST_PLAYER_GHOST));
+            randPlaceOneInLevel(l, l->m_pEntities, &rng, GameObject(MONST_PLAYER_GHOST));
     }
 
     static void GenerateSnekLevel(Level* l, const unsigned int seed)
@@ -144,7 +146,7 @@ public:
             }
         }
         drawRect(l->m_pSurfaces, 0, 0, l->width, l->height, l->width, GameObject(WALL_BRICK));
-        randPlaceOneInLevel(l, &rng, GameObject(STAIRS));
+        randPlaceOneInLevel(l, l->m_pFurnishings, &rng, GameObject(STAIRS));
     }
 
     static void drawRect(GameObject* arr, unsigned int left, unsigned int top,
@@ -185,7 +187,7 @@ public:
 
     static void fillRectPrbMonst(GameObject* arr, unsigned int left, unsigned int top,
         unsigned int right, unsigned int bottom, unsigned int width,
-        std::mt19937* rng, unsigned int prbThreshLTCreate)
+        std::mt19937* rng, unsigned int prbThreshLTCreate, double fractionDefaultHealth)
     {
         for (unsigned int r = top; r < bottom; r++)
         {
@@ -194,7 +196,7 @@ public:
                 if (rng->operator()() < prbThreshLTCreate)
                 {
                     ObjectCode code = GetRandomMonstCode(rng);
-                    arr[r * width + c] = GameObject(code);
+                    arr[r * width + c] = GameObject(code, fractionDefaultHealth);
                 }
             }
         }
@@ -217,7 +219,7 @@ public:
         }
     }
 
-    static void randPlaceOneInLevel(Level* l, std::mt19937* rng, GameObject& templ)
+    static Position randPlaceOneInLevel(Level* l, GameObject* targetArr, std::mt19937* rng, GameObject& templ)
     {
         // should refactor the following into a function
         unsigned int row, col;
@@ -227,8 +229,9 @@ public:
             row = rng->operator()() % l->height;
             col = rng->operator()() % l->width;
             surf = l->m_pSurfaces[row * l->width + col].getCode();
-        } while (l->m_pEntities[row * l->width + col].getCode() != ObjectCode::NONE ||
-            (surf >= MIN_WALL && surf <= MAX_WALL));
-        l->m_pFurnishings[row * l->width + col] = GameObject(templ);
+        } while (!IsCodeNone(l->m_pEntities[row * l->width + col].getCode()) ||
+            IsCodeWall(surf));
+        targetArr[row * l->width + col] = GameObject(templ);
+        return Position{ col, row };
     }
 };

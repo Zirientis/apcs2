@@ -14,6 +14,12 @@ GameObject::GameObject(const ObjectCode c)
     health = GetDefaultHealth(c);
 }
 
+GameObject::GameObject(const ObjectCode c, double factorDefaultHealth)
+{
+    code = c;
+    health = (int)(factorDefaultHealth * GetDefaultHealth(c));
+}
+
 GameObject::GameObject(const ObjectCode c, int hp) // expert use only!
 {
     code = c;

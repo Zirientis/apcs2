@@ -9,6 +9,7 @@ private:
 public:
     GameObject(); // NONE
     GameObject(const ObjectCode);
+    GameObject(const ObjectCode, double);
     GameObject(const ObjectCode, int);
     GameObject(const GameObject&);
     ObjectCode getCode() const;

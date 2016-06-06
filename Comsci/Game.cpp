@@ -63,199 +63,209 @@ void Game::start()
     showBanner();
     for (uint64_t turn = 0;;turn++) // forever
     {
-        const unsigned int width = m_pCurrentLevel->GetWidth();
-        const unsigned int height = m_pCurrentLevel->GetHeight();
-        for (m_activePlayer = 0; m_activePlayer < m_numPlayers; m_activePlayer++)
-        {
-            // Set the necessary overlays
-            Position playerPos = m_pPlayerPositions[m_activePlayer];
-            unsigned int ptrOffset = playerPos.yTile * width + playerPos.xTile;
-            GameObject* overlay = m_pCurrentLevel->m_pOverlays + ptrOffset;
-            // Wait for input
-            Position p;
-            int xDiff, yDiff;
-            do
-            {
-                if (!playersPlaced)
-                    getInput(this, &p, L"Place your player...\n");
-                else
-                {
-                    overlay->setCode(ObjectCode::INDICATOR_BLUE);
-                    getInput(this, &p, L"Make your move...\n");
-                }
-                overlay->setCode(ObjectCode::NONE);
-                xDiff = std::abs((int)p.xTile - (int)playerPos.xTile);
-                yDiff = std::abs((int)p.yTile - (int)playerPos.yTile);
-            } while (p.xTile >= width || p.yTile >= height ||
-                (playersPlaced && (xDiff > 1 || yDiff > 1)) && !WIZARD_MODE);
-            // deactivate the overlay
+        tick(turn);
+        score--;
+    } // forever
+}
 
-            ObjectCode targetEntCode = m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile].getCode();
-            ObjectCode targetSurfCode = m_pCurrentLevel->m_pSurfaces[p.yTile * width + p.xTile].getCode();
+void Game::tick(uint64_t turn)
+{
+    const unsigned int width = m_pCurrentLevel->GetWidth();
+    const unsigned int height = m_pCurrentLevel->GetHeight();
+    for (m_activePlayer = 0; m_activePlayer < m_numPlayers; m_activePlayer++)
+    {
+        // Set the necessary overlays
+        Position playerPos = m_pPlayerPositions[m_activePlayer];
+        unsigned int ptrOffset = playerPos.yTile * width + playerPos.xTile;
+        GameObject* overlay = m_pCurrentLevel->m_pOverlays + ptrOffset;
+        // Wait for input
+        Position p;
+        int xDiff, yDiff;
+        do
+        {
             if (!playersPlaced)
+                getInput(this, &p, L"Place your player...\n");
+            else
             {
-                GameObject playerTemplate = GameObject((ObjectCode)(ObjectCode::PLAYER_1 + m_activePlayer));
-                if (placeEntity(playerTemplate, p, false) == AC_NONE)
-                {
-                    m_pPlayerPositions[m_activePlayer] = p;
-                }
-                else
-                {
-                    showText(L"Try again!");
-                    m_activePlayer--;
-                }
+                overlay->setCode(ObjectCode::INDICATOR_BLUE);
+                getInput(this, &p, L"Make your move...\n");
             }
-            else if (moveEntity(playerPos, p) == AC_NONE)
+            overlay->setCode(ObjectCode::NONE);
+            xDiff = std::abs((int)p.xTile - (int)playerPos.xTile);
+            yDiff = std::abs((int)p.yTile - (int)playerPos.yTile);
+        } while (p.xTile >= width || p.yTile >= height ||
+            (playersPlaced && (xDiff > 1 || yDiff > 1)) && !WIZARD_MODE);
+        // deactivate the overlay
+
+        ObjectCode targetEntCode = m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile].getCode();
+        ObjectCode targetSurfCode = m_pCurrentLevel->m_pSurfaces[p.yTile * width + p.xTile].getCode();
+        if (!playersPlaced)
+        {
+            GameObject playerTemplate = GameObject((ObjectCode)(ObjectCode::PLAYER_1 + m_activePlayer));
+            if (placeEntity(playerTemplate, p, false) == AC_NONE)
             {
                 m_pPlayerPositions[m_activePlayer] = p;
             }
-            else if (IsCodeCoin(targetEntCode))
+            else
             {
-                score += GetScoreChange(targetEntCode);
-                m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile] = GameObject();
-                if (moveEntity(playerPos, p) != AC_NONE)
-                {
-                    // ASSERT: Couldn't move to square after taking potion!
-                    __debugbreak();
-                }
-                else
-                    m_pPlayerPositions[m_activePlayer] = p;
-                showText(L"You pick up the coins.");
+                showText(L"Try again!");
+                m_activePlayer--;
             }
-            else if (IsCodePotion(targetEntCode))
+        }
+        ActionCode moveRes = moveEntity(playerPos, p);
+        if (moveRes == AC_STAIR_TRIGGERED)
+        {
+            return;
+        }
+        else if (moveRes == AC_NONE)
+        {
+            m_pPlayerPositions[m_activePlayer] = p;
+        }
+        else if (IsCodeCoin(targetEntCode))
+        {
+            score += GetScoreChange(targetEntCode);
+            m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile] = GameObject();
+            if (moveEntity(playerPos, p) != AC_NONE)
             {
-                score += GetScoreChange(targetEntCode);
-                m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile] = GameObject();
-                if (moveEntity(playerPos, p) != AC_NONE)
-                {
-                    // ASSERT: Couldn't move to square after taking potion!
-                    __debugbreak();
-                }
-                else
-                    m_pPlayerPositions[m_activePlayer] = p;
-                showText(L"You quaff the potion. You feel a vague sense of improvement.");
-            }
-            else if (p == playerPos)
-            {
-                showText(L"You look around curiously.");
-            }
-            else if (IsCodePlayer(targetEntCode))
-            {
-                showText(L"You can't attack your teammate!");
-            }
-            else if (p != playerPos && !IsCodeWall(targetSurfCode))
-            {
-                // attack
-                GameObject* npc = m_pCurrentLevel->m_pEntities + (p.yTile * width + p.xTile);
-                if (npc->isAttackable())
-                {
-                    showText(L"You attack the creature!");
-                    if (npc->attack(PLAYER_DAMAGE) < 0)
-                    {
-                        showText(L"You have mortally wounded it!");
-                        score += GetScoreChange(targetEntCode);
-                        int randRes = random() & 0b1111;
-                        if (randRes <= 0b0111)
-                            *npc = GameObject(ObjectCode::COIN);
-                        else if (randRes <= 0b1001)
-                            *npc = GameObject(GetSpawner(npc->getCode()));
-                        else if (randRes == 0b1111)
-                            *npc = GameObject(ObjectCode::POTION_PURPLE);
-                        else
-                            *npc = GameObject();
-                    }
-                }
-                else
-                    showText(L"You can't attack that!");
+                // ASSERT: Couldn't move to square after taking potion!
+                __debugbreak();
             }
             else
-                showText(L"Something was already there! You forfeit your turn.");
+                m_pPlayerPositions[m_activePlayer] = p;
+            showText(L"You pick up the coins.");
         }
-        playersPlaced = true;
-        // AI logic runs here
-        //MessageBox(NULL, LPCWSTR(u"AI Thinking..."), LPCWSTR(u"AI Thinking"), 0);
-        showText(L"You hear the creatures of the dungeon begin to stir...");
+        else if (IsCodePotion(targetEntCode))
+        {
+            score += GetScoreChange(targetEntCode);
+            m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile] = GameObject();
+            if (moveEntity(playerPos, p) != AC_NONE)
+            {
+                // ASSERT: Couldn't move to square after taking potion!
+                __debugbreak();
+            }
+            else
+                m_pPlayerPositions[m_activePlayer] = p;
+            showText(L"You quaff the potion. You feel a vague sense of improvement.");
+        }
+        else if (p == playerPos)
+        {
+            showText(L"You look around curiously.");
+        }
+        else if (IsCodePlayer(targetEntCode))
+        {
+            showText(L"You can't attack your teammate!");
+        }
+        else if (p != playerPos && !IsCodeWall(targetSurfCode))
+        {
+            // attack
+            GameObject* npc = m_pCurrentLevel->m_pEntities + (p.yTile * width + p.xTile);
+            if (npc->isAttackable())
+            {
+                showText(L"You attack the creature!");
+                if (npc->attack(PLAYER_DAMAGE) < 0)
+                {
+                    showText(L"You have mortally wounded it!");
+                    score += GetScoreChange(targetEntCode);
+                    int randRes = random() & 0b1111;
+                    if (randRes <= 0b0111)
+                        *npc = GameObject(ObjectCode::COIN);
+                    else if (randRes <= 0b1001)
+                        *npc = GameObject(GetSpawner(npc->getCode()));
+                    else if (randRes == 0b1111)
+                        *npc = GameObject(ObjectCode::POTION_PURPLE);
+                    else
+                        *npc = GameObject();
+                }
+            }
+            else
+                showText(L"You can't attack that!");
+        }
+        else
+            showText(L"Something was already there! You forfeit your turn.");
+    }
+    playersPlaced = true;
+    // AI logic runs here
+    //MessageBox(NULL, LPCWSTR(u"AI Thinking..."), LPCWSTR(u"AI Thinking"), 0);
+    showText(L"You hear the creatures of the dungeon begin to stir...");
 
-        // Now allow each non-player entity to act
-        // FIXME: GameObject should take a turnCreated, if objects should sleep for 1 turn.
-        for (unsigned int i = 0; i < width * height; i++)
+    // Now allow each non-player entity to act
+    // FIXME: GameObject should take a turnCreated, if objects should sleep for 1 turn.
+    for (unsigned int i = 0; i < width * height; i++)
+    {
+        GameObject* npc = m_pCurrentLevel->m_pEntities + i;
+        ObjectCode npcCode = npc->getCode();
+        Position npcPos = Position{ i % width, i / width };
+        if (IsCodeNone(npcCode) || IsCodePlayer(npcCode))
+            continue;
+        // Now do something!
+        // On death, monster *should* have a chance to turn into a spawner.
+        if (npc->getHealth() <= 0)
         {
-            GameObject* npc = m_pCurrentLevel->m_pEntities + i;
-            ObjectCode npcCode = npc->getCode();
-            Position npcPos = Position{ i % width, i / width };
-            if (IsCodeNone(npcCode) || IsCodePlayer(npcCode))
-                continue;
-            // Now do something!
-            // On death, monster *should* have a chance to turn into a spawner.
-            if (npc->getHealth() <= 0)
+            continue;
+        }
+        else if (IsCodeMonst(npcCode))
+        {
+            if (npcPos.xTile > 0 && npcPos.xTile < width - 1 && npcPos.yTile > 0 && npcPos.yTile < height - 1)
             {
-                continue;
-            }
-            else if (IsCodeMonst(npcCode))
-            {
-                if (npcPos.xTile > 0 && npcPos.xTile < width - 1 && npcPos.yTile > 0 && npcPos.yTile < height - 1)
+                Position movePos = Position{ npcPos.xTile + (random() % 3) - 1, npcPos.yTile + (random() % 3) - 1 };
+                AssertPositionChangeValid(npcPos, movePos);
+                if (moveEntity(npcPos, movePos) != AC_NONE)
                 {
-                    Position movePos = Position{ npcPos.xTile + (random() % 3) - 1, npcPos.yTile + (random() % 3) - 1 };
-                    AssertPositionChangeValid(npcPos, movePos);
-                    if (moveEntity(npcPos, movePos) != AC_NONE)
+                    GameObject* blockingEntity = m_pCurrentLevel->m_pEntities + (movePos.yTile * width + movePos.xTile);
+                    if (IsCodePlayer(blockingEntity->getCode()))
                     {
-                        GameObject* blockingEntity = m_pCurrentLevel->m_pEntities + (movePos.yTile * width + movePos.xTile);
-                        if (IsCodePlayer(blockingEntity->getCode()))
-                        {
-                            showText(L"The creature attacks you!");
-                            int lostHealth = (random() % 4) + 1;
-                            int hp = blockingEntity->attack(lostHealth);
-                            std::wstring dmgStr = L"You lost ";
-                            dmgStr += std::to_wstring(lostHealth);
-                            dmgStr += L" health. You have ";
-                            dmgStr += std::to_wstring(hp);
-                            dmgStr += L" health remaining.";
-                            showText(dmgStr.data());
-                            REAPER(hp); // We may need to end the game.
-                        }
+                        showText(L"The creature attacks you!");
+                        int lostHealth = (random() % 4) + 1;
+                        int hp = blockingEntity->attack(lostHealth);
+                        std::wstring dmgStr = L"You lost ";
+                        dmgStr += std::to_wstring(lostHealth);
+                        dmgStr += L" health. You have ";
+                        dmgStr += std::to_wstring(hp);
+                        dmgStr += L" health remaining.";
+                        showText(dmgStr.data());
+                        REAPER(hp); // We may need to end the game.
                     }
                 }
             }
         }
-        for (unsigned int i = 0; i < width * height; i++)
+    }
+    for (unsigned int i = 0; i < width * height; i++)
+    {
+        GameObject* npc = m_pCurrentLevel->m_pEntities + i;
+        ObjectCode npcCode = npc->getCode();
+        Position npcPos = Position{ i % width, i / width };
+        if (IsCodeNone(npcCode) || IsCodePlayer(npcCode))
+            continue;
+        else if (IsCodeSpawner(npcCode))
         {
-            GameObject* npc = m_pCurrentLevel->m_pEntities + i;
-            ObjectCode npcCode = npc->getCode();
-            Position npcPos = Position{ i % width, i / width };
-            if (IsCodeNone(npcCode) || IsCodePlayer(npcCode))
+            if (random() & 1) // 50% chance a spawner will activate
                 continue;
-            else if (IsCodeSpawner(npcCode))
+            if (npcPos.xTile > 0 && npcPos.xTile < width - 1 && npcPos.yTile > 0 && npcPos.yTile < height - 1 && turn % 4 == 0)
             {
-                if (random() & 1) // 50% chance a spawner will activate
-                    continue;
-                if (npcPos.xTile > 0 && npcPos.xTile < width - 1 && npcPos.yTile > 0 && npcPos.yTile < height - 1 && turn % 4 == 0)
+                //npc->setCode(GetSpawnedItem(npcCode));
+                Position spawneePos = Position{ npcPos.xTile + (random() % 3) - 1, npcPos.yTile + (random() % 3) - 1 };
+                AssertPositionChangeValid(npcPos, spawneePos);
+                ActionCode res = placeEntity(GameObject(GetSpawnedItem(npcCode)), spawneePos, false);
+                if (DEBUG_SPAWNER && res != AC_PLACE_FAIL)
                 {
-                    //npc->setCode(GetSpawnedItem(npcCode));
-                    Position spawneePos = Position{ npcPos.xTile + (random() % 3) - 1, npcPos.yTile + (random() % 3) - 1 };
-                    AssertPositionChangeValid(npcPos, spawneePos);
-                    ActionCode res = placeEntity(GameObject(GetSpawnedItem(npcCode)), spawneePos, false);
-                    if (DEBUG_SPAWNER && res != AC_PLACE_FAIL)
-                    {
-                        m_pCurrentLevel->m_pOverlays[npcPos.yTile * width + npcPos.xTile].setCode(INDICATOR_RED);
-                        m_pCurrentLevel->m_pOverlays[spawneePos.yTile * width + spawneePos.xTile].setCode(INDICATOR_GREEN);
-                        std::wstring str = L"Spawner at (";
-                        str += std::to_wstring(npcPos.xTile);
-                        str += L", ";
-                        str += std::to_wstring(npcPos.yTile);
-                        str += L") created object at (";
-                        str += std::to_wstring(spawneePos.xTile);
-                        str += L", ";
-                        str += std::to_wstring(spawneePos.yTile);
-                        str += L").";
-                        MessageBox(NULL, str.data(), L"Comsci DEBUG", 0);
-                        m_pCurrentLevel->m_pOverlays[npcPos.yTile * width + npcPos.xTile].setCode(NONE);
-                        m_pCurrentLevel->m_pOverlays[spawneePos.yTile * width + spawneePos.xTile].setCode(NONE);
-                    }
+                    m_pCurrentLevel->m_pOverlays[npcPos.yTile * width + npcPos.xTile].setCode(INDICATOR_RED);
+                    m_pCurrentLevel->m_pOverlays[spawneePos.yTile * width + spawneePos.xTile].setCode(INDICATOR_GREEN);
+                    std::wstring str = L"Spawner at (";
+                    str += std::to_wstring(npcPos.xTile);
+                    str += L", ";
+                    str += std::to_wstring(npcPos.yTile);
+                    str += L") created object at (";
+                    str += std::to_wstring(spawneePos.xTile);
+                    str += L", ";
+                    str += std::to_wstring(spawneePos.yTile);
+                    str += L").";
+                    MessageBox(NULL, str.data(), L"Comsci DEBUG", 0);
+                    m_pCurrentLevel->m_pOverlays[npcPos.yTile * width + npcPos.xTile].setCode(NONE);
+                    m_pCurrentLevel->m_pOverlays[spawneePos.yTile * width + spawneePos.xTile].setCode(NONE);
                 }
             }
         }
-        score--;
-    } // forever
+    }
 }
 
 bool Game::IsReady()
@@ -295,7 +305,8 @@ ActionCode Game::moveEntity(Position start, Position end)
             if (result == AC_STAIR_TRIGGERED)
             {
                 ObjectCode npcCode = newEnt->getCode();
-                doStairAction(npcCode);
+                if (doStairAction(npcCode))
+                    return AC_STAIR_TRIGGERED;
             }
             return AC_NONE;
         }
