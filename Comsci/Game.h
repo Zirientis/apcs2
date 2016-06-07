@@ -1,153 +1,26 @@
 #pragma once
-#include "Level.h"
-#include "LevelGenerator.h"
-#include "Position.h"
-#include "ActionCode.h"
 #include "GameType.h"
-#include <Windows.h>
-
-#include <vector>
-#include <random>
-#include <string>
-
-#define INPUT_HANDLE_NAME L"Game Input Ready"
-#define TEXT_HANDLE_NAME L"Text Line Displayed"
-
-#ifdef _DEBUG
-#define WIZARD_MODE true
-#ifndef NO_DEBUG_SPAWNER
-#define DEBUG_SPAWNER true
-#else
-#define DEBUG_SPAWNER false
-#endif // DEBUG_SPAWNER
-#ifndef NO_DEBUG_MOVE
-#define DEBUG_MOVE true
-#else
-#define DEBUG_MOVE false
-#endif // DEBUG_MOVE
-#else
-#define WIZARD_MODE false
-#ifdef DEBUG_SPAWNER
-#undef DEBUG_SPAWNER
-#endif // DEBUG_SPAWNER
-#define DEBUG_SPAWNER false
-#ifdef DEBUG_MOVE
-#undef DEBUG_MOVE
-#endif // DEBUG_MOVE
-#define DEBUG_MOVE false
-#endif // _DEBUG
-
+#include "Position.h"
+#include "GameObject.h"
 class Game
 {
-private:
-    bool ready;
-    static const int PLAYER_DAMAGE = 30;
-    Level* m_pCurrentLevel;
-    Position* m_pPlayerPositions; // For Game bookkeeping
-    int m_numPlayers;
-    int m_activePlayer;
-    bool playersPlaced;
-    Position synchronizedPos;
-    const wchar_t* synchronizedTextString;
-    HANDLE inputEvent; // setting this one means input is ready.
-    HANDLE textEvent; // if unsignalled, there is text to show and then signal
-    int64_t score;
-    void(*getInput) (void*, Position*, const wchar_t*);
-    GameType gameType;
-    std::mt19937 random;
-
-    ActionCode moveEntity(Position start, Position end);
-    ActionCode placeEntity(GameObject& templateObj, Position pos, bool force);
-    void showBanner();
-    void advanceLevel();
-    void showText(const wchar_t* textString);
-    void DEATH();
-    void REAPER(int hp);
-    bool doStairAction(ObjectCode); // true if invalidation req
-    void tick(uint64_t);
 public:
-    Game(int, GameType, void (*getInput) (void*, Position*, const wchar_t*));
-    ~Game();
-    void start();
+    virtual void start() = 0;
 
-    bool IsReady();
+    virtual bool IsReady() = 0;
 
-    int getActivePlayer();
+    virtual int getActivePlayer() = 0;
     //std::vector<Action> getPotentialPlayerActions();
-    void DefaultMemberGetInput(Position*, const wchar_t*); // game thread only!
-    bool MaybeSendPosition(Position); // Returns whether the position was set
-    const wchar_t* GetOutputText();
-    const int GetDifficulty();
-    const int64_t GetScore();
+    virtual void DefaultMemberGetInput(Position*, const wchar_t*) = 0; // game thread only!
+    virtual bool MaybeSendPosition(Position) = 0; // Returns whether the position was set
+    virtual const wchar_t* GetOutputText() = 0;
+    virtual const int GetDifficulty() = 0;
+    virtual const int64_t GetScore() = 0;
 
-    const GameObject* GetEntityAt(Position);
-    const GameObject* GetFurnishingAt(Position);
-    const GameObject* GetSurfaceAt(Position);
-    const GameObject* GetOverlayAt(Position);
-    unsigned int GetWidth();
-    unsigned int GetHeight();
+    virtual const GameObject* GetEntityAt(Position) = 0;
+    virtual const GameObject* GetFurnishingAt(Position) = 0;
+    virtual const GameObject* GetSurfaceAt(Position) = 0;
+    virtual const GameObject* GetOverlayAt(Position) = 0;
+    virtual unsigned int GetWidth() = 0;
+    virtual unsigned int GetHeight() = 0;
 };
-
-void DefaultInputFunc(void*, Position*, const wchar_t*); // Game thread only!
-DWORD WINAPI GameThreadEntryProc(void*);
-
-inline void AssertPositionChangeValid(Position start, Position end)
-{
-    const int xDiff = ((int)start.xTile) - ((int)end.xTile);
-    if (std::abs(xDiff) > 1)
-        __debugbreak();
-    const int yDiff = ((int)start.yTile) - ((int)end.yTile);
-    if (std::abs(yDiff) > 1)
-        __debugbreak();
-}
-
-inline void Game::DEATH()
-{
-    // HACKETY HACK HACK
-    std::wstring outstr;
-    outstr += L"Game Over! Your score was ";
-    outstr += std::to_wstring(score);
-    MessageBox(NULL, outstr.data(), L"Comsci", 0);
-    //delete this;
-    ExitThread(0);
-}
-
-inline void Game::REAPER(int hp)
-{
-    if (hp <= 0)
-    {
-        showText(L"You have died!");
-        DEATH();
-    }
-}
-
-// If this returns true, the level has been invalidated.
-inline bool Game::doStairAction(ObjectCode triggerCode)
-{
-    switch (gameType)
-    {
-    case GT_SPIDER:
-        if (IsCodePlayer(triggerCode))
-        {
-            //return AC_STAIR_TRIGGERED;
-            showText(L"The stairs collapse downward!");
-            showText(L"It seems that your adventure is over!");
-            DEATH();
-        }
-        break;
-    case GT_CLASSIC:
-        // here we go
-        if (IsCodePlayer(triggerCode))
-        {
-            showText(L"You descend the stairs.");
-            advanceLevel();
-            Position playerPos = LevelGenerator::randPlaceOneInLevel(m_pCurrentLevel, m_pCurrentLevel->m_pEntities, &random, GameObject(PLAYER_1));
-            m_pPlayerPositions[m_activePlayer] = playerPos;
-            return true;
-        }
-        break;
-    default:
-        break;
-    }
-    return false;
-}

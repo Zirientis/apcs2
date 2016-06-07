@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "LocalGame.h"
 
 #include "GameObject.h"
 #include "ObjectCode.h"
@@ -15,9 +16,21 @@
 #include <random>
 #include <cmath>
 #include <string>
-Game::Game(int numPlayers, GameType mode, void (*getInputFunc) (void*, Position*, const wchar_t*))
-    : ready(false)
+
+inline void AssertPositionChangeValid(Position start, Position end)
 {
+    const int xDiff = ((int)start.xTile) - ((int)end.xTile);
+    if (std::abs(xDiff) > 1)
+        __debugbreak();
+    const int yDiff = ((int)start.yTile) - ((int)end.yTile);
+    if (std::abs(yDiff) > 1)
+        __debugbreak();
+}
+
+LocalGame::LocalGame(int numPlayers, GameType mode, void(*getInputFunc) (void*, Position*, const wchar_t*))
+    : Game()
+{
+    ready = false;
     std::random_device rd;
     random = std::mt19937(rd());
     score = 0;
@@ -39,8 +52,9 @@ Game::Game(int numPlayers, GameType mode, void (*getInputFunc) (void*, Position*
     gameType = mode;
 }
 
-Game::~Game()
+LocalGame::~LocalGame()
 {
+    
     ready = false;
     delete m_pCurrentLevel;
     m_pCurrentLevel = nullptr;
@@ -56,7 +70,7 @@ Game::~Game()
     textEvent = nullptr;
 }
 
-void Game::start()
+void LocalGame::start()
 {
     advanceLevel();
     showBanner();
@@ -67,7 +81,7 @@ void Game::start()
     } // forever
 }
 
-void Game::tick(uint64_t turn)
+void LocalGame::tick(uint64_t turn)
 {
     const unsigned int width = m_pCurrentLevel->GetWidth();
     const unsigned int height = m_pCurrentLevel->GetHeight();
@@ -278,12 +292,12 @@ void Game::tick(uint64_t turn)
     m_pCurrentLevel->MarkAllEntitiesReady();
 }
 
-bool Game::IsReady()
+bool LocalGame::IsReady()
 {
     return ready;
 }
 
-ActionCode Game::moveEntity(Position start, Position end)
+ActionCode LocalGame::moveEntity(Position start, Position end)
 {
     // Currently assuming the player can fly to any location in 1 turn.
     // Only move the player if the surface allows it and there is no other entity already there.
@@ -342,7 +356,7 @@ ActionCode Game::moveEntity(Position start, Position end)
     return AC_MOVE_FAIL;
 }
 
-ActionCode Game::placeEntity(GameObject& templateObj, Position pos, bool force)
+ActionCode LocalGame::placeEntity(GameObject& templateObj, Position pos, bool force)
 {
     GameObject* ent = m_pCurrentLevel->m_pEntities + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
     GameObject* surf = m_pCurrentLevel->m_pSurfaces + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
@@ -356,7 +370,7 @@ ActionCode Game::placeEntity(GameObject& templateObj, Position pos, bool force)
     return AC_PLACE_FAIL;
 }
 
-void Game::showBanner()
+void LocalGame::showBanner()
 {
     showText(L"Welcome to Comsci\u2122! [Build " COMSCI_VERSION_STR "]");
     showText(L"Please read the ReadMe if you have not already done so.");
@@ -380,7 +394,7 @@ void Game::showBanner()
     }
 }
 
-void Game::advanceLevel()
+void LocalGame::advanceLevel()
 {
     ready = false;
     int oldDiff = -1;
@@ -393,17 +407,17 @@ void Game::advanceLevel()
     ready = true;
 }
 
-int Game::getActivePlayer() // main thread, and only when locked
+int LocalGame::getActivePlayer() // main thread, and only when locked
 {
     return m_activePlayer;
 }
 /*
-std::vector<Action> Game::getPotentialPlayerActions()
+std::vector<Action> LocalGame::getPotentialPlayerActions()
 {
 
 }
 */
-bool Game::MaybeSendPosition(Position pos) // main thread only!
+bool LocalGame::MaybeSendPosition(Position pos) // main thread only!
 {
     // First check to ensure the game thread is done using the position.
     // It should be nonsignalled. If signaled, game thread is still active.
@@ -418,7 +432,7 @@ bool Game::MaybeSendPosition(Position pos) // main thread only!
     return true;
 }
 
-void Game::DefaultMemberGetInput(Position* outPos, const wchar_t* prompt) // game thread only!
+void LocalGame::DefaultMemberGetInput(Position* outPos, const wchar_t* prompt) // game thread only!
 {
     synchronizedTextString = prompt;
     WaitForSingleObject(inputEvent, INFINITE);
@@ -428,22 +442,22 @@ void Game::DefaultMemberGetInput(Position* outPos, const wchar_t* prompt) // gam
     ResetEvent(inputEvent);
 }
 
-const wchar_t* Game::GetOutputText()
+const wchar_t* LocalGame::GetOutputText()
 {
     return synchronizedTextString;
 }
 
-const int Game::GetDifficulty()
+const int LocalGame::GetDifficulty()
 {
     return m_pCurrentLevel->difficulty;
 }
 
-const int64_t Game::GetScore()
+const int64_t LocalGame::GetScore()
 {
     return score;
 }
 
-void Game::showText(const wchar_t* textString)
+void LocalGame::showText(const wchar_t* textString)
 {
     synchronizedTextString = textString;
     ResetEvent(textEvent);
@@ -451,34 +465,85 @@ void Game::showText(const wchar_t* textString)
     synchronizedTextString = nullptr;
 }
 
-const GameObject* Game::GetEntityAt(Position p)
+const GameObject* LocalGame::GetEntityAt(Position p)
 {
     return m_pCurrentLevel->GetEntityAt(p);
 }
 
-const GameObject* Game::GetFurnishingAt(Position p)
+const GameObject* LocalGame::GetFurnishingAt(Position p)
 {
     return m_pCurrentLevel->GetFurnishingAt(p);
 }
 
-const GameObject* Game::GetSurfaceAt(Position p)
+const GameObject* LocalGame::GetSurfaceAt(Position p)
 {
     return m_pCurrentLevel->GetSurfaceAt(p);
 }
 
-const GameObject* Game::GetOverlayAt(Position p)
+const GameObject* LocalGame::GetOverlayAt(Position p)
 {
     return m_pCurrentLevel->GetOverlayAt(p);
 }
 
-unsigned int Game::GetWidth()
+unsigned int LocalGame::GetWidth()
 {
     return m_pCurrentLevel->GetWidth();
 }
 
-unsigned int Game::GetHeight()
+unsigned int LocalGame::GetHeight()
 {
     return m_pCurrentLevel->GetHeight();
+}
+
+inline void LocalGame::DEATH()
+{
+    // HACKETY HACK HACK
+    std::wstring outstr;
+    outstr += L"Game Over! Your score was ";
+    outstr += std::to_wstring(score);
+    MessageBox(NULL, outstr.data(), L"Comsci", 0);
+    //delete this;
+    ExitThread(0);
+}
+
+inline void LocalGame::REAPER(int hp)
+{
+    if (hp <= 0)
+    {
+        showText(L"You have died!");
+        DEATH();
+    }
+}
+
+// If this returns true, the level has been invalidated.
+inline bool LocalGame::doStairAction(ObjectCode triggerCode)
+{
+    switch (gameType)
+    {
+    case GT_SPIDER:
+        if (IsCodePlayer(triggerCode))
+        {
+            //return AC_STAIR_TRIGGERED;
+            showText(L"The stairs collapse downward!");
+            showText(L"It seems that your adventure is over!");
+            DEATH();
+        }
+        break;
+    case GT_CLASSIC:
+        // here we go
+        if (IsCodePlayer(triggerCode))
+        {
+            showText(L"You descend the stairs.");
+            advanceLevel();
+            Position playerPos = LevelGenerator::randPlaceOneInLevel(m_pCurrentLevel, m_pCurrentLevel->m_pEntities, &random, GameObject(PLAYER_1));
+            m_pPlayerPositions[m_activePlayer] = playerPos;
+            return true;
+        }
+        break;
+    default:
+        break;
+    }
+    return false;
 }
 
 void DefaultInputFunc(void* pGameVoid, Position* outPos, const wchar_t* prompt) // game thread only!

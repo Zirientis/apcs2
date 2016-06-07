@@ -152,12 +152,14 @@
     <ClInclude Include="AI.h" />
     <ClInclude Include="Comsci.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="LocalGame.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameType.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LevelGenerator.h" />
     <ClInclude Include="LevelType.h" />
     <ClInclude Include="lodepng.h" />
+    <ClInclude Include="network\RemoteGame.h" />
     <ClInclude Include="ObjectCode.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="Resource.h" />
@@ -168,7 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Comsci.cpp" />
-    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="LocalGame.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="lodepng.cpp" />

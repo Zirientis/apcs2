@@ -17,7 +17,7 @@
 
 class Level
 {
-    friend class Game;
+    friend class LocalGame;
     friend class LevelGenerator;
 private:
     GameObject* m_pOverlays;
