@@ -98,25 +98,31 @@ void Game::tick(uint64_t turn)
 
         ObjectCode targetEntCode = m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile].getCode();
         ObjectCode targetSurfCode = m_pCurrentLevel->m_pSurfaces[p.yTile * width + p.xTile].getCode();
+        ActionCode actRes = AC_MAX;
         if (!playersPlaced)
         {
             GameObject playerTemplate = GameObject((ObjectCode)(ObjectCode::PLAYER_1 + m_activePlayer));
             if (placeEntity(playerTemplate, p, false) == AC_NONE)
             {
                 m_pPlayerPositions[m_activePlayer] = p;
+                actRes = AC_NONE;
             }
             else
             {
                 showText(L"Try again!");
                 m_activePlayer--;
+                continue;
             }
         }
-        ActionCode moveRes = moveEntity(playerPos, p);
-        if (moveRes == AC_STAIR_TRIGGERED)
+        else
+            actRes = moveEntity(playerPos, p);
+        if (actRes == AC_MAX)
+            __debugbreak();
+        if (actRes == AC_STAIR_TRIGGERED)
         {
             return;
         }
-        else if (moveRes == AC_NONE)
+        else if (actRes == AC_NONE)
         {
             m_pPlayerPositions[m_activePlayer] = p;
         }
@@ -269,11 +275,7 @@ void Game::tick(uint64_t turn)
             }
         }
     }
-    for (unsigned int i = 0; i < width * height; i++)
-    {
-        GameObject* npc = m_pCurrentLevel->m_pEntities + i;
-        npc->setActionPerformed(false);
-    }
+    m_pCurrentLevel->MarkAllEntitiesReady();
 }
 
 bool Game::IsReady()
@@ -381,7 +383,7 @@ void Game::showBanner()
 void Game::advanceLevel()
 {
     ready = false;
-    int oldDiff = 0;
+    int oldDiff = -1;
     if (m_pCurrentLevel)
     {
         oldDiff = m_pCurrentLevel->difficulty;

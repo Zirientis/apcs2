@@ -23,6 +23,15 @@ Level::~Level()
     m_pOverlays = nullptr;
 }
 
+void Level::MarkAllEntitiesReady()
+{
+    for (unsigned int i = 0; i < width * height; i++)
+    {
+        GameObject* npc = m_pEntities + i;
+        npc->setActionPerformed(false);
+    }
+}
+
 const GameObject* Level::GetOverlayAt(Position p)
 {
     return m_pOverlays + (p.yTile * width + p.xTile);

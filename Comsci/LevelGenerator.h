@@ -12,17 +12,19 @@ public:
         {
         case LT_SPIDER:
             GenerateSpiderLevel(l, seed);
-            return;
+            break;
         case LT_SNEK:
             GenerateSnekLevel(l, seed);
-            return;
+            break;
         case LT_CLASSIC_1:
             GenerateClassic1Level(l, seed);
-            return;
+            break;
         default:
             __debugbreak();
             // Unknown level type!
         }
+        l->MarkAllEntitiesReady();
+        return;
     }
 
     static void GenerateClassic1Level(Level* l, const unsigned int seed)
@@ -64,7 +66,7 @@ public:
                     row + BASE_SEGMENT_LENGTH - 1,
                     l->width,
                     &rng,
-                    std::numeric_limits<unsigned int>::max() >> 5,
+                    (std::numeric_limits<unsigned int>::max() >> 5) + (l->difficulty * (1 << 23)), // at 1 << 23, P increases by ~0.002 each level
                     ((double)l->difficulty / 10) + 0.9
                 );
                 fillRectPrbSpawner(l->m_pEntities,
@@ -74,7 +76,7 @@ public:
                     row + BASE_SEGMENT_LENGTH - 1,
                     l->width,
                     &rng,
-                    std::numeric_limits<unsigned int>::max() >> 7
+                    (std::numeric_limits<unsigned int>::max() >> 6) + (l->difficulty * (1 << 22)) // at 1 << 22, P increases by ~0.001 each level
                 );
             }
         }

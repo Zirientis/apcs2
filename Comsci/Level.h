@@ -27,6 +27,8 @@ private:
 
     int difficulty;
     unsigned int width, height;
+
+    void MarkAllEntitiesReady();
 public:
     Level(int, LevelType, const unsigned int);
     ~Level();
