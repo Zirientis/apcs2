@@ -13,7 +13,7 @@ extract the archive and run the Comsci.exe executable file. The game will start
 and prompt you to begin.
 
 2. How-to
-As of Build 0.1alpha, a new game will start after clicking on the prompt on the
+As of Build 0.2alpha, a new game will start after clicking on the prompt on the
 title screen. When prompted to place your player, select an open square and
 left-click it to start your player there. When prompted to move, a blue outline
 will surround the player whose turn it is to move. Select an adjacent square to
@@ -30,6 +30,9 @@ As of Build 0.1alpha, the implemented game mode is Spider Onslaught!, where you
 try to maximize your score while fighting of a horde of spiders! You are given
 three player characters, and must fight to achieve the maximum possible total
 score. Classic mode is coming soon!
+In addition, players can now choose to play in Classic mode, truly the intended
+experience for fans! In classic mode, you kill monsters, find epic loot, and
+explore ever-more-challenging dungeons!
 
 5. Credits
 Comsci was built by Ryan Later and Michael Shuen.
