@@ -188,7 +188,7 @@ void LocalGame::tick(uint64_t turn)
                     int randRes = random() & 0b1111;
                     if (randRes <= 0b0111)
                         *npc = GameObject(ObjectCode::COIN);
-                    else if (randRes <= 0b1001)
+                    else if (randRes <= 0b1001 && gameType != GT_SNEK)
                         *npc = GameObject(GetSpawner(npc->getCode()));
                     else if (randRes == 0b1111)
                         *npc = GameObject(ObjectCode::POTION_PURPLE);
@@ -250,6 +250,7 @@ void LocalGame::tick(uint64_t turn)
             }
         }
     }
+    unsigned int monstCount = 0;
     for (unsigned int i = 0; i < width * height; i++)
     {
         GameObject* npc = m_pCurrentLevel->m_pEntities + i;
@@ -257,6 +258,8 @@ void LocalGame::tick(uint64_t turn)
         Position npcPos = Position{ i % width, i / width };
         if (IsCodeNone(npcCode) || IsCodePlayer(npcCode))
             continue;
+        else if (IsCodeMonst(npcCode))
+            monstCount++;
         else if (IsCodeSpawner(npcCode))
         {
             if (random() & 1) // 50% chance a spawner will activate
@@ -288,6 +291,14 @@ void LocalGame::tick(uint64_t turn)
                 }
             }
         }
+    }
+    if (monstCount && gameType == GT_SNEK)
+    {
+        std::wstring msg = L"Congratulations! You killed all the Sneks in ";
+        msg += std::to_wstring(turn);
+        msg += L" turns!";
+        MessageBox(NULL, msg.data(), L"Comsci", 0);
+        PostQuitMessage(0);
     }
     m_pCurrentLevel->MarkAllEntitiesReady();
 }

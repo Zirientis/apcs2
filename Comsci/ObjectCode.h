@@ -1,5 +1,6 @@
 #pragma once
 #include <random>
+#include "GameType.h"
 enum ObjectCode {
     MIN_WALL,
     WALL_MARIO = MIN_WALL,
@@ -158,14 +159,18 @@ inline ObjectCode GetSpawner(ObjectCode spawnee)
     }
 }
 
-inline int GetScoreChange(ObjectCode query)
+inline int GetScoreChange(ObjectCode query, GameType type = GT_MAX)
 {
     if (IsCodePotion(query))
         return 100;
     if (IsCodeCoin(query))
         return 50;
     if (IsCodeMonst(query))
+    {
+        if (query == ObjectCode::MONST_SNEK && type == GT_SNEK)
+            return 0;
         return 25;
+    }
     return 0;
 }
 

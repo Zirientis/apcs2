@@ -2,8 +2,12 @@
 #include <asio.hpp>
 #include "autogen/network/comsci.pb.h"
 
-DWORD WINAPI ServerThreadEntryProc(void*)
+#include "GameObject.h"
+
+DWORD WINAPI ServerThreadEntryProc(void* lpGameVoid)
 {
+    Game* game = reinterpret_cast<Game*>(lpGameVoid);
+    
     asio::io_service iosvc;
-    return 0;
+    return 2;
 }

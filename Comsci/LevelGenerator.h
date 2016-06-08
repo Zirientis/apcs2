@@ -108,6 +108,10 @@ public:
                     continue;
                 drawRect(l->m_pSurfaces, col, row, col + BASE_SEGMENT_LENGTH,
                     row + BASE_SEGMENT_LENGTH, l->width, GameObject(WALL_MARIO));
+                if (row != 0)
+                    l->m_pSurfaces[row * l->width + col + BASE_SEGMENT_LENGTH / 2] = GameObject(FLOOR_STONE);
+                if (col != 0)
+                    l->m_pSurfaces[(row + BASE_SEGMENT_LENGTH / 2) * l->width + col] = GameObject(FLOOR_STONE);
                 fillRect(l->m_pSurfaces, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,
                     row + BASE_SEGMENT_LENGTH - 1, l->width, GameObject(FLOOR_STONE));
                 fillRectPrb(l->m_pEntities, col + 1, row + 1, col + BASE_SEGMENT_LENGTH - 1,

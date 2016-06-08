@@ -26,6 +26,8 @@
 #include "Position.h"
 #include "GameType.h"
 
+#include "Server.h"
+
 #define SPRITE_DIM 25
 #define TARGET_FRAMERATE 30
 #define GAMEBOARD_ORIGIN_X 0
@@ -65,6 +67,9 @@ public:
 	Comsci();
 	~Comsci();
     void CreateGame(GameType);
+    void DestroyGame();
+    void CreateServer();
+    void DestroyServer();
 
 	HRESULT Initialize();
 
@@ -108,6 +113,8 @@ private:
     HANDLE gameTextHandle;
     bool gameStarted;
     GameType gameType;
+
+    HANDLE serverThread;
 };
 
 Comsci::Comsci() :
@@ -122,7 +129,8 @@ Comsci::Comsci() :
     game(nullptr),
     gameTextHandle(NULL),
     gameThread(NULL),
-    gameType(GameType::GT_CLASSIC)
+    gameType(GameType::GT_CLASSIC),
+    serverThread(NULL)
 {
 }
 
@@ -134,11 +142,8 @@ Comsci::~Comsci()
 	SafeRelease(&m_pSpriteSheet);
     SafeRelease(&m_pDirectWriteFactory);
     SafeRelease(&m_pTextFormat);
-    TerminateThread(gameThread, 1);
-    CloseHandle(gameThread);
-    CloseHandle(gameTextHandle);
-    delete game;
-    game = nullptr;
+    DestroyServer();
+    DestroyGame();
 }
 
 void Comsci::CreateGame(GameType type)
@@ -146,6 +151,26 @@ void Comsci::CreateGame(GameType type)
     game = new LocalGame(GetGameTypeMaxPlayer(type), type, &DefaultInputFunc);
     gameTextHandle = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT_HANDLE_NAME);
     gameThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
+}
+
+void Comsci::DestroyGame()
+{
+    TerminateThread(gameThread, 1);
+    delete game;
+    game = nullptr;
+    CloseHandle(gameThread);
+    CloseHandle(gameTextHandle);
+}
+
+void Comsci::CreateServer()
+{
+    serverThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&ServerThreadEntryProc, game, 0, NULL);
+}
+
+void Comsci::DestroyServer()
+{
+    TerminateThread(serverThread, 2); // ehh...
+    CloseHandle(serverThread);
 }
 
 void Comsci::RunMessageLoop()
@@ -193,7 +218,7 @@ HRESULT Comsci::Initialize()
 			static_cast<UINT>(ceil(1920.f * dpiX / 96.f)),
 			static_cast<UINT>(ceil(1080.f * dpiY / 96.f)),
 			NULL,
-			NULL,
+			LoadMenu(NULL, MAKEINTRESOURCE(IDC_COMSCI)),
 			HINST_THISCOMPONENT,
 			this
 			);

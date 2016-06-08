@@ -8,6 +8,8 @@
 #include "Position.h"
 #include "GameType.h"
 
+#include "Server.h"
+
 #include "version.h"
 
 #include <dwrite.h>
@@ -30,7 +32,6 @@ bool RealMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 		CoUninitialize();
 	}
-
 	return false;
 }
 
@@ -43,6 +44,11 @@ int WINAPI WinMain(
 
 {
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
+    std::string strCmdLine = std::string(lpCmdLine);
+    bool connectToRemote = strCmdLine.find("/remote") != std::string::npos ||
+        strCmdLine.find("--remote") != std::string::npos;
+    if (connectToRemote)
+        MessageBox(NULL, L"Will connect to remote server", L"Comsci DEBUG", 0);
     bool playAgain = false;
     do
     {
@@ -66,7 +72,7 @@ void Comsci::RenderSprite(UINT left, UINT top, ObjectCode spriteId)
 
 HRESULT Comsci::OnRender()
 {
-    if (gameStarted && game->IsReady() && WaitForSingleObject(gameThread, 0) != WAIT_TIMEOUT)
+    if (gameStarted && WaitForSingleObject(gameThread, 0) != WAIT_TIMEOUT && game->IsReady())
     {
         PostQuitMessage(0);
     }
@@ -230,11 +236,69 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 			wasHandled = true;
 			break;
 
+            case WM_COMMAND:
+            {
+                WORD menu = LOWORD(wParam);
+                OutputDebugString((std::to_wstring(menu) + L"\n").data());
+                if (menu == IDM_EXIT)
+                {
+                    PostQuitMessage(0);
+                    result = 1;
+                    wasHandled = true;
+                    break;
+                }
+                if (menu == IDM_ABOUT)
+                {
+                    MessageBox(hwnd, L"Comsci: A game by Ryan Later and Michael Shuen.\nSee the README for more information.", L"About Comsci", MB_ICONINFORMATION);
+                }
+                if (menu == ID_NEWLOCALGAME_CLASSIC)
+                {
+                    pComsci->DestroyServer();
+                    pComsci->DestroyGame();
+                    pComsci->CreateGame(GameType::GT_CLASSIC);
+                    pComsci->CreateServer();
+                    result = 0;
+                    wasHandled = true;
+                    break;
+                }
+                if (menu == ID_NEWLOCALGAME_SNEK)
+                {
+                    pComsci->DestroyServer();
+                    pComsci->DestroyGame();
+                    pComsci->CreateGame(GameType::GT_SNEK);
+                    pComsci->CreateServer();
+                    result = 0;
+                    wasHandled = true;
+                    break;
+                }
+                if (menu == ID_NEWLOCALGAME_SPIDERONSLAUGHT)
+                {
+                    pComsci->DestroyServer();
+                    pComsci->DestroyGame();
+                    pComsci->CreateGame(GameType::GT_SPIDER);
+                    pComsci->CreateServer();
+                    result = 0;
+                    wasHandled = true;
+                    break;
+                }
+                if (menu == ID_GAME_CONNECT)
+                {
+                    MessageBox(hwnd, L"For this demonstration, we will connect to the local machine.", L"Comsci", MB_ICONINFORMATION);
+                    result = 0;
+                    wasHandled = true;
+                    break;
+                }
+            }
+            result = 0;
+            wasHandled = true;
+            break;
+
             case WM_LBUTTONDOWN:
             {
                 if (!pComsci->gameStarted)
                 {
                     pComsci->CreateGame(pComsci->gameType);
+                    pComsci->CreateServer();
                     pComsci->gameStarted = true;
                 }
                 else if (!pComsci->game->IsReady()) {}
