@@ -21,6 +21,7 @@
 #include "texpath.h"
 #include "Game.h"
 #include "LocalGame.h"
+#include "network/RemoteGame.h"
 #include "GameObject.h"
 #include "ObjectCode.h"
 #include "Position.h"
@@ -67,6 +68,7 @@ public:
 	Comsci();
 	~Comsci();
     void CreateGame(GameType);
+    bool CreateRemoteGame();
     void DestroyGame();
     void CreateServer();
     void DestroyServer();
@@ -153,13 +155,36 @@ void Comsci::CreateGame(GameType type)
     gameThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
 }
 
+bool Comsci::CreateRemoteGame()
+{
+    try
+    {
+        game = new RemoteGame(&DefaultInputFunc);
+        gameTextHandle = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT_HANDLE_NAME);
+        gameThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
+    }
+    catch (std::exception e)
+    {
+        return false;
+    }
+    return true;
+}
+
 void Comsci::DestroyGame()
 {
-    TerminateThread(gameThread, 1);
+    if (gameThread)
+    {
+        TerminateThread(gameThread, 1);
+        CloseHandle(gameThread);
+        gameThread = NULL;
+    }
     delete game;
     game = nullptr;
-    CloseHandle(gameThread);
-    CloseHandle(gameTextHandle);
+    if (gameTextHandle)
+    {
+        CloseHandle(gameTextHandle);
+        gameTextHandle = NULL;
+    }
 }
 
 void Comsci::CreateServer()
@@ -169,8 +194,12 @@ void Comsci::CreateServer()
 
 void Comsci::DestroyServer()
 {
-    TerminateThread(serverThread, 2); // ehh...
-    CloseHandle(serverThread);
+    if (serverThread)
+    {
+        TerminateThread(serverThread, 2); // ehh...
+        CloseHandle(serverThread);
+        serverThread = NULL;
+    }
 }
 
 void Comsci::RunMessageLoop()

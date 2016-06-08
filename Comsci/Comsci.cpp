@@ -72,6 +72,8 @@ void Comsci::RenderSprite(UINT left, UINT top, ObjectCode spriteId)
 
 HRESULT Comsci::OnRender()
 {
+    if (!game)
+        return S_OK;
     if (gameStarted && WaitForSingleObject(gameThread, 0) != WAIT_TIMEOUT && game->IsReady())
     {
         PostQuitMessage(0);
@@ -284,6 +286,12 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
                 if (menu == ID_GAME_CONNECT)
                 {
                     MessageBox(hwnd, L"For this demonstration, we will connect to the local machine.", L"Comsci", MB_ICONINFORMATION);
+                    pComsci->DestroyServer();
+                    pComsci->DestroyGame();
+                    if (!pComsci->CreateRemoteGame())
+                    {
+                        MessageBox(hwnd, L"Failed to connect!", L"Comsci", 0);
+                    }
                     result = 0;
                     wasHandled = true;
                     break;

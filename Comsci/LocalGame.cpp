@@ -90,7 +90,7 @@ void LocalGame::tick(uint64_t turn)
         // Set the necessary overlays
         Position playerPos = m_pPlayerPositions[m_activePlayer];
         unsigned int ptrOffset = playerPos.yTile * width + playerPos.xTile;
-        GameObject* overlay = m_pCurrentLevel->m_pOverlays + ptrOffset;
+        GameObject* overlay = m_pCurrentLevel->GetOverlays() + ptrOffset;
         // Wait for input
         Position p;
         int xDiff, yDiff;
@@ -110,8 +110,8 @@ void LocalGame::tick(uint64_t turn)
             (playersPlaced && (xDiff > 1 || yDiff > 1)) && !WIZARD_MODE);
         // deactivate the overlay
 
-        ObjectCode targetEntCode = m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile].getCode();
-        ObjectCode targetSurfCode = m_pCurrentLevel->m_pSurfaces[p.yTile * width + p.xTile].getCode();
+        ObjectCode targetEntCode = m_pCurrentLevel->GetEntities()[p.yTile * width + p.xTile].getCode();
+        ObjectCode targetSurfCode = m_pCurrentLevel->GetSurfaces()[p.yTile * width + p.xTile].getCode();
         ActionCode actRes = AC_MAX;
         if (!playersPlaced)
         {
@@ -143,7 +143,7 @@ void LocalGame::tick(uint64_t turn)
         else if (IsCodeCoin(targetEntCode))
         {
             score += GetScoreChange(targetEntCode);
-            m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile] = GameObject();
+            m_pCurrentLevel->GetEntities()[p.yTile * width + p.xTile] = GameObject();
             if (moveEntity(playerPos, p) != AC_NONE)
             {
                 // ASSERT: Couldn't move to square after taking potion!
@@ -156,7 +156,7 @@ void LocalGame::tick(uint64_t turn)
         else if (IsCodePotion(targetEntCode))
         {
             score += GetScoreChange(targetEntCode);
-            m_pCurrentLevel->m_pEntities[p.yTile * width + p.xTile] = GameObject();
+            m_pCurrentLevel->GetEntities()[p.yTile * width + p.xTile] = GameObject();
             if (moveEntity(playerPos, p) != AC_NONE)
             {
                 // ASSERT: Couldn't move to square after taking potion!
@@ -177,7 +177,7 @@ void LocalGame::tick(uint64_t turn)
         else if (p != playerPos && !IsCodeWall(targetSurfCode))
         {
             // attack
-            GameObject* npc = m_pCurrentLevel->m_pEntities + (p.yTile * width + p.xTile);
+            GameObject* npc = m_pCurrentLevel->GetEntities() + (p.yTile * width + p.xTile);
             if (npc->isAttackable())
             {
                 showText(L"You attack the creature!");
@@ -211,7 +211,7 @@ void LocalGame::tick(uint64_t turn)
     // FIXME: GameObject should take a turnCreated, if objects should sleep for 1 turn.
     for (unsigned int i = 0; i < width * height; i++)
     {
-        GameObject* npc = m_pCurrentLevel->m_pEntities + i;
+        GameObject* npc = m_pCurrentLevel->GetEntities() + i;
         if (npc->isActionPerformed())
             continue;
         ObjectCode npcCode = npc->getCode();
@@ -232,7 +232,7 @@ void LocalGame::tick(uint64_t turn)
                 AssertPositionChangeValid(npcPos, movePos);
                 if (moveEntity(npcPos, movePos) != AC_NONE)
                 {
-                    GameObject* blockingEntity = m_pCurrentLevel->m_pEntities + (movePos.yTile * width + movePos.xTile);
+                    GameObject* blockingEntity = m_pCurrentLevel->GetEntities() + (movePos.yTile * width + movePos.xTile);
                     if (IsCodePlayer(blockingEntity->getCode()))
                     {
                         showText(L"The creature attacks you!");
@@ -253,7 +253,7 @@ void LocalGame::tick(uint64_t turn)
     unsigned int monstCount = 0;
     for (unsigned int i = 0; i < width * height; i++)
     {
-        GameObject* npc = m_pCurrentLevel->m_pEntities + i;
+        GameObject* npc = m_pCurrentLevel->GetEntities() + i;
         ObjectCode npcCode = npc->getCode();
         Position npcPos = Position{ i % width, i / width };
         if (IsCodeNone(npcCode) || IsCodePlayer(npcCode))
@@ -274,8 +274,8 @@ void LocalGame::tick(uint64_t turn)
                     npc->setActionPerformed(true);
                 if (DEBUG_SPAWNER && res != AC_PLACE_FAIL)
                 {
-                    m_pCurrentLevel->m_pOverlays[npcPos.yTile * width + npcPos.xTile].setCode(INDICATOR_RED);
-                    m_pCurrentLevel->m_pOverlays[spawneePos.yTile * width + spawneePos.xTile].setCode(INDICATOR_GREEN);
+                    m_pCurrentLevel->GetOverlays()[npcPos.yTile * width + npcPos.xTile].setCode(INDICATOR_RED);
+                    m_pCurrentLevel->GetOverlays()[spawneePos.yTile * width + spawneePos.xTile].setCode(INDICATOR_GREEN);
                     std::wstring str = L"Spawner at (";
                     str += std::to_wstring(npcPos.xTile);
                     str += L", ";
@@ -286,8 +286,8 @@ void LocalGame::tick(uint64_t turn)
                     str += std::to_wstring(spawneePos.yTile);
                     str += L").";
                     MessageBox(NULL, str.data(), L"Comsci DEBUG", 0);
-                    m_pCurrentLevel->m_pOverlays[npcPos.yTile * width + npcPos.xTile].setCode(NONE);
-                    m_pCurrentLevel->m_pOverlays[spawneePos.yTile * width + spawneePos.xTile].setCode(NONE);
+                    m_pCurrentLevel->GetOverlays()[npcPos.yTile * width + npcPos.xTile].setCode(NONE);
+                    m_pCurrentLevel->GetOverlays()[spawneePos.yTile * width + spawneePos.xTile].setCode(NONE);
                 }
             }
         }
@@ -325,23 +325,23 @@ ActionCode LocalGame::moveEntity(Position start, Position end)
 
     if (IsCodeNone(m_pCurrentLevel->GetEntityAt(end)->getCode())) // tile is empty
     {
-        GameObject* oldEnt = m_pCurrentLevel->m_pEntities + (start.yTile * m_pCurrentLevel->GetWidth() + start.xTile);
-        GameObject* newSurf = m_pCurrentLevel->m_pSurfaces + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
-        GameObject* oldFurn = m_pCurrentLevel->m_pFurnishings + (start.yTile * m_pCurrentLevel->GetWidth() + start.xTile);
+        GameObject* oldEnt = m_pCurrentLevel->GetEntities() + (start.yTile * m_pCurrentLevel->GetWidth() + start.xTile);
+        GameObject* newSurf = m_pCurrentLevel->GetSurfaces() + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
+        GameObject* oldFurn = m_pCurrentLevel->GetFurnishings() + (start.yTile * m_pCurrentLevel->GetWidth() + start.xTile);
 
         if (newSurf->onBeforeWalk(oldEnt) && oldFurn->onAfterWalk(oldEnt))
         // ok to move to new tile, and old tile allows it (after effects from furnishing run)
         {
-            GameObject* newEnt = m_pCurrentLevel->m_pEntities + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
+            GameObject* newEnt = m_pCurrentLevel->GetEntities() + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
             *newEnt = *oldEnt;
             newEnt->setActionPerformed(true);
             *oldEnt = GameObject();
-            GameObject* newFurn = m_pCurrentLevel->m_pFurnishings + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
+            GameObject* newFurn = m_pCurrentLevel->GetFurnishings() + (end.yTile * m_pCurrentLevel->GetWidth() + end.xTile);
             ActionCode result = newFurn->onWalk(newEnt); // TODO: has issues if the trap moves the entity
             if (DEBUG_MOVE)
             {
-                m_pCurrentLevel->m_pOverlays[start.yTile * m_pCurrentLevel->GetWidth() + start.xTile].setCode(INDICATOR_RED);
-                m_pCurrentLevel->m_pOverlays[end.yTile * m_pCurrentLevel->GetWidth() + end.xTile].setCode(INDICATOR_GREEN);
+                m_pCurrentLevel->GetOverlays()[start.yTile * m_pCurrentLevel->GetWidth() + start.xTile].setCode(INDICATOR_RED);
+                m_pCurrentLevel->GetOverlays()[end.yTile * m_pCurrentLevel->GetWidth() + end.xTile].setCode(INDICATOR_GREEN);
                 std::wstring debugStr = L"Move from (";
                 debugStr += std::to_wstring(start.xTile);
                 debugStr += L", ";
@@ -352,8 +352,8 @@ ActionCode LocalGame::moveEntity(Position start, Position end)
                 debugStr += std::to_wstring(end.yTile);
                 debugStr += L")";
                 MessageBox(NULL, debugStr.data(), L"Comsci DEBUG", 0);
-                m_pCurrentLevel->m_pOverlays[start.yTile * m_pCurrentLevel->GetWidth() + start.xTile].setCode(NONE);
-                m_pCurrentLevel->m_pOverlays[end.yTile * m_pCurrentLevel->GetWidth() + end.xTile].setCode(NONE);
+                m_pCurrentLevel->GetOverlays()[start.yTile * m_pCurrentLevel->GetWidth() + start.xTile].setCode(NONE);
+                m_pCurrentLevel->GetOverlays()[end.yTile * m_pCurrentLevel->GetWidth() + end.xTile].setCode(NONE);
             }
             if (result == AC_STAIR_TRIGGERED)
             {
@@ -369,12 +369,12 @@ ActionCode LocalGame::moveEntity(Position start, Position end)
 
 ActionCode LocalGame::placeEntity(GameObject& templateObj, Position pos, bool force)
 {
-    GameObject* ent = m_pCurrentLevel->m_pEntities + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
-    GameObject* surf = m_pCurrentLevel->m_pSurfaces + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
+    GameObject* ent = m_pCurrentLevel->GetEntities() + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
+    GameObject* surf = m_pCurrentLevel->GetSurfaces() + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
     if (force || (IsCodeNone(ent->getCode()) && surf->onBeforeWalk(nullptr)))
     {
         *ent = GameObject(templateObj);
-        GameObject* furn = m_pCurrentLevel->m_pFurnishings + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
+        GameObject* furn = m_pCurrentLevel->GetFurnishings() + (pos.yTile * m_pCurrentLevel->GetWidth() + pos.xTile);
         furn->onWalk(ent);
         return AC_NONE;
     }
@@ -411,7 +411,7 @@ void LocalGame::advanceLevel()
     int oldDiff = -1;
     if (m_pCurrentLevel)
     {
-        oldDiff = m_pCurrentLevel->difficulty;
+        oldDiff = m_pCurrentLevel->GetDifficulty();
         delete m_pCurrentLevel;
     }
     m_pCurrentLevel = new Level(oldDiff + 1, LevelTypeFromGameType(gameType), random());
@@ -460,7 +460,7 @@ const wchar_t* LocalGame::GetOutputText()
 
 const int LocalGame::GetDifficulty()
 {
-    return m_pCurrentLevel->difficulty;
+    return m_pCurrentLevel->GetDifficulty();
 }
 
 const int64_t LocalGame::GetScore()
@@ -546,7 +546,7 @@ inline bool LocalGame::doStairAction(ObjectCode triggerCode)
         {
             showText(L"You descend the stairs.");
             advanceLevel();
-            Position playerPos = LevelGenerator::randPlaceOneInLevel(m_pCurrentLevel, m_pCurrentLevel->m_pEntities, &random, GameObject(PLAYER_1));
+            Position playerPos = LevelGenerator::randPlaceOneInLevel(m_pCurrentLevel, m_pCurrentLevel->GetEntities(), &random, GameObject(PLAYER_1));
             m_pPlayerPositions[m_activePlayer] = playerPos;
             return true;
         }

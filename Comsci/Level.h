@@ -17,7 +17,7 @@
 
 class Level
 {
-    friend class LocalGame;
+    //friend class LocalGame;
     friend class LevelGenerator;
 private:
     GameObject* m_pOverlays;
@@ -28,9 +28,9 @@ private:
     int difficulty;
     unsigned int width, height;
 
-    void MarkAllEntitiesReady();
 public:
     Level(int, LevelType, const unsigned int);
+    Level::Level(GameObject* over, GameObject* ent, GameObject* furn, GameObject* surf, int diff, unsigned int w, unsigned int h);
     ~Level();
     const GameObject* GetOverlayAt(Position);
     const GameObject* GetEntityAt(Position);
@@ -38,4 +38,14 @@ public:
     const GameObject* GetSurfaceAt(Position);
     unsigned int GetWidth();
     unsigned int GetHeight();
+    void MarkAllEntitiesReady();
+
+    int GetDifficulty();
+    void SetDifficulty(int);
+
+    // HERE BE DRAGONS
+    GameObject* GetOverlays();
+    GameObject* GetEntities();
+    GameObject* GetFurnishings();
+    GameObject* GetSurfaces();
 };
