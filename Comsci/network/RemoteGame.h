@@ -5,6 +5,7 @@
 #include "../Server.h"
 
 using namespace asio::ip;
+#pragma comment(lib, "libprotobuf.lib")
 
 class RemoteGame : public Game
 {

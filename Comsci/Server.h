@@ -4,6 +4,11 @@
 
 #include "GameObject.h"
 
+#ifdef _DEBUG
+#pragma comment(lib, "libprotobuf.lib")
+#else
+#pragma comment(lib, "libprotobuf.lib")
+#endif
 #define COMSCI_SERVER_PORT 16180 // 10000 * phi
 
 using namespace asio::ip;
