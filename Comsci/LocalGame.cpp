@@ -292,7 +292,7 @@ void LocalGame::tick(uint64_t turn)
             }
         }
     }
-    if (monstCount && gameType == GT_SNEK)
+    if (monstCount == 0 && gameType == GT_SNEK)
     {
         std::wstring msg = L"Congratulations! You killed all the Sneks in ";
         msg += std::to_wstring(turn);
