@@ -29,24 +29,21 @@ public:
         : Game()
     {
         MessageBox(NULL, L"You see a wooden sign. Someone with impeccable penmanship\n has painted in white paint: NOT YET IMPLEMENTED.", L"Comsci", MB_ICONINFORMATION);
-        /*
+        
         ready = false;
         asio::io_service svc;
         tcp::socket sock(svc);
         tcp::resolver res(svc);
         tcp::resolver::query q("127.0.0.1", std::to_string(COMSCI_SERVER_PORT));
         asio::connect(sock, res.resolve(q));
-        csnet::ClientHello hello;
-        hello.set_version(0);
-        std::string out = hello.SerializeAsString();
-        //hello.SerializeToString(&out);
+        std::vector<char> out;
         asio::error_code err;
-        size_t msgLen = out.length();
+        size_t msgLen = out.size();
         asio::write(sock, asio::buffer(&msgLen, sizeof(size_t)), err);
         size_t len = asio::write(sock, asio::buffer(out), err);
         inputFunc = getInputFunc;
         //ready = true;
-        */
+        
     }
 
     ~RemoteGame()
