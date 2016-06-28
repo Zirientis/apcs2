@@ -124,6 +124,11 @@ inline bool IsCodePlayer(ObjectCode query)
     return query >= MIN_PLAYER && query <= MAX_PLAYER;
 }
 
+inline bool IsCodeStair(ObjectCode query)
+{
+    return query == STAIRS;
+}
+
 inline ObjectCode GetSpawnedItem(ObjectCode spawner)
 {
     switch (spawner)
@@ -171,6 +176,8 @@ inline int GetScoreChange(ObjectCode query, GameType type = GT_MAX)
             return 0;
         return 25;
     }
+    if (IsCodeStair(query))
+        return 100;
     return 0;
 }
 

@@ -20,8 +20,6 @@
 #include "lodepng.h"
 #include "texpath.h"
 #include "Game.h"
-#include "LocalGame.h"
-#include "network/RemoteGame.h"
 #include "GameObject.h"
 #include "ObjectCode.h"
 #include "Position.h"
@@ -150,13 +148,14 @@ Comsci::~Comsci()
 
 void Comsci::CreateGame(GameType type)
 {
-    game = new LocalGame(GetGameTypeMaxPlayer(type), type, &DefaultInputFunc);
+    game = new Game(GetGameTypeMaxPlayer(type), type, &DefaultInputFunc);
     gameTextHandle = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT_HANDLE_NAME);
     gameThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
 }
 
 bool Comsci::CreateRemoteGame()
 {
+    /*
     try
     {
         game = new RemoteGame(&DefaultInputFunc);
@@ -168,6 +167,8 @@ bool Comsci::CreateRemoteGame()
         return false;
     }
     return true;
+    */
+    return false;
 }
 
 void Comsci::DestroyGame()
