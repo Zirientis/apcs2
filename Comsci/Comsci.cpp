@@ -93,10 +93,13 @@ HRESULT Comsci::OnRender()
 		int height = static_cast<int>(rtSize.height);
         D2D1_RECT_F fullScreen = D2D1::RectF(0, 0, width, height);
 
+
         if (!gameStarted)
         {
             D2D1_SIZE_F rtSize = m_pRenderTarget->GetSize();
-            std::wstring str = L"Welcome to Comsci!\n";
+            std::wstring str = L"No game active";
+            /*
+            str = L"Welcome to Comsci!\n";
             str += L"[Build " COMSCI_VERSION_STR L"]\n";
             str += L"Demonstration:\n";
             str += L"   Game Mode: ";
@@ -113,6 +116,7 @@ HRESULT Comsci::OnRender()
             str += L" player)\n";
             str += L"Left-click to continue...\n";
             str += L"Right-click to quit.";
+            */
             m_pRenderTarget->DrawText(str.data(), str.length(), m_pTextFormat, fullScreen, m_pBlackBrush);
         }
         else if (!game->IsReady())
@@ -123,20 +127,33 @@ HRESULT Comsci::OnRender()
         }
         else
         {
-            D2D1_RECT_F textDisp = D2D1::RectF(0, 0, width, GAMEBOARD_ORIGIN_Y);
-            //m_pRenderTarget->FillRectangle(textDisp, m_pCornflowerBlueBrush);
-            m_pRenderTarget->DrawLine(D2D1::Point2F(0, GAMEBOARD_ORIGIN_Y), D2D1::Point2F(width, GAMEBOARD_ORIGIN_Y), m_pBlackBrush);
-            // we have text to render if event is nonsignalled
-            // signal in WndProc when mouse input is recieved.
-            const wchar_t* text = game->GetOutputText();
-            std::wstring str = L"Level ";
-            str += std::to_wstring(game->GetDifficulty());
-            str += L" Score ";
-            str += std::to_wstring(game->GetScore());
-            str += L"\n";
-            if (text)
-                str += text;
-            m_pRenderTarget->DrawText(str.data(), str.length(), m_pTextFormat, textDisp, m_pBlackBrush);
+            // Render top panel
+            {
+                D2D1_RECT_F textDisp = D2D1::RectF(0, 0, width, GAMEBOARD_ORIGIN_Y);
+                //m_pRenderTarget->FillRectangle(textDisp, m_pCornflowerBlueBrush);
+                m_pRenderTarget->DrawLine(D2D1::Point2F(0, GAMEBOARD_ORIGIN_Y), D2D1::Point2F(width, GAMEBOARD_ORIGIN_Y), m_pBlackBrush);
+                // we have text to render if event is nonsignalled
+                // signal in WndProc when mouse input is recieved.
+                const wchar_t* text = game->GetOutputText();
+                std::wstring str = L"Level ";
+                str += std::to_wstring(game->GetDifficulty());
+                str += L" Score ";
+                str += std::to_wstring(game->GetScore());
+                str += L"\n";
+                if (text)
+                    str += text;
+                m_pRenderTarget->DrawText(str.data(), str.length(), m_pTextFormat, textDisp, m_pBlackBrush);
+            }
+            // Render info panel
+            {
+                D2D1_RECT_F textDisp = D2D1::RectF(0, GAMEBOARD_ORIGIN_Y, GAMEBOARD_ORIGIN_X, height);
+                //m_pRenderTarget->FillRectangle(textDisp, m_pCornflowerBlueBrush);
+                m_pRenderTarget->DrawLine(D2D1::Point2F(GAMEBOARD_ORIGIN_X, GAMEBOARD_ORIGIN_Y), D2D1::Point2F(GAMEBOARD_ORIGIN_X, height), m_pBlackBrush);
+                // we have text to render if event is nonsignalled
+                // signal in WndProc when mouse input is recieved.
+                std::wstring str = L"Tee Hee";
+                m_pRenderTarget->DrawText(str.data(), str.length(), m_pTextFormat, textDisp, m_pBlackBrush);
+            }
             // We should query the status of the level and render the contents
             // Pseudocode:
             // Get level map and dimensions.
@@ -241,7 +258,7 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             case WM_COMMAND:
             {
                 WORD menu = LOWORD(wParam);
-                OutputDebugString((std::to_wstring(menu) + L"\n").data());
+                //OutputDebugString((std::to_wstring(menu) + L"\n").data());
                 if (menu == IDM_EXIT)
                 {
                     PostQuitMessage(0);
@@ -291,6 +308,7 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
                     if (!pComsci->CreateRemoteGame())
                     {
                         MessageBox(hwnd, L"Failed to connect!", L"Comsci", 0);
+                        pComsci->DestroyGame();
                     }
                     result = 0;
                     wasHandled = true;
@@ -303,12 +321,7 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 
             case WM_LBUTTONDOWN:
             {
-                if (!pComsci->gameStarted)
-                {
-                    pComsci->CreateGame(pComsci->gameType);
-                    pComsci->CreateServer();
-                    pComsci->gameStarted = true;
-                }
+                if (!pComsci->gameStarted) {}
                 else if (!pComsci->game->IsReady()) {}
                 else if (WaitForSingleObject(pComsci->gameTextHandle, 0) == WAIT_TIMEOUT) // if unsignalled
                 {

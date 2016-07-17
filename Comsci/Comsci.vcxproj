@@ -157,7 +157,6 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\Desktop\Cygwin\home\Reyn\FinalProject\ObjectCode.h" />
     <ClInclude Include="ActionCode.h" />
     <ClInclude Include="AI.h" />
     <ClInclude Include="Comsci.h" />

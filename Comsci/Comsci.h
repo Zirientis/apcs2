@@ -29,7 +29,7 @@
 
 #define SPRITE_DIM 25
 #define TARGET_FRAMERATE 30
-#define GAMEBOARD_ORIGIN_X 0
+#define GAMEBOARD_ORIGIN_X 250
 #define GAMEBOARD_ORIGIN_Y 60
 void CALLBACK RedrawTimerProc(HWND timerHwnd, UINT msg, UINT_PTR timerId, DWORD dwTime);
 
@@ -112,7 +112,7 @@ private:
     HANDLE gameThread;
     HANDLE gameTextHandle;
     bool gameStarted;
-    GameType gameType;
+    //GameType gameType;
 
     HANDLE serverThread;
 };
@@ -129,7 +129,7 @@ Comsci::Comsci() :
     game(nullptr),
     gameTextHandle(NULL),
     gameThread(NULL),
-    gameType(GameType::GT_CLASSIC),
+    //gameType(GameType::GT_CLASSIC),
     serverThread(NULL)
 {
 }
@@ -151,6 +151,7 @@ void Comsci::CreateGame(GameType type)
     game = new Game(GetGameTypeMaxPlayer(type), type, &DefaultInputFunc);
     gameTextHandle = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT_HANDLE_NAME);
     gameThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
+    gameStarted = true;
 }
 
 bool Comsci::CreateRemoteGame()
@@ -173,6 +174,7 @@ bool Comsci::CreateRemoteGame()
 
 void Comsci::DestroyGame()
 {
+    gameStarted = false;
     if (gameThread)
     {
         TerminateThread(gameThread, 1);
