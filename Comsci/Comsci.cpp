@@ -72,9 +72,7 @@ void Comsci::RenderSprite(UINT left, UINT top, ObjectCode spriteId)
 
 HRESULT Comsci::OnRender()
 {
-    if (!game)
-        return S_OK;
-    if (gameStarted && WaitForSingleObject(gameThread, 0) != WAIT_TIMEOUT && game->IsReady())
+    if (gameStarted && WaitForSingleObject(gameThread, 0) != WAIT_TIMEOUT && game && game->IsReady())
     {
         PostQuitMessage(0);
     }
@@ -151,7 +149,7 @@ HRESULT Comsci::OnRender()
                 m_pRenderTarget->DrawLine(D2D1::Point2F(GAMEBOARD_ORIGIN_X, GAMEBOARD_ORIGIN_Y), D2D1::Point2F(GAMEBOARD_ORIGIN_X, height), m_pBlackBrush);
                 // we have text to render if event is nonsignalled
                 // signal in WndProc when mouse input is recieved.
-                std::wstring str = L"Tee Hee";
+                std::wstring str = L"Player "/* + std::to_wstring(game->getActivePlayer() + 1)*/; // WARNING SYNCHRONIZATION HAZARD
                 m_pRenderTarget->DrawText(str.data(), str.length(), m_pTextFormat, textDisp, m_pBlackBrush);
             }
             // We should query the status of the level and render the contents
