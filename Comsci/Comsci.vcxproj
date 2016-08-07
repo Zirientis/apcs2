@@ -88,6 +88,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Program Files\boost\boost_1_61_0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -102,7 +103,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;ASIO_STANDALONE=1;INCR_SEGMENTS_AFTER_COUNT=0;TEXTURES_DIR="textures\\";NO_DEBUG_SPAWNER=1;NO_DEBUG_MOVE=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>asio\asio-1.10.6\include;protobuf\protobuf-2.6.1\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\boost\boost_1_61_0</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <Link>
@@ -122,6 +123,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Program Files\boost\boost_1_61_0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -140,7 +142,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;ASIO_STANDALONE=1;INCR_SEGMENTS_AFTER_COUNT=0;TEXTURES_DIR="";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>asio\asio-1.10.6\include;protobuf\protobuf-2.6.1\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\boost\boost_1_61_0</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <Link>
@@ -158,7 +160,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActionCode.h" />
-    <ClInclude Include="AI.h" />
     <ClInclude Include="Comsci.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />

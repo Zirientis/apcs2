@@ -48,9 +48,6 @@
     <ClInclude Include="Position.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AI.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ActionCode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
