@@ -60,11 +60,11 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #endif
 
 
-class Comsci
+class ComsciFrontendWin
 {
 public:
-	Comsci();
-	~Comsci();
+	ComsciFrontendWin();
+	~ComsciFrontendWin();
     void CreateGame(GameType);
     bool CreateRemoteGame();
     void DestroyGame();
@@ -117,7 +117,7 @@ private:
     HANDLE serverThread;
 };
 
-Comsci::Comsci() :
+ComsciFrontendWin::ComsciFrontendWin() :
     m_hwnd(NULL),
     m_pDirect2dFactory(NULL),
     m_pRenderTarget(NULL),
@@ -134,7 +134,7 @@ Comsci::Comsci() :
 {
 }
 
-Comsci::~Comsci()
+ComsciFrontendWin::~ComsciFrontendWin()
 {
 	SafeRelease(&m_pDirect2dFactory);
 	SafeRelease(&m_pRenderTarget);
@@ -146,15 +146,18 @@ Comsci::~Comsci()
     DestroyGame();
 }
 
-void Comsci::CreateGame(GameType type)
+void ComsciFrontendWin::CreateGame(GameType type)
 {
+    ///*
     game = new Game(GetGameTypeMaxPlayer(type), type, &DefaultInputFunc);
     gameTextHandle = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT_HANDLE_NAME);
     gameThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&GameThreadEntryProc, game, 0, NULL);
     gameStarted = true;
+    //*/
+    //__debugbreak();
 }
 
-bool Comsci::CreateRemoteGame()
+bool ComsciFrontendWin::CreateRemoteGame()
 {
     /*
     try
@@ -172,8 +175,9 @@ bool Comsci::CreateRemoteGame()
     return false;
 }
 
-void Comsci::DestroyGame()
+void ComsciFrontendWin::DestroyGame()
 {
+    ///*
     gameStarted = false;
     if (gameThread)
     {
@@ -188,24 +192,32 @@ void Comsci::DestroyGame()
         CloseHandle(gameTextHandle);
         gameTextHandle = NULL;
     }
+    //*/
+    //__debugbreak();
 }
 
-void Comsci::CreateServer()
+void ComsciFrontendWin::CreateServer()
 {
-    serverThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&ServerThreadEntryProc, game, 0, NULL);
+    ///*
+    serverThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&CoreThreadEntryProc, game, 0, NULL);
+    //*/
+    //__debugbreak();
 }
 
-void Comsci::DestroyServer()
+void ComsciFrontendWin::DestroyServer()
 {
+    ///*
     if (serverThread)
     {
         TerminateThread(serverThread, 2); // ehh...
         CloseHandle(serverThread);
         serverThread = NULL;
     }
+    //*/
+    //__debugbreak();
 }
 
-void Comsci::RunMessageLoop()
+void ComsciFrontendWin::RunMessageLoop()
 {
 	MSG msg;
 
@@ -216,7 +228,7 @@ void Comsci::RunMessageLoop()
 	}
 }
 
-HRESULT Comsci::Initialize()
+HRESULT ComsciFrontendWin::Initialize()
 {
 	HRESULT hr;
 
@@ -227,7 +239,7 @@ HRESULT Comsci::Initialize()
 		//Register the window class
 		WNDCLASSEX wcex = { sizeof(WNDCLASSEX) };
 		wcex.style = CS_HREDRAW | CS_VREDRAW;
-		wcex.lpfnWndProc = Comsci::WndProc;
+		wcex.lpfnWndProc = ComsciFrontendWin::WndProc;
 		wcex.cbClsExtra = 0;
 		wcex.cbWndExtra = sizeof(LONG_PTR);
 		wcex.hInstance = HINST_THISCOMPONENT;
@@ -266,7 +278,7 @@ HRESULT Comsci::Initialize()
 	return hr;
 }
 
-HRESULT Comsci::CreateDeviceIndependentResources()
+HRESULT ComsciFrontendWin::CreateDeviceIndependentResources()
 {
 	HRESULT hr = S_OK;
 	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pDirect2dFactory);
@@ -299,7 +311,7 @@ HRESULT Comsci::CreateDeviceIndependentResources()
 	return hr;
 }
 
-HRESULT Comsci::CreateDeviceResources()
+HRESULT ComsciFrontendWin::CreateDeviceResources()
 {
 	HRESULT hr = S_OK;
 	if (!m_pRenderTarget)
@@ -337,14 +349,14 @@ HRESULT Comsci::CreateDeviceResources()
 	return hr;
 }
 
-void Comsci::DiscardDeviceResources()
+void ComsciFrontendWin::DiscardDeviceResources()
 {
 	SafeRelease(&m_pRenderTarget);
 	SafeRelease(&m_pBlackBrush);
     SafeRelease(&m_pSpriteSheet);
 }
 
-void Comsci::OnResize(UINT width, UINT height)
+void ComsciFrontendWin::OnResize(UINT width, UINT height)
 {
 	if (m_pRenderTarget)
 	{

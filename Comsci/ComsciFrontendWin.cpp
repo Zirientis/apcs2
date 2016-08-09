@@ -1,7 +1,7 @@
-// Comsci.cpp : Defines the entry point for the application.
+// ComsciFrontendWin.cpp : Defines the entry point for the application.
 //
 #include "stdafx.h"
-#include "Comsci.h"
+#include "ComsciFrontendWin.h"
 
 #include "ObjectCode.h"
 #include "Game.h"
@@ -23,7 +23,7 @@ bool RealMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	if (SUCCEEDED(CoInitialize(NULL)))
 	{
 		{
-			Comsci app;
+			ComsciFrontendWin app;
 
 			if (SUCCEEDED(app.Initialize()))
 			{
@@ -59,7 +59,7 @@ int WINAPI WinMain(
 }
 
 
-void Comsci::RenderSprite(UINT left, UINT top, ObjectCode spriteId)
+void ComsciFrontendWin::RenderSprite(UINT left, UINT top, ObjectCode spriteId)
 {
     if (spriteId == ObjectCode::NONE)
         return;
@@ -70,7 +70,7 @@ void Comsci::RenderSprite(UINT left, UINT top, ObjectCode spriteId)
 }
 
 
-HRESULT Comsci::OnRender()
+HRESULT ComsciFrontendWin::OnRender()
 {
     if (gameStarted && WaitForSingleObject(gameThread, 0) != WAIT_TIMEOUT && game && game->IsReady())
     {
@@ -95,7 +95,7 @@ HRESULT Comsci::OnRender()
         if (!gameStarted)
         {
             D2D1_SIZE_F rtSize = m_pRenderTarget->GetSize();
-            std::wstring str = L"No game active";
+            std::wstring str = COMSCI_VERSION_STR L"\nNo game active";
             /*
             str = L"Welcome to Comsci!\n";
             str += L"[Build " COMSCI_VERSION_STR L"]\n";
@@ -187,14 +187,14 @@ HRESULT Comsci::OnRender()
 	return hr;
 }
 
-LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ComsciFrontendWin::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	LRESULT result = 0;
 
 	if (message == WM_CREATE)
 	{
 		LPCREATESTRUCT pcs = (LPCREATESTRUCT)lParam;
-		Comsci *pComsci = (Comsci *)pcs->lpCreateParams;
+		ComsciFrontendWin *pComsci = (ComsciFrontendWin *)pcs->lpCreateParams;
 
 		::SetWindowLongPtrW(
 			hwnd,
@@ -206,7 +206,7 @@ LRESULT CALLBACK Comsci::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
 	}
 	else
 	{
-		Comsci *pComsci = reinterpret_cast<Comsci *>(static_cast<LONG_PTR>(
+		ComsciFrontendWin *pComsci = reinterpret_cast<ComsciFrontendWin *>(static_cast<LONG_PTR>(
 			::GetWindowLongPtrW(
 				hwnd,
 				GWLP_USERDATA

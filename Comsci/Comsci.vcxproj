@@ -93,7 +93,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_61_0\stage\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_61_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -111,7 +111,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_61_0\stage\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_61_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent />
     <PreBuildEvent />
@@ -132,7 +132,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_61_0\stage\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_61_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -154,7 +154,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_61_0\stage\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\boost\boost_1_61_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent />
     <PreBuildEvent />
@@ -164,7 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActionCode.h" />
-    <ClInclude Include="Comsci.h" />
+    <ClInclude Include="ComsciFrontendWin.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameType.h" />
@@ -182,7 +182,7 @@
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Comsci.cpp" />
+    <ClCompile Include="ComsciFrontendWin.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Level.cpp" />
@@ -201,6 +201,9 @@
     <Image Include="Comsci.ico" />
     <Image Include="small.ico" />
     <Image Include="textures\spritesheet.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

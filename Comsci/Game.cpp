@@ -9,7 +9,7 @@
 
 #include "version.h"
 
-#include <Windows.h>
+
 
 #include <vector>
 #include <random>
