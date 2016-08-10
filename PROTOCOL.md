@@ -1,6 +1,24 @@
 # Comsci Wire Protocol #
 Comsci is based on the TCP transport with a custom wire protocol.
 
+## General Information and Value Types ##
+When values are given in hexadecimal format, e.g. ```0x03```, the given value
+also indicates the width of the field. In the previous example, the field
+would have a width of 1 byte.
+
+The type POSITION_TYPE is to be a field 32 bits (4 bytes) in width.
+
+The type POSITIONDIFF_TYPE is to be a field 32 bits (4 bytes) in width.
+
+The type SPACER1_TYPE is to be a field 8 bits (1 byte) in width. It is defined
+to have the value ```0x00```.
+
+The type LAYER_TYPE is to be a field 8 bits (1 byte) in width.
+
+The type ENTITY_TYPE is to be a field 16 bits (2 bytes) in width.
+
+The type STRLEN_TYPE is to be a field 16 bits (2 bytes) in width.
+
 ## High-Level Overview ##
 ### Connecting ###
 Upon connecting to a Comsci server, the client MUST send the ClientHello
@@ -11,17 +29,22 @@ message, the server MUST respond with a ServerAvailableGames message.
 
 ### Joining a game ###
 To join a game, the sequence of events is as follows:
+
 0. Client sends ClientJoinGame request, containing the ID of the game it that
    it wishes to join.
+
 0. Server sends either ServerJoinSuccess or ServerJoinFailure.
+
 0. If the client recieves ServerJoinSuccess, continue to the next step.
    If it recieves ServerJoinFailure, the request is considered to have failed.
+
 0. The client should use the information provided in the server's response to
    construct the state required for rendering. The server will send the
    position of the client's character(s), the map tiles as seen by said
    character(s), and other general information, including, but not limited to,
    the number of other characters, information describing time limits, if any,
    and information about other players and the game itself.
+
 0. At this point, the client has joined the game.
 
 ### Recieving game updates and sending user input ###
@@ -49,9 +72,11 @@ is not currently implemented.
 byte
 0   1   2   3   4   5   6   7
 +---+---+---+---+---+---+---+---+
-|    Header     |Version|  Len  |
+|    Header     |Ver|Typ|  Len  |
 +---+---+---+---+---+---+---+---+
-| Type  |
+| Data......
++---+---+---+---+
+| Terminator    |
 ```
 
 ## Packet Fields ##
@@ -86,13 +111,52 @@ Packet type. The following types are defined:
 0x0E - Heartbeat
 ```
 
-### ServerStateChanged subfields ###
-* FieldChangeRect
-* FieldChangeSparseMultiType
-* FieldChangeSparseSingleType
-* DisplayPrompt
-* InputPrompt
-* InputTimerUpdate
-* ActorResourceChange
-* ActorItemChange
-* ActorExistenceChange
+### Terminator ###
+Terminates a particular packet.
+This field is 4 bytes in width and always contains the reserved value
+```0xFFEEDD3E```.
+The Terminator field is always aligned on a 4-byte boundary. If necessary,
+SPACER1_TYPE characters shall be added before this field to ensure alignment.
+
+### ServerStateChanged subtypes ###
+```
+0x00 FieldChangeRect
+0x01 FieldChangeSparseMultiType
+0x02 FieldChangeSparseSingleType
+0x03 DisplayPrompt
+0x04 InputPrompt
+0x05 InputTimerUpdate
+0x06 ActorResourceChange
+0x07 ActorItemChange
+0x08 ActorExistenceChange
+```
+
+#### ServerStateChanged Additional Specifications ####
+
+##### 0x00 FieldChangeRect #####
+The data should consist of a POSITION_TYPE indicating the upper left position
+of the rectangle, followed by a POSITIONDIFF_TYPE indicating the horizontal
+dimension of the rectangle, followed by a POSITIONDIFF_TYPE indicating the
+vertical dimension of the rectangle, followed by a LAYER_TYPE indicating the
+layer, followed by an array of 3 SPACER1_TYPE to ensure ENTITY_TYPE alignment,
+followed by an array of size ```horizontal * vertical``` of type ENTITY_TYPE
+that contains the actual data for the rectangle being updated. Each horizontal
+line of entities will be sent, then the next line of entities, and so on,
+until all data for the rectangle has been sent.
+
+##### 0x01 FieldChangeSparseMultiType #####
+Not yet defined.
+
+##### 0x02 FieldChangeSparseSingleType #####
+Not yet defined.
+
+##### 0x03 DisplayPrompt #####
+The data shall consist of a STRLEN_TYPE containing the number of *bytes* in
+the message, followed by the message encoded in UTF-8 format, with a null
+terminator.
+
+##### 0x04 InputPrompt #####
+Not yet defined.
+
+##### 0x05 InputTimerUpdate #####
+Not yet defined.
