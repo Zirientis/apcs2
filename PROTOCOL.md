@@ -31,7 +31,17 @@ As the game is played, it will frequently become necessary for the clients'
 representation of the game to be updated, and for clients to transmit
 information about player actions to the server.
 
+When the server needs to change the state held by the clients, it will send a
+ServerStateChanged message, containing the changes to be made. The
+ServerStateChanged message contains a subtype, indicating what kind of change
+is to be made.
 
+When the client needs to send input to the server, the client will send a
+ClientSendInput message containing the input. The server MUST respond with a
+ServerInputRecieved message indicating that the message was recieved. If the
+client does not recieve this confirmation, it should alert the user to
+potential network connectivity problems. Proper handling for dropped input
+is not currently implemented.
 
 ## General Packet Description ##
 (numbers given above the diagram are byte offsets from the beginning of the packet)
@@ -58,10 +68,31 @@ The total size, in bytes, of the entire packet, headers and all.
 
 ### Type ###
 Packet type. The following types are defined:
+```
 0x00 - Reserved
 0x01 - ClientHello
 0x02 - ServerHello
 0x03 - ClientListGames
 0x04 - ServerAvailableGames
 0x05 - ClientJoinGame
-0x06 -
+0x06 - ServerJoinSuccess
+0x07 - ServerJoinFailure
+0x08 - ServerStateChanged
+0x09 - ClientSendInput
+0x0A - ServerInputRecieved
+0x0B - ClientLeaveGame
+0x0C - ClientGoodbye
+0x0D - ServerGoodbye
+0x0E - Heartbeat
+```
+
+### ServerStateChanged subfields ###
+* FieldChangeRect
+* FieldChangeSparseMultiType
+* FieldChangeSparseSingleType
+* DisplayPrompt
+* InputPrompt
+* InputTimerUpdate
+* ActorResourceChange
+* ActorItemChange
+* ActorExistenceChange
