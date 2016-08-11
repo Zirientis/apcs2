@@ -60,7 +60,7 @@ EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 #endif
 
 
-class ComsciFrontendWin
+class ComsciFrontendWin : public ComsciFrontend
 {
 public:
 	ComsciFrontendWin();
