@@ -1,21 +1,21 @@
 #pragma once
 #include "ComsciBackend.h"
 
-public class ComsciFrontend
+class ComsciFrontend
 {
 public:
 	ComsciFrontend();
-	ComsciFrontend(ComsciBackend);
+	ComsciFrontend(ComsciBackend*);
 	~ComsciFrontend();
 	
 	enum BackendReusePolicy
 	{
-		REUSE_ALLOWED;
-		PRIVATE;
-	}
+		BACKEND_REUSE_ALLOWED,
+		BACKEND_PRIVATE
+	};
 	
-	setBackendReusePolicy(BackendReusePolicy);	
+	void setBackendReusePolicy(BackendReusePolicy);
 private:
 	ComsciBackend* m_pBackend;
 	BackendReusePolicy m_backendReusePolicy;
-}
+};
